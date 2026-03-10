@@ -8,7 +8,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FaHome,
   FaPlus,
   FaEdit,
   FaTrash,
@@ -361,7 +360,13 @@ const RoomManagement = () => {
         <div className="w-full px-6 sm:px-8 lg:px-10 py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
-              <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+              <button
+                type="button"
+                title="Open sidebar"
+                aria-label="Open sidebar"
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+              >
                 <FaBars className="w-5 h-5" />
               </button>
               <div className="flex flex-col">
@@ -601,7 +606,7 @@ const RoomManagement = () => {
                   <h3 className="text-xl font-bold text-gray-900">
                     {editingRoom ? 'Edit Room' : 'Add New Room'}
                   </h3>
-                  <button type="button" onClick={closeModal} className="text-gray-500 hover:text-gray-600 transition-colors">
+                  <button type="button" title="Close room modal" aria-label="Close room modal" onClick={closeModal} className="text-gray-500 hover:text-gray-600 transition-colors">
                     <FaTimes className="w-5 h-5" />
                   </button>
                 </div>
@@ -633,6 +638,7 @@ const RoomManagement = () => {
                       <input
                         ref={fileInputRef}
                         type="file"
+                        title="Upload room image"
                         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                         onChange={handleImageChange}
                         className="hidden"
@@ -677,6 +683,7 @@ const RoomManagement = () => {
                       <label className="block text-sm font-medium text-gray-600 mb-1">Location</label>
                       <input
                         type="text"
+                        title="Room location"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                         className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
@@ -689,6 +696,7 @@ const RoomManagement = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Block *</label>
                       <select
+                        title="Room block"
                         value={formData.block}
                         onChange={(e) => setFormData({ ...formData, block: e.target.value })}
                         className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
@@ -701,6 +709,7 @@ const RoomManagement = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Floor *</label>
                       <select
+                        title="Room floor"
                         value={formData.floor}
                         onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
                         className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
@@ -717,6 +726,7 @@ const RoomManagement = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Room Type *</label>
                       <select
+                        title="Room type"
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                         className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
@@ -730,6 +740,7 @@ const RoomManagement = () => {
                       <label className="block text-sm font-medium text-gray-600 mb-1">Beds (Capacity) *</label>
                       <input
                         type="number"
+                        title="Beds capacity"
                         min={1}
                         max={10}
                         required
@@ -750,6 +761,7 @@ const RoomManagement = () => {
                         </div>
                         <input
                           type="number"
+                          title="Room price"
                           min={4000}
                           step={100}
                           required
@@ -763,6 +775,7 @@ const RoomManagement = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Availability</label>
                         <select
+                          title="Room availability"
                           value={formData.status}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                           className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
@@ -890,7 +903,7 @@ const RoomManagement = () => {
           <div className="relative bg-gray-50 rounded-2xl max-w-sm w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900">Allocate Student</h3>
-              <button onClick={() => setShowAllocateModal(false)} className="text-gray-500 hover:text-gray-600">
+              <button type="button" title="Close allocate modal" aria-label="Close allocate modal" onClick={() => setShowAllocateModal(false)} className="text-gray-500 hover:text-gray-600">
                 <FaTimes />
               </button>
             </div>

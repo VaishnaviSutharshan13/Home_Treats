@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FaHouse, FaPlus, FaMagnifyingGlass, FaFilter, FaDollarSign, FaReceipt,
+  FaPlus, FaMagnifyingGlass, FaDollarSign, FaReceipt,
   FaCircleCheck, FaCircleXmark, FaClock, FaSpinner, FaFileLines,
   FaUserSlash, FaEye, FaTrash, FaMoneyBillWave, FaChartBar,
   FaTriangleExclamation, FaDownload, FaXmark, FaChevronDown, FaChevronLeft,
@@ -280,7 +280,13 @@ const FeesManagement = () => {
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+            <button
+              type="button"
+              title="Open sidebar"
+              aria-label="Open sidebar"
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+            >
               <FaBars className="w-5 h-5" />
             </button>
           <Link
@@ -422,6 +428,8 @@ const FeesManagement = () => {
             {/* Status */}
             <div className="relative">
               <select
+                title="Filter by fee status"
+                aria-label="Filter by fee status"
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
@@ -438,6 +446,8 @@ const FeesManagement = () => {
             {/* Fee Type */}
             <div className="relative">
               <select
+                title="Filter by fee type"
+                aria-label="Filter by fee type"
                 value={filterFeeType}
                 onChange={e => setFilterFeeType(e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[160px]"
@@ -454,6 +464,8 @@ const FeesManagement = () => {
             {/* Semester */}
             <div className="relative">
               <select
+                title="Filter by semester"
+                aria-label="Filter by semester"
                 value={filterSemester}
                 onChange={e => setFilterSemester(e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
@@ -639,7 +651,7 @@ const FeesManagement = () => {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <h2 className="text-lg font-bold text-gray-900">Fee Details</h2>
-              <button onClick={() => setViewingFee(null)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close fee details" aria-label="Close fee details" onClick={() => setViewingFee(null)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
@@ -728,7 +740,7 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Add New Fee</h2>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close add fee modal" aria-label="Close add fee modal" onClick={() => setShowAddModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
@@ -750,7 +762,7 @@ const FeesManagement = () => {
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Fee Type</label>
                 <div className="relative">
-                  <select required value={addForm.feeType} onChange={e => setAddForm({ ...addForm, feeType: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors pr-10">
+                  <select required title="Fee type" aria-label="Fee type" value={addForm.feeType} onChange={e => setAddForm({ ...addForm, feeType: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors pr-10">
                     <option value="Hostel Fee">Hostel Fee</option>
                     <option value="Mess Fee">Mess Fee</option>
                     <option value="Library Fee">Library Fee</option>
@@ -761,12 +773,12 @@ const FeesManagement = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Amount (LKR) — min 4,000</label>
-                <input required type="number" min={4000} value={addForm.amount} onChange={e => setAddForm({ ...addForm, amount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                <input required title="Fee amount" type="number" min={4000} value={addForm.amount} onChange={e => setAddForm({ ...addForm, amount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Due Date</label>
-                  <input required type="date" value={addForm.dueDate} onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                  <input required title="Due date" type="date" value={addForm.dueDate} onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Semester</label>
@@ -798,7 +810,7 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Record Payment</h2>
               </div>
-              <button onClick={() => { setShowPaymentModal(false); setSelectedFee(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close payment modal" aria-label="Close payment modal" onClick={() => { setShowPaymentModal(false); setSelectedFee(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
@@ -824,18 +836,18 @@ const FeesManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Paid Amount (LKR)</label>
-                  <input required type="number" min={1} max={selectedFee.amount} value={paymentForm.paidAmount} onChange={e => setPaymentForm({ ...paymentForm, paidAmount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                  <input required title="Paid amount" type="number" min={1} max={selectedFee.amount} value={paymentForm.paidAmount} onChange={e => setPaymentForm({ ...paymentForm, paidAmount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
                   <p className="text-xs text-gray-600 mt-1">Max: LKR {selectedFee.amount.toLocaleString()}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Paid Date</label>
-                  <input required type="date" value={paymentForm.paidDate} onChange={e => setPaymentForm({ ...paymentForm, paidDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                  <input required title="Paid date" type="date" value={paymentForm.paidDate} onChange={e => setPaymentForm({ ...paymentForm, paidDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Payment Method</label>
                 <div className="relative">
-                  <select required value={paymentForm.paymentMethod} onChange={e => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
+                  <select required title="Payment method" aria-label="Payment method" value={paymentForm.paymentMethod} onChange={e => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
                     <option value="Online Transfer">Online Transfer</option>
                     <option value="Cash">Cash</option>
                     <option value="Bank Deposit">Bank Deposit</option>
@@ -873,7 +885,7 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Payment Receipt</h2>
               </div>
-              <button onClick={() => { setShowReceiptModal(false); setReceipt(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close receipt modal" aria-label="Close receipt modal" onClick={() => { setShowReceiptModal(false); setReceipt(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
@@ -940,19 +952,19 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Monthly Report</h2>
               </div>
-              <button onClick={() => setShowReportPrompt(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close report prompt" aria-label="Close report prompt" onClick={() => setShowReportPrompt(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Year</label>
-                <input type="number" min={2020} max={2030} value={reportYear} onChange={e => setReportYear(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                <input title="Report year" type="number" min={2020} max={2030} value={reportYear} onChange={e => setReportYear(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Month</label>
                 <div className="relative">
-                  <select value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
+                  <select title="Report month" aria-label="Report month" value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('default', { month: 'long' })}</option>
                     ))}
@@ -985,7 +997,7 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Monthly Report</h2>
               </div>
-              <button onClick={() => { setShowReportModal(false); setReportData(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close report modal" aria-label="Close report modal" onClick={() => { setShowReportModal(false); setReportData(null); }} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>
@@ -1037,7 +1049,7 @@ const FeesManagement = () => {
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Unpaid Students</h2>
               </div>
-              <button onClick={() => setShowUnpaidModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
+              <button type="button" title="Close unpaid students modal" aria-label="Close unpaid students modal" onClick={() => setShowUnpaidModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors">
                 <FaXmark />
               </button>
             </div>

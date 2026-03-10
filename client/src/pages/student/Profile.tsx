@@ -89,7 +89,8 @@ const Profile = () => {
 
   const fetchPaymentSummary = async () => {
     try {
-      const res = await feesService.getMyFees();
+      if (!user?.studentId) return;
+      const res = await feesService.getByStudent(user.studentId);
       if (res.success && Array.isArray(res.data)) {
         const fees = res.data;
         const summary: PaymentSummary = {
@@ -218,6 +219,9 @@ const Profile = () => {
                 <p className="text-neutral-600 mt-1">Manage your personal information and account settings</p>
               </div>
               <button
+                type="button"
+                title="Toggle sidebar"
+                aria-label="Toggle sidebar"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="lg:hidden p-2 rounded-md text-neutral-600 hover:bg-neutral-100"
               >
@@ -335,25 +339,25 @@ const Profile = () => {
                           <span className="text-sm font-bold text-neutral-900">{paymentSummary.total}</span>
                         </div>
                         {paymentSummary.total > 0 && (
-                          <div className="mt-2 h-2 bg-neutral-100 rounded-full overflow-hidden flex">
-                            {paymentSummary.paid > 0 && (
-                              <div
-                                className="bg-purple-500 h-full"
-                                style={{ width: `${(paymentSummary.paid / paymentSummary.total) * 100}%` }}
-                              />
-                            )}
-                            {paymentSummary.pending > 0 && (
-                              <div
-                                className="bg-amber-500 h-full"
-                                style={{ width: `${(paymentSummary.pending / paymentSummary.total) * 100}%` }}
-                              />
-                            )}
-                            {paymentSummary.overdue > 0 && (
-                              <div
-                                className="bg-red-500 h-full"
-                                style={{ width: `${(paymentSummary.overdue / paymentSummary.total) * 100}%` }}
-                              />
-                            )}
+                          <div className="mt-2 space-y-2">
+                            <progress
+                              className="w-full h-2 rounded-full accent-purple-500"
+                              value={paymentSummary.paid}
+                              max={paymentSummary.total}
+                              aria-label="Paid invoice ratio"
+                            />
+                            <progress
+                              className="w-full h-2 rounded-full accent-amber-500"
+                              value={paymentSummary.pending}
+                              max={paymentSummary.total}
+                              aria-label="Pending invoice ratio"
+                            />
+                            <progress
+                              className="w-full h-2 rounded-full accent-red-500"
+                              value={paymentSummary.overdue}
+                              max={paymentSummary.total}
+                              aria-label="Overdue invoice ratio"
+                            />
                           </div>
                         )}
                       </div>
@@ -395,6 +399,8 @@ const Profile = () => {
                         {isEditing ? (
                           <input
                             type="text"
+                            title="Full name"
+                            aria-label="Full name"
                             value={editData.name}
                             onChange={(e) => setEditData({ ...editData, name: e.target.value })}
                             className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
@@ -483,6 +489,8 @@ const Profile = () => {
                     <label className="block text-sm font-medium text-neutral-700 mb-2">Current Password</label>
                     <input
                       type="password"
+                      title="Current password"
+                      aria-label="Current password"
                       value={passwordData.currentPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                       className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
@@ -495,6 +503,8 @@ const Profile = () => {
                     <label className="block text-sm font-medium text-neutral-700 mb-2">New Password</label>
                     <input
                       type="password"
+                      title="New password"
+                      aria-label="New password"
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                       className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
@@ -508,6 +518,8 @@ const Profile = () => {
                     <label className="block text-sm font-medium text-neutral-700 mb-2">Confirm New Password</label>
                     <input
                       type="password"
+                      title="Confirm new password"
+                      aria-label="Confirm new password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                       className="w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
