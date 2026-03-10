@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaPlus, FaEdit, FaTrash, FaSearch, FaUser, FaEnvelope, FaPhone, FaCheck, FaTimes, FaSpinner, FaEye, FaChevronLeft, FaBars } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaUser, FaEnvelope, FaPhone, FaCheck, FaTimes, FaSpinner, FaEye, FaChevronLeft, FaBars } from 'react-icons/fa';
 import { studentService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
 
@@ -221,7 +221,13 @@ const StudentManagement = () => {
           >
             {toast.type === 'success' ? <FaCheck /> : <FaTimes />}
             <span>{toast.message}</span>
-            <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+            <button
+              type="button"
+              title="Close notification"
+              aria-label="Close notification"
+              onClick={() => setToast(null)}
+              className="ml-2 hover:opacity-80"
+            >
               <FaTimes className="w-3 h-3" />
             </button>
           </div>
@@ -234,7 +240,13 @@ const StudentManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+                <button
+                  type="button"
+                  title="Open sidebar"
+                  aria-label="Open sidebar"
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+                >
                   <FaBars className="w-5 h-5" />
                 </button>
               <Link
@@ -462,6 +474,7 @@ const StudentManagement = () => {
                             <input
                               type="text"
                               required
+                              title="Full name"
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -486,6 +499,7 @@ const StudentManagement = () => {
                           <input
                             type="email"
                             required
+                            title="Email address"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -497,6 +511,7 @@ const StudentManagement = () => {
                           <input
                             type="tel"
                             required
+                            title="Phone number"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -519,6 +534,7 @@ const StudentManagement = () => {
                           <div>
                             <label className="block text-sm font-medium text-gray-600">Status</label>
                             <select
+                              title="Student status"
                               value={formData.status}
                               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -533,6 +549,7 @@ const StudentManagement = () => {
                           <div>
                             <label className="block text-sm font-medium text-gray-600">Course</label>
                             <select
+                              title="Course"
                               value={formData.course}
                               onChange={(e) => setFormData({ ...formData, course: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -549,6 +566,7 @@ const StudentManagement = () => {
                           <div>
                             <label className="block text-sm font-medium text-gray-600">Year</label>
                             <select
+                              title="Year"
                               value={formData.year}
                               onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
@@ -591,6 +609,7 @@ const StudentManagement = () => {
                           <div className="mt-3">
                             <label className="block text-sm font-medium text-gray-600">Relationship</label>
                             <select
+                              title="Emergency contact relationship"
                               value={formData.emergencyContact.relationship}
                               onChange={(e) => setFormData({ ...formData, emergencyContact: { ...formData.emergencyContact, relationship: e.target.value } })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"

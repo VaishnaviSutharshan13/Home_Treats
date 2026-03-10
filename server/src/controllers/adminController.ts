@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Student from '../models/Student';
+import User from '../models/User';
 import Room from '../models/Room';
 import Complaint from '../models/Complaint';
 import Fee from '../models/Fee';
@@ -7,8 +8,9 @@ import Fee from '../models/Fee';
 // GET system statistics
 export const getStats = async (req: Request, res: Response) => {
   try {
-    const totalStudents = await Student.countDocuments();
-    const activeStudents = await Student.countDocuments({ status: 'Active' });
+    // Student metrics should come from auth users table, since registered users are stored in User collection.
+    const totalStudents = await User.countDocuments({ role: 'student' });
+    const activeStudents = await User.countDocuments({ role: 'student', isActive: true });
     const totalRooms = await Room.countDocuments();
     const occupiedRooms = await Room.countDocuments({ status: 'Occupied' });
     const availableRooms = await Room.countDocuments({ status: 'Available' });

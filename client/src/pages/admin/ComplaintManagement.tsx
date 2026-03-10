@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaPlus, FaEdit, FaSearch, FaFilter, FaExclamationTriangle, FaCheckCircle, FaClock, FaTimesCircle, FaSpinner, FaComment, FaEye, FaTrash, FaChevronLeft, FaBars } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaSearch, FaFilter, FaExclamationTriangle, FaCheckCircle, FaClock, FaTimesCircle, FaSpinner, FaComment, FaEye, FaTrash, FaChevronLeft, FaBars } from 'react-icons/fa';
 import { complaintService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
 
@@ -251,6 +251,8 @@ const ComplaintManagement = () => {
             <label className="block text-sm font-medium text-gray-600 mb-1">Estimated Resolution (optional)</label>
             <input
               type="date"
+              title="Estimated resolution date"
+              aria-label="Estimated resolution date"
               value={estimatedResolution}
               onChange={e => setEstimatedResolution(e.target.value)}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 mb-6 focus:outline-none focus:border-purple-500"
@@ -312,7 +314,13 @@ const ComplaintManagement = () => {
       <div className="w-full bg-white border-b border-purple-500/20 text-gray-900 py-6">
         <div className="w-full px-5 sm:px-7 lg:px-8">
           <div className="flex items-center gap-3 mb-3">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+            <button
+              type="button"
+              title="Open sidebar"
+              aria-label="Open sidebar"
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+            >
               <FaBars className="w-5 h-5" />
             </button>
           <Link
@@ -347,12 +355,16 @@ const ComplaintManagement = () => {
               <input
                 type="text"
                 placeholder="Search complaints..."
+                title="Search complaints"
+                aria-label="Search complaints"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:border-purple-500"
               />
             </div>
             <select
+              title="Filter by complaint category"
+              aria-label="Filter by complaint category"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:border-purple-500"
@@ -365,6 +377,8 @@ const ComplaintManagement = () => {
               <option value="Housekeeping">Housekeeping</option>
             </select>
             <select
+              title="Filter by complaint status"
+              aria-label="Filter by complaint status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:border-purple-500"
@@ -376,6 +390,8 @@ const ComplaintManagement = () => {
               <option value="Rejected">Rejected</option>
             </select>
             <select
+              title="Filter by complaint priority"
+              aria-label="Filter by complaint priority"
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:border-purple-500"

@@ -15,10 +15,8 @@ import {
   FaWifi,
   FaDoorOpen,
   FaBath,
-  FaLock,
   FaBuilding,
   FaShieldAlt,
-  FaUtensils,
   FaTshirt,
   FaBolt,
   FaWater,
@@ -35,8 +33,6 @@ import {
   FaBook,
   FaChair,
   FaLayerGroup,
-  FaUserShield,
-  FaTree,
 } from 'react-icons/fa';
 
 /* ─────────────────────────────────────────────────

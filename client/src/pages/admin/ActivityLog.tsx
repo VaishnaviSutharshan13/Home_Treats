@@ -133,6 +133,9 @@ const ActivityLog = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
+                type="button"
+                title="Open sidebar"
+                aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
               >
@@ -210,6 +213,8 @@ const ActivityLog = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">Target Type</label>
                 <select
+                  title="Filter by target type"
+                  aria-label="Filter by target type"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none bg-gray-100 text-gray-900"
@@ -229,6 +234,8 @@ const ActivityLog = () => {
                   <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
                   <input
                     type="date"
+                    title="Start date"
+                    aria-label="Start date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
@@ -243,6 +250,8 @@ const ActivityLog = () => {
                   <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
                   <input
                     type="date"
+                    title="End date"
+                    aria-label="End date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
@@ -390,6 +399,9 @@ const ActivityLog = () => {
                 </p>
                 <div className="flex items-center gap-1">
                   <button
+                    type="button"
+                    title="Previous page"
+                    aria-label="Previous page"
                     onClick={() => fetchLogs(pagination.page - 1)}
                     disabled={pagination.page <= 1}
                     className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
@@ -411,6 +423,9 @@ const ActivityLog = () => {
                     }
                     return (
                       <button
+                        type="button"
+                        title={`Go to page ${pageNum}`}
+                        aria-label={`Go to page ${pageNum}`}
                         key={pageNum}
                         onClick={() => fetchLogs(pageNum)}
                         className={`w-8 h-8 rounded-lg text-sm font-medium transition ${
@@ -425,6 +440,9 @@ const ActivityLog = () => {
                   })}
 
                   <button
+                    type="button"
+                    title="Next page"
+                    aria-label="Next page"
                     onClick={() => fetchLogs(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
                     className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-30 disabled:cursor-not-allowed"

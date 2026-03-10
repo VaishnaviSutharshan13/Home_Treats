@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaHome, FaUsers, FaBed, FaExclamationTriangle, FaDollarSign, FaChartBar, FaCog, FaSignOutAlt, FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 
@@ -14,13 +14,13 @@ const Admin = () => {
     collectedFees: 0
   });
 
-  const [recentActivities, setRecentActivities] = useState([
+  const recentActivities = [
     { id: 1, type: 'student', action: 'New student registered', time: '2 mins ago', icon: <FaUsers className="text-purple-600" /> },
     { id: 2, type: 'room', action: 'Room A-201 allocated', time: '5 mins ago', icon: <FaBed className="text-purple-500" /> },
     { id: 3, type: 'complaint', action: 'Complaint resolved', time: '10 mins ago', icon: <FaExclamationTriangle className="text-orange-500" /> },
     { id: 4, type: 'fee', action: 'Fee payment received', time: '15 mins ago', icon: <FaDollarSign className="text-purple-500" /> },
     { id: 5, type: 'system', action: 'Database backup completed', time: '1 hour ago', icon: <FaCog className="text-gray-500" /> }
-  ]);
+  ];
 
   const [quickActions] = useState([
     { id: 1, title: 'Add Student', description: 'Register new student', icon: <FaUsers />, color: 'blue', link: '/student-management' },
@@ -200,13 +200,28 @@ const Admin = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button className="text-purple-600 hover:text-purple-300">
+                      <button
+                        type="button"
+                        aria-label="View activity"
+                        title="View activity"
+                        className="text-purple-600 hover:text-purple-300"
+                      >
                         <FaEye />
                       </button>
-                      <button className="text-purple-600 hover:text-purple-800">
+                      <button
+                        type="button"
+                        aria-label="Edit activity"
+                        title="Edit activity"
+                        className="text-purple-600 hover:text-purple-800"
+                      >
                         <FaEdit />
                       </button>
-                      <button className="text-red-600 hover:text-red-800">
+                      <button
+                        type="button"
+                        aria-label="Delete activity"
+                        title="Delete activity"
+                        className="text-red-600 hover:text-red-800"
+                      >
                         <FaTrash />
                       </button>
                     </div>

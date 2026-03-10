@@ -12,8 +12,6 @@ import {
   FaBed,
   FaExclamationTriangle,
   FaMoneyBillWave,
-  FaChartLine,
-  FaSpinner,
   FaArrowUp,
   FaArrowDown,
   FaCalendarAlt,
@@ -22,8 +20,6 @@ import {
   FaBars,
 } from 'react-icons/fa';
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -91,6 +87,19 @@ interface BookingRequest {
   createdAt: string;
 }
 
+const getOccupancyColorClasses = (name: string) => {
+  switch (name.toLowerCase()) {
+    case 'occupied':
+      return { dot: 'bg-purple-600', bg: 'bg-purple-500/10', text: 'text-purple-600' };
+    case 'available':
+      return { dot: 'bg-purple-600', bg: 'bg-purple-500/10', text: 'text-purple-600' };
+    case 'maintenance':
+      return { dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-500' };
+    default:
+      return { dot: 'bg-gray-500', bg: 'bg-gray-100', text: 'text-gray-600' };
+  }
+};
+
 /* ──────────────── Custom Recharts Tooltip ──────────────── */
 
 const RevenueTooltip = ({ active, payload, label }: any) => {
@@ -110,10 +119,11 @@ const RevenueTooltip = ({ active, payload, label }: any) => {
 
 const OccupancyTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
+  const colors = getOccupancyColorClasses(payload[0].name || '');
   return (
     <div className="bg-[#f5f3ff] rounded-xl border border-purple-500/20 px-4 py-3">
       <div className="flex items-center gap-2">
-        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: payload[0].payload.color }} />
+        <div className={`w-3 h-3 rounded-full ${colors.dot}`} />
         <span className="text-sm font-medium text-gray-700">{payload[0].name}</span>
       </div>
       <p className="text-sm text-gray-500 mt-1">
@@ -286,6 +296,9 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
+                type="button"
+                title="Open sidebar"
+                aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
               >
@@ -314,9 +327,10 @@ const Dashboard = () => {
                 key={idx}
                 to={card.link}
                 className={`group bg-white rounded-2xl border border-gray-200 p-5 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 ${
+                  idx === 0 ? 'delay-75' : idx === 1 ? 'delay-150' : idx === 2 ? 'delay-200' : 'delay-300'
+                } ${
                   chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                 }`}
-                style={{ transitionDelay: `${idx * 75}ms` }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-11 h-11 ${card.iconBg} rounded-xl flex items-center justify-center text-white shadow-sm`}>
@@ -342,9 +356,10 @@ const Dashboard = () => {
           {/* --- ROW 2: Monthly Revenue Chart --- */}
           <div
             className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              'delay-300 '
+            }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
-            style={{ transitionDelay: '350ms' }}
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
@@ -414,9 +429,10 @@ const Dashboard = () => {
             {/* Room Occupancy Donut */}
             <div
               className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+                'delay-500 '
+              }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
-              style={{ transitionDelay: '450ms' }}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-1">Room Occupancy Overview</h3>
               <p className="text-sm text-gray-500 mb-4">{stats.rooms.total} total rooms</p>
@@ -464,8 +480,11 @@ const Dashboard = () => {
               {/* Mini stats under chart */}
               <div className="grid grid-cols-3 gap-3 mt-4">
                 {occupancyData.map((item) => (
-                  <div key={item.name} className="text-center p-2 rounded-xl" style={{ backgroundColor: `${item.color}10` }}>
-                    <p className="text-xl font-bold" style={{ color: item.color }}>{item.value}</p>
+                  <div
+                    key={item.name}
+                    className={`text-center p-2 rounded-xl ${getOccupancyColorClasses(item.name).bg}`}
+                  >
+                    <p className={`text-xl font-bold ${getOccupancyColorClasses(item.name).text}`}>{item.value}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{item.name}</p>
                   </div>
                 ))}
@@ -475,9 +494,10 @@ const Dashboard = () => {
             {/* Recent Students Widget */}
             <div
               className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+                'delay-500 '
+              }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
-              style={{ transitionDelay: '550ms' }}
             >
               <div className="flex items-center justify-between mb-5">
                 <div>
@@ -501,13 +521,12 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {recentStudents.map((student, idx) => (
+                  {recentStudents.map((student) => (
                     <div
                       key={student._id}
                       className={`flex items-center gap-4 p-3 rounded-xl hover:bg-purple-500/5 transition-all duration-300 ${
                         chartsLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
                       }`}
-                      style={{ transitionDelay: `${600 + idx * 80}ms` }}
                     >
                       {/* Avatar */}
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
@@ -551,9 +570,10 @@ const Dashboard = () => {
           {/* --- ROW 4: Room Booking Requests --- */}
           <div
             className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              'delay-700 '
+            }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
-            style={{ transitionDelay: '620ms' }}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Room Booking Requests</h3>
@@ -614,9 +634,10 @@ const Dashboard = () => {
             {/* Complaint Status */}
             <div
               className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+                'delay-700 '
+              }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
-              style={{ transitionDelay: '650ms' }}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Complaint Status</h3>
               <div className="space-y-4">
@@ -638,9 +659,10 @@ const Dashboard = () => {
                         <span className="text-sm font-semibold text-gray-700">{item.count}</span>
                       </div>
                       <div className={`w-full ${item.bgLight} rounded-full h-2`}>
-                        <div
-                          className={`${item.color} h-2 rounded-full transition-all duration-1000`}
-                          style={{ width: chartsLoaded ? `${pct}%` : '0%' }}
+                        <progress
+                          className={`w-full ${item.color} h-2 rounded-full transition-all duration-1000`}
+                          value={chartsLoaded ? Number(pct) : 0}
+                          max={100}
                         />
                       </div>
                     </div>
@@ -665,9 +687,10 @@ const Dashboard = () => {
             {/* Fee Collection Overview */}
             <div
               className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+                'delay-700 '
+              }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
-              style={{ transitionDelay: '700ms' }}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Fee Collection</h3>
 
@@ -722,9 +745,10 @@ const Dashboard = () => {
             {/* Recent Activity */}
             <div
               className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+                'delay-700 '
+              }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
-              style={{ transitionDelay: '750ms' }}
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
               {activities.length === 0 ? (
@@ -756,9 +780,10 @@ const Dashboard = () => {
           {/* --- ROW 5: Quick Actions --- */}
           <div
             className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              'delay-1000 '
+            }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
-            style={{ transitionDelay: '850ms' }}
           >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
