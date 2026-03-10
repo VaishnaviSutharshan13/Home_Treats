@@ -150,7 +150,7 @@ const testimonials = [
 ────────────────────────────────────────────────── */
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-sans">
 
       {/* ══════════════════════════════════════════════
           1. HERO SECTION
@@ -178,24 +178,24 @@ const Home = () => {
         />
 
         {/* Content */}
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
 
           {/* Tag badge */}
-          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/40 text-white text-sm font-medium px-5 py-2.5 rounded-full mb-8 shadow-lg">
+          <div className="inline-flex items-center gap-2 bg-white/30 backdrop-blur-sm border border-white/40 text-white text-sm font-semibold px-6 py-2.5 rounded-full mb-10 shadow-xl">
             <FaBuilding className="w-4 h-4 text-purple-200" />
             Student Hostel Building — Colombo, Sri Lanka
           </div>
 
           {/* Main Title */}
           <h1
-            className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight"
-            style={{ textShadow: '0 2px 24px rgba(0,0,0,0.35)' }}
+            className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 leading-tight tracking-tight drop-shadow-xl"
+            style={{ textShadow: '0 2px 24px rgba(0,0,0,0.30)' }}
           >
-            <span className="block text-white text-3xl md:text-4xl lg:text-5xl font-semibold mb-2 opacity-95">
+            <span className="block text-white text-3xl md:text-4xl lg:text-5xl font-semibold mb-2 opacity-95 tracking-normal">
               Welcome to
             </span>
             <span
-              className="block font-extrabold"
+              className="block font-black"
               style={{
                 background: 'linear-gradient(90deg, #ffffff 0%, #e9d5ff 50%, #ddd6fe 100%)',
                 WebkitBackgroundClip: 'text',
@@ -207,15 +207,15 @@ const Home = () => {
             >
               Home_Treats
             </span>
-            <span className="block text-white/90 text-2xl md:text-3xl lg:text-4xl font-semibold mt-3">
+            <span className="block text-white/90 text-2xl md:text-3xl lg:text-4xl font-semibold mt-3 tracking-wide">
               Student Hostel
             </span>
           </h1>
 
           {/* Subtitle */}
           <p
-            className="text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed"
-            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.3)' }}
+            className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
+            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.25)' }}
           >
             Your home away from home — providing{' '}
             <span className="text-purple-200 font-semibold">safe, comfortable and affordable</span>{' '}
@@ -223,7 +223,7 @@ const Home = () => {
           </p>
 
           {/* Stats Row */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-4 mb-14">
             {[
               { label: 'Total Rooms', value: '50+' },
               { label: 'Student Capacity', value: '120+' },
@@ -232,7 +232,7 @@ const Home = () => {
             ].map((s) => (
               <div
                 key={s.label}
-                className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-6 py-3 text-center shadow-md hover:bg-white/30 transition-all duration-300"
+                className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl px-7 py-3 text-center shadow-lg hover:bg-white/40 transition-all duration-300"
               >
                 <div className="text-2xl font-extrabold text-white drop-shadow">{s.value}</div>
                 <div className="text-xs text-purple-100 mt-0.5 font-medium">{s.label}</div>
@@ -241,17 +241,17 @@ const Home = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link
               to="/rooms"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-purple-50 text-purple-700 rounded-xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-purple-50 text-purple-700 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20 border border-purple-100"
             >
               View Available Rooms
               <FaArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               to="/contact"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600/80 hover:bg-purple-600 border border-white/30 text-white rounded-xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-lg"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600/90 hover:bg-purple-700 border border-white/30 text-white rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-lg"
             >
               Book a Room
               <FaArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -261,8 +261,8 @@ const Home = () => {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/70 rounded-full mt-2" />
+          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center shadow-lg">
+            <div className="w-1 h-3 bg-white/80 rounded-full mt-2" />
           </div>
         </div>
       </section>
@@ -270,7 +270,7 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           2. ABOUT THE HOSTEL
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-[#f5f3ff]">
+      <section className="py-28 bg-[#f5f3ff]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
 
@@ -280,13 +280,13 @@ const Home = () => {
                 <FaHome className="w-4 h-4" />
                 About Our Hostel
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-7 leading-tight tracking-tight">
                 Your Home Away From{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
                   Home
                 </span>
               </h2>
-              <p className="text-gray-500 text-lg leading-relaxed mb-6">
+              <p className="text-gray-500 text-lg leading-relaxed mb-6 font-medium">
                 Home_Treats is a modern student hostel located in the heart of Colombo, Sri Lanka. We provide
                 a safe, comfortable and affordable living environment designed specifically for university
                 students who need a supportive home base while they focus on their studies.
@@ -308,7 +308,7 @@ const Home = () => {
                   { label: 'Floors', value: '4 Floors' },
                   { label: 'Established', value: '2016' },
                 ].map((d) => (
-                  <div key={d.label} className="bg-white rounded-xl p-4 border border-purple-500/10 shadow-sm">
+                  <div key={d.label} className="bg-white rounded-2xl p-4 border border-purple-500/10 shadow-md hover:shadow-lg transition-shadow duration-200">
                     <div className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wide">{d.label}</div>
                     <div className="text-gray-800 font-semibold">{d.value}</div>
                   </div>
@@ -354,34 +354,34 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           3. HOSTEL FACILITIES
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
+      <section className="py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
               What We Provide
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
               Hostel{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
                 Facilities
               </span>
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg font-medium">
               Everything you need for a comfortable student life — all included within the hostel building.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {facilities.map((f, i) => (
               <div
                 key={i}
-                className="bg-[#f5f3ff] rounded-2xl border border-purple-500/10 p-7 hover:border-purple-500/30 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1"
+                className="bg-[#f5f3ff] rounded-2xl border border-purple-500/10 p-8 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1"
               >
-                <div className="w-14 h-14 bg-white border border-purple-500/20 rounded-2xl flex items-center justify-center mb-5 text-purple-600 shadow-sm group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
+                <div className="w-16 h-16 bg-white border border-purple-500/20 rounded-2xl flex items-center justify-center mb-6 text-purple-600 shadow-md group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
                   {f.icon}
                 </div>
-                <h3 className="text-gray-800 font-bold text-lg mb-2">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+                <h3 className="text-gray-800 font-bold text-lg mb-2 tracking-wide">{f.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed font-medium">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -391,43 +391,43 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           4. WHY CHOOSE OUR HOSTEL
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-[#f5f3ff]">
+      <section className="py-28 bg-[#f5f3ff]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
               <FaStar className="w-4 h-4" />
               Why Students Choose Us
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
               Why Choose{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
                 Home_Treats?
               </span>
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg font-medium">
               Hundreds of students have made Home_Treats their home — here is why they love it.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-3 gap-10">
             {whyChoose.map((item, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-gray-200/60 p-8 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group text-center hover:-translate-y-2"
+                className="bg-white rounded-2xl border border-gray-200/60 p-9 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group text-center hover:-translate-y-2"
               >
                 <div
                   className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300`}
                 >
                   {item.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3 tracking-wide">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed font-medium">{item.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Trust stats bar */}
-          <div className="mt-14 bg-white rounded-2xl border border-purple-500/15 p-6 shadow-sm">
+          <div className="mt-14 bg-white rounded-2xl border border-purple-500/15 p-8 shadow-md">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: '120+', label: 'Students Currently Living' },
@@ -448,28 +448,28 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           5. BUILDING GALLERY
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
+      <section className="py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
               Photo Gallery
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
               Inside Our{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
                 Hostel Building
               </span>
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto font-medium">
               Take a virtual tour of our facilities — from the exterior to every comfort inside.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[220px]">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 auto-rows-[220px]">
             {galleryImages.map((img, i) => (
               <div
                 key={i}
-                className={`relative overflow-hidden rounded-2xl group cursor-pointer ${img.span}`}
+                className={`relative overflow-hidden rounded-2xl group cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300 ${img.span}`}
               >
                 <img
                   src={img.url}
@@ -477,7 +477,7 @@ const Home = () => {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-purple-900/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-4 left-4 text-white font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 drop-shadow">
+                <div className="absolute bottom-4 left-4 text-white font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 drop-shadow-lg">
                   <FaCheckCircle className="w-4 h-4 text-purple-300" />
                   {img.label}
                 </div>
@@ -490,29 +490,29 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           6. TESTIMONIALS
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-[#f5f3ff]">
+      <section className="py-28 bg-[#f5f3ff]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
               <FaHeart className="w-4 h-4" />
               Student Reviews
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
               What Our Students{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
                 Say
               </span>
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto font-medium">
               Hear directly from students who call Home_Treats their home.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-3 gap-8">
             {testimonials.map((t, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-gray-200/60 p-7 hover:border-purple-500/30 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1 flex flex-col"
+                className="bg-white rounded-2xl border border-gray-200/60 p-8 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1 flex flex-col"
               >
                 {/* Quote icon */}
                 <div className="mb-5">
@@ -530,7 +530,7 @@ const Home = () => {
                 </div>
 
                 {/* Review text */}
-                <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-6">"{t.review}"</p>
+                <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-6 font-medium">"{t.review}"</p>
 
                 {/* Student info */}
                 <div className="flex items-center gap-3 pt-4 border-t border-purple-500/10">
@@ -551,28 +551,28 @@ const Home = () => {
       {/* ══════════════════════════════════════════════
           7. CALL TO ACTION
       ══════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
+      <section className="py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative bg-gradient-to-br from-purple-600 via-purple-650 to-violet-700 rounded-3xl overflow-hidden">
+            <div className="relative bg-gradient-to-br from-purple-600 via-purple-650 to-violet-700 rounded-3xl overflow-hidden shadow-2xl">
             {/* Decorative blobs */}
             <div className="absolute -top-16 -right-16 w-72 h-72 bg-white/5 rounded-full pointer-events-none" />
             <div className="absolute -bottom-10 -left-10 w-52 h-52 bg-white/5 rounded-full pointer-events-none" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 px-8 md:px-16 py-16 md:py-20 text-center">
+            <div className="relative z-10 px-8 md:px-16 py-20 md:py-24 text-center">
               <div className="inline-flex items-center gap-2 bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
                 <FaBed className="w-4 h-4" />
                 Rooms Available Now
               </div>
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 drop-shadow">
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 drop-shadow-xl tracking-tight">
                 Ready to Find Your Room?
               </h2>
-              <p className="text-purple-100 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+              <p className="text-purple-100 text-lg max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
                 Explore our available room types, check pricing and contact the hostel management to secure your spot today.
               </p>
 
               {/* Contact details */}
-              <div className="flex flex-wrap justify-center gap-4 mb-10">
+              <div className="flex flex-wrap justify-center gap-5 mb-12">
                 {[
                   { icon: <FaPhone className="w-4 h-4" />, text: '+94 11 234 5678' },
                   { icon: <FaEnvelope className="w-4 h-4" />, text: 'info@hometreats.lk' },
@@ -580,7 +580,7 @@ const Home = () => {
                 ].map((c) => (
                   <div
                     key={c.text}
-                    className="flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/20 text-white text-sm px-4 py-2.5 rounded-xl transition-all duration-200 backdrop-blur-sm"
+                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 border border-white/20 text-white text-sm px-5 py-2.5 rounded-xl transition-all duration-200 backdrop-blur-sm shadow"
                   >
                     {c.icon}
                     {c.text}
@@ -588,10 +588,10 @@ const Home = () => {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-5 justify-center">
                 <Link
                   to="/rooms"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-purple-700 rounded-xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-purple-700 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20 border border-purple-100"
                 >
                   <FaBed className="w-5 h-5" />
                   View Available Rooms
@@ -599,7 +599,7 @@ const Home = () => {
                 </Link>
                 <Link
                   to="/contact"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/15 hover:bg-white/25 border border-white/30 text-white rounded-xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/20 hover:bg-white/30 border border-white/30 text-white rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow"
                 >
                   <FaEnvelope className="w-5 h-5" />
                   Send a Booking Request
