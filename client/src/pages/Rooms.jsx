@@ -12,6 +12,7 @@ const sortOptions = ["Price: Low to High", "Price: High to Low", "Rating", "Newe
 const roomsData = [
   {
     id: 1,
+    slug: "deluxe-single",
     image: "/images/rooms/room1.jpg",
     title: "Deluxe Single Room",
     price: 15000,
@@ -25,6 +26,7 @@ const roomsData = [
   },
   {
     id: 2,
+    slug: "spacious-double",
     image: "/images/rooms/room2.jpg",
     title: "Spacious Double Room",
     price: 22000,
@@ -38,6 +40,7 @@ const roomsData = [
   },
   {
     id: 3,
+    slug: "modern-dormitory",
     image: "/images/rooms/room3.jpg",
     title: "Modern Dormitory",
     price: 9000,
@@ -91,11 +94,29 @@ const Rooms = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
-      {/* Header */}
-      <header className="py-10 bg-gradient-to-b from-purple-100 to-white text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-purple-700 mb-2">Find Your Perfect Student Room</h1>
-        <p className="text-lg text-gray-600 font-medium">Browse and book the best student rooms in Sri Lanka. Filter by type, price, and more!</p>
-      </header>
+      <section className="w-full bg-gradient-to-br from-purple-800 via-purple-600 to-purple-500 relative flex flex-col items-center justify-center text-center py-28 sm:py-24">
+        {/* Optional overlay pattern or blur */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+        <div className="relative z-10 max-w-2xl mx-auto px-4">
+          {/* Breadcrumb */}
+          <div className="text-sm text-white/70 mb-4 tracking-wide">Home &gt; Rooms</div>
+          {/* Glassmorphism container */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-10 shadow-lg flex flex-col items-center animate-fadeIn">
+            {/* Small label */}
+            <div className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-2">HOME TREATS</div>
+            {/* Heading */}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide text-white drop-shadow-lg mb-2">
+              Our Rooms
+            </h1>
+            {/* Divider */}
+            <div className="w-12 h-1 bg-white/30 rounded-full mb-4"></div>
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg md:text-xl text-white/80 font-medium mt-4">
+              Find and book comfortable student rooms at Home Treats
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* Filter Bar */}
       <section className="max-w-5xl mx-auto mt-8 px-4">
@@ -194,7 +215,7 @@ const Rooms = () => {
               <RoomCard
                 key={room.id}
                 {...room}
-                onViewDetails={() => alert(`View details for ${room.title}`)}
+                roomSlug={room.slug}
                 onBookNow={() => alert(`Book now for ${room.title}`)}
                 onQuickView={() => alert(`Quick view for ${room.title}`)}
               />

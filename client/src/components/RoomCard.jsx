@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaUserFriends, FaMapMarkerAlt, FaWifi, FaTable, FaFan, FaStar, FaBed, FaBath, FaHeart } from "react-icons/fa";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsFillDoorOpenFill } from "react-icons/bs";
@@ -36,10 +37,12 @@ const RoomCard = ({
   availability,
   rating,
   reviews,
+  roomSlug,
   onViewDetails,
   onBookNow,
   onQuickView,
 }) => {
+  const navigate = useNavigate();
   const [favorite, setFavorite] = useState(false);
   return (
     <div className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group animate-fadeIn flex flex-col overflow-hidden">
@@ -111,7 +114,7 @@ const RoomCard = ({
         {/* Buttons */}
         <div className="mt-auto flex flex-col gap-2 sm:flex-row">
           <button
-            onClick={onViewDetails}
+            onClick={() => roomSlug ? navigate(`/room/${roomSlug}`) : onViewDetails?.()}
             className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
           >
             View Details
