@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Rooms from './pages/Rooms';
 import RoomDetails from './pages/RoomDetails';
+import RoomDetailsPage from './pages/RoomDetailsPage';
 import ContactUs from './pages/ContactUs';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -60,6 +61,7 @@ function AppShell() {
               <Route path="/about" element={<About />} />
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/rooms/:id" element={<RoomDetails />} />
+              <Route path="/room/:roomId" element={<RoomDetailsPage />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
