@@ -64,8 +64,8 @@ function AppShell() {
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/rooms/:id" element={<RoomDetails />} />
               <Route path="/room/:roomId" element={<RoomDetailsPage />} />
-              <Route path="/select-room/:roomType" element={<RoomSelectionPage />} />
-              <Route path="/booking-form" element={<BookingForm />} />
+              <Route path="/room-selection" element={<ProtectedRoute><RoomSelectionPage /></ProtectedRoute>} />
+              <Route path="/booking-form" element={<ProtectedRoute><BookingForm /></ProtectedRoute>} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
