@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   FaWifi,
   FaFan,
@@ -152,6 +153,7 @@ const InfoCard = ({ icon, title, time, day, note, accentColor }) => (
 const RoomDetailsPage = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const room = roomData[roomId];
 
@@ -330,14 +332,22 @@ const RoomDetailsPage = () => {
 
               {/* Book Now Button */}
               <button
-                onClick={() => navigate(`/select-room/${roomId}`)}
+                onClick={() => {
+                  // Save room type slug for room selection page
+                  localStorage.setItem("bookingRoomType", roomId);
+                  if (isAuthenticated) {
+                    navigate("/room-selection");
+                  } else {
+                    navigate("/login");
+                  }
+                }}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02] shadow-md"
               >
                 Book Now
               </button>
 
               <p className="text-xs text-gray-400 text-center mt-4">
-                Select a specific room to book
+                {isAuthenticated ? "Select a specific room to book" : "Login required to book"}
               </p>
             </div>
           </div>

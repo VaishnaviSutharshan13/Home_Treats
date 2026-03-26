@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   FaArrowLeft,
   FaSearch,
@@ -11,6 +11,7 @@ import {
   FaFilter,
   FaRedo,
   FaDoorOpen,
+  FaBed,
 } from "react-icons/fa";
 import { MdMeetingRoom } from "react-icons/md";
 
@@ -22,56 +23,53 @@ const roomTypeConfig = {
     title: "Deluxe Single Room",
     label: "Single",
     price: 15000,
-    color: "purple",
   },
   "spacious-double": {
     title: "Spacious Double Room",
     label: "Double",
     price: 22000,
-    color: "purple",
   },
   "modern-dormitory": {
     title: "Modern Dormitory",
     label: "Dormitory",
     price: 9000,
-    color: "purple",
   },
 };
 
 /* ──────────────────────────────────────────────────
    STATIC ROOM DATA — organized by room type slug
-   Each room has a unique room number
+   Each room has a unique room number + beds info
 ────────────────────────────────────────────────── */
 const allRooms = {
   "deluxe-single": [
-    { id: "ds-1", roomNumber: "B01-101", building: "Building 01", floor: "1st Floor", status: "Available" },
-    { id: "ds-2", roomNumber: "B01-202", building: "Building 01", floor: "2nd Floor", status: "Available", note: "Only 1 left" },
-    { id: "ds-3", roomNumber: "B01-303", building: "Building 01", floor: "3rd Floor", status: "Not Available" },
-    { id: "ds-4", roomNumber: "B02-101", building: "Building 02", floor: "1st Floor", status: "Available" },
-    { id: "ds-5", roomNumber: "B02-204", building: "Building 02", floor: "2nd Floor", status: "Limited", note: "Only 1 left" },
-    { id: "ds-6", roomNumber: "B02-305", building: "Building 02", floor: "3rd Floor", status: "Not Available" },
-    { id: "ds-7", roomNumber: "B01-401", building: "Building 01", floor: "4th Floor", status: "Available" },
-    { id: "ds-8", roomNumber: "B02-402", building: "Building 02", floor: "4th Floor", status: "Limited", note: "Only 2 left" },
+    { id: "ds-1", roomNumber: "B01-101", building: "Building 01", floor: "1st Floor", status: "Available", totalBeds: 1, occupiedBeds: 0 },
+    { id: "ds-2", roomNumber: "B01-202", building: "Building 01", floor: "2nd Floor", status: "Available", totalBeds: 1, occupiedBeds: 0, note: "Only 1 left" },
+    { id: "ds-3", roomNumber: "B01-303", building: "Building 01", floor: "3rd Floor", status: "Not Available", totalBeds: 1, occupiedBeds: 1 },
+    { id: "ds-4", roomNumber: "B02-101", building: "Building 02", floor: "1st Floor", status: "Available", totalBeds: 1, occupiedBeds: 0 },
+    { id: "ds-5", roomNumber: "B02-204", building: "Building 02", floor: "2nd Floor", status: "Limited", totalBeds: 1, occupiedBeds: 0, note: "Only 1 left" },
+    { id: "ds-6", roomNumber: "B02-305", building: "Building 02", floor: "3rd Floor", status: "Not Available", totalBeds: 1, occupiedBeds: 1 },
+    { id: "ds-7", roomNumber: "B01-401", building: "Building 01", floor: "4th Floor", status: "Available", totalBeds: 1, occupiedBeds: 0 },
+    { id: "ds-8", roomNumber: "B02-402", building: "Building 02", floor: "4th Floor", status: "Limited", totalBeds: 1, occupiedBeds: 0, note: "Only 2 left" },
   ],
   "spacious-double": [
-    { id: "sd-1", roomNumber: "B01-102", building: "Building 01", floor: "1st Floor", status: "Available" },
-    { id: "sd-2", roomNumber: "B01-203", building: "Building 01", floor: "2nd Floor", status: "Limited", note: "Only 1 left" },
-    { id: "sd-3", roomNumber: "B01-304", building: "Building 01", floor: "3rd Floor", status: "Available" },
-    { id: "sd-4", roomNumber: "B02-102", building: "Building 02", floor: "1st Floor", status: "Not Available" },
-    { id: "sd-5", roomNumber: "B02-205", building: "Building 02", floor: "2nd Floor", status: "Available" },
-    { id: "sd-6", roomNumber: "B02-306", building: "Building 02", floor: "3rd Floor", status: "Available" },
-    { id: "sd-7", roomNumber: "B01-403", building: "Building 01", floor: "4th Floor", status: "Not Available" },
-    { id: "sd-8", roomNumber: "B02-404", building: "Building 02", floor: "4th Floor", status: "Limited", note: "Only 1 left" },
+    { id: "sd-1", roomNumber: "B01-102", building: "Building 01", floor: "1st Floor", status: "Available", totalBeds: 2, occupiedBeds: 0 },
+    { id: "sd-2", roomNumber: "B01-203", building: "Building 01", floor: "2nd Floor", status: "Limited", totalBeds: 2, occupiedBeds: 1, note: "Only 1 left" },
+    { id: "sd-3", roomNumber: "B01-304", building: "Building 01", floor: "3rd Floor", status: "Available", totalBeds: 2, occupiedBeds: 0 },
+    { id: "sd-4", roomNumber: "B02-102", building: "Building 02", floor: "1st Floor", status: "Not Available", totalBeds: 2, occupiedBeds: 2 },
+    { id: "sd-5", roomNumber: "B02-205", building: "Building 02", floor: "2nd Floor", status: "Available", totalBeds: 2, occupiedBeds: 0 },
+    { id: "sd-6", roomNumber: "B02-306", building: "Building 02", floor: "3rd Floor", status: "Available", totalBeds: 2, occupiedBeds: 1 },
+    { id: "sd-7", roomNumber: "B01-403", building: "Building 01", floor: "4th Floor", status: "Not Available", totalBeds: 2, occupiedBeds: 2 },
+    { id: "sd-8", roomNumber: "B02-404", building: "Building 02", floor: "4th Floor", status: "Limited", totalBeds: 2, occupiedBeds: 1, note: "Only 1 left" },
   ],
   "modern-dormitory": [
-    { id: "md-1", roomNumber: "B01-103", building: "Building 01", floor: "1st Floor", status: "Available" },
-    { id: "md-2", roomNumber: "B01-204", building: "Building 01", floor: "2nd Floor", status: "Available" },
-    { id: "md-3", roomNumber: "B01-305", building: "Building 01", floor: "3rd Floor", status: "Not Available" },
-    { id: "md-4", roomNumber: "B02-103", building: "Building 02", floor: "1st Floor", status: "Limited", note: "Only 2 left" },
-    { id: "md-5", roomNumber: "B02-206", building: "Building 02", floor: "2nd Floor", status: "Available" },
-    { id: "md-6", roomNumber: "B02-307", building: "Building 02", floor: "3rd Floor", status: "Not Available" },
-    { id: "md-7", roomNumber: "B01-404", building: "Building 01", floor: "4th Floor", status: "Available" },
-    { id: "md-8", roomNumber: "B02-405", building: "Building 02", floor: "4th Floor", status: "Available" },
+    { id: "md-1", roomNumber: "B01-103", building: "Building 01", floor: "1st Floor", status: "Available", totalBeds: 6, occupiedBeds: 2 },
+    { id: "md-2", roomNumber: "B01-204", building: "Building 01", floor: "2nd Floor", status: "Available", totalBeds: 6, occupiedBeds: 3 },
+    { id: "md-3", roomNumber: "B01-305", building: "Building 01", floor: "3rd Floor", status: "Not Available", totalBeds: 6, occupiedBeds: 6 },
+    { id: "md-4", roomNumber: "B02-103", building: "Building 02", floor: "1st Floor", status: "Limited", totalBeds: 6, occupiedBeds: 5, note: "Only 1 left" },
+    { id: "md-5", roomNumber: "B02-206", building: "Building 02", floor: "2nd Floor", status: "Available", totalBeds: 6, occupiedBeds: 1 },
+    { id: "md-6", roomNumber: "B02-307", building: "Building 02", floor: "3rd Floor", status: "Not Available", totalBeds: 6, occupiedBeds: 6 },
+    { id: "md-7", roomNumber: "B01-404", building: "Building 01", floor: "4th Floor", status: "Available", totalBeds: 6, occupiedBeds: 0 },
+    { id: "md-8", roomNumber: "B02-405", building: "Building 02", floor: "4th Floor", status: "Available", totalBeds: 6, occupiedBeds: 4 },
   ],
 };
 
@@ -87,34 +85,44 @@ const statusConfig = {
     bg: "bg-green-50",
     text: "text-green-700",
     border: "border-green-200",
-    dot: "bg-green-500",
     icon: <FaCheckCircle className="w-3.5 h-3.5" />,
   },
   Limited: {
     bg: "bg-yellow-50",
     text: "text-yellow-700",
     border: "border-yellow-200",
-    dot: "bg-yellow-500",
     icon: <FaExclamationCircle className="w-3.5 h-3.5" />,
   },
   "Not Available": {
     bg: "bg-red-50",
     text: "text-red-600",
     border: "border-red-200",
-    dot: "bg-red-500",
     icon: <FaTimesCircle className="w-3.5 h-3.5" />,
   },
 };
 
 /* ══════════════════════════════════════════════════
    ROOM SELECTION PAGE COMPONENT
+   Reads room type from localStorage (bookingRoomType)
+   Protected via ProtectedRoute in App.tsx
 ══════════════════════════════════════════════════ */
 const RoomSelectionPage = () => {
-  const { roomType } = useParams();
   const navigate = useNavigate();
 
-  const config = roomTypeConfig[roomType];
-  const rooms = allRooms[roomType] || [];
+  // Read room type from localStorage
+  const [roomTypeSlug, setRoomTypeSlug] = useState(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("bookingRoomType");
+    if (!saved || !roomTypeConfig[saved]) {
+      navigate("/rooms", { replace: true });
+      return;
+    }
+    setRoomTypeSlug(saved);
+  }, [navigate]);
+
+  const config = roomTypeSlug ? roomTypeConfig[roomTypeSlug] : null;
+  const rooms = roomTypeSlug ? (allRooms[roomTypeSlug] || []) : [];
 
   // State
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -154,7 +162,7 @@ const RoomSelectionPage = () => {
 
   const handleContinueBooking = () => {
     if (!selectedRoom || !config) return;
-    // Save selected room data to localStorage for post-login redirect
+    // Save selected room data to localStorage for booking form
     const bookingData = {
       roomId: selectedRoom.roomNumber,
       building: selectedRoom.building,
@@ -163,27 +171,14 @@ const RoomSelectionPage = () => {
       price: config.price,
     };
     localStorage.setItem("selectedRoom", JSON.stringify(bookingData));
-    navigate("/login");
+    navigate("/booking-form");
   };
 
-  /* ---------- ROOM TYPE NOT FOUND ---------- */
+  /* ---------- LOADING / NOT FOUND ---------- */
   if (!config) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center px-6">
-          <div className="text-7xl mb-6">🏠</div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">Room Type Not Found</h2>
-          <p className="text-gray-500 mb-8 max-w-md mx-auto">
-            The room type you're looking for doesn't exist.
-          </p>
-          <button
-            onClick={() => navigate("/rooms")}
-            className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            <FaArrowLeft className="w-4 h-4" />
-            Back to Rooms
-          </button>
-        </div>
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -196,7 +191,7 @@ const RoomSelectionPage = () => {
         <div className="relative z-10 max-w-6xl mx-auto px-4">
           {/* Back link */}
           <Link
-            to={`/room/${roomType}`}
+            to={`/room/${roomTypeSlug}`}
             className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors text-sm font-medium"
           >
             <FaArrowLeft className="w-3.5 h-3.5" />
@@ -240,7 +235,7 @@ const RoomSelectionPage = () => {
               <input
                 type="text"
                 name="search"
-                placeholder="Search room number..."
+                placeholder="Search room ID..."
                 value={filters.search}
                 onChange={handleFilterChange}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-sm text-gray-700 transition-all outline-none"
@@ -377,6 +372,13 @@ const RoomSelectionPage = () => {
                     <div className="flex items-center gap-2.5 text-sm">
                       <FaDoorOpen className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       <span className="text-gray-600">{config.label}</span>
+                    </div>
+                    {/* Beds info */}
+                    <div className="flex items-center gap-2.5 text-sm">
+                      <FaBed className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      <span className="text-gray-600">
+                        {room.occupiedBeds}/{room.totalBeds} occupied
+                      </span>
                     </div>
                   </div>
 

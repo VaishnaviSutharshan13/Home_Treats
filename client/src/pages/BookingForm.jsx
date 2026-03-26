@@ -7,9 +7,12 @@ import {
   FaDoorOpen,
   FaMoneyBillWave,
   FaUser,
+  FaEnvelope,
   FaPhone,
+  FaIdCard,
   FaCalendarAlt,
   FaClock,
+  FaStickyNote,
   FaArrowRight,
 } from "react-icons/fa";
 import { MdMeetingRoom } from "react-icons/md";
@@ -26,9 +29,12 @@ const BookingForm = () => {
   const [roomData, setRoomData] = useState(null);
   const [formData, setFormData] = useState({
     fullName: "",
+    email: "",
     phone: "",
+    nic: "",
     startDate: "",
     duration: "",
+    notes: "",
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -57,9 +63,13 @@ const BookingForm = () => {
   const validate = () => {
     const errors = {};
     if (!formData.fullName.trim()) errors.fullName = "Full name is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Enter a valid email address";
     if (!formData.phone.trim()) errors.phone = "Phone number is required";
     else if (!/^[0-9]{10}$/.test(formData.phone.trim()))
       errors.phone = "Enter a valid 10-digit phone number";
+    if (!formData.nic.trim()) errors.nic = "NIC / ID is required";
     if (!formData.startDate) errors.startDate = "Start date is required";
     if (!formData.duration) errors.duration = "Please select a duration";
     setFormErrors(errors);
@@ -76,8 +86,9 @@ const BookingForm = () => {
       ...formData,
     };
     localStorage.setItem("bookingFormData", JSON.stringify(paymentData));
-    // Clean up selectedRoom from localStorage
+    // Clean up booking flow keys from localStorage
     localStorage.removeItem("selectedRoom");
+    localStorage.removeItem("bookingRoomType");
     navigate("/payment");
   };
 
@@ -91,7 +102,7 @@ const BookingForm = () => {
       {/* ── HERO SECTION ─────────────────────────── */}
       <section className="w-full bg-gradient-to-br from-purple-800 via-purple-600 to-purple-500 relative py-14 sm:py-18">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative z-10 max-w-3xl mx-auto px-4">
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
           <Link
             to="/rooms"
             className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 transition-colors text-sm font-medium"
@@ -116,7 +127,7 @@ const BookingForm = () => {
       </section>
 
       {/* ── CONTENT ──────────────────────────────── */}
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="max-w-4xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* ── LEFT: Room Details Card (Read-only) ── */}
           <div className="lg:col-span-2">
@@ -181,7 +192,7 @@ const BookingForm = () => {
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Full Name
+                    Full Name <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
                     <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -203,10 +214,35 @@ const BookingForm = () => {
                   )}
                 </div>
 
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    Email <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="john@example.com"
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                        formErrors.email
+                          ? "border-red-400 bg-red-50"
+                          : "border-gray-200 hover:border-purple-300"
+                      }`}
+                    />
+                  </div>
+                  {formErrors.email && (
+                    <p className="mt-1.5 text-sm text-red-500">{formErrors.email}</p>
+                  )}
+                </div>
+
                 {/* Phone Number */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Phone Number
+                    Phone Number <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
                     <FaPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -228,10 +264,35 @@ const BookingForm = () => {
                   )}
                 </div>
 
+                {/* NIC / ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    NIC / ID <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <FaIdCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      name="nic"
+                      value={formData.nic}
+                      onChange={handleChange}
+                      placeholder="Enter your NIC or ID number"
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                        formErrors.nic
+                          ? "border-red-400 bg-red-50"
+                          : "border-gray-200 hover:border-purple-300"
+                      }`}
+                    />
+                  </div>
+                  {formErrors.nic && (
+                    <p className="mt-1.5 text-sm text-red-500">{formErrors.nic}</p>
+                  )}
+                </div>
+
                 {/* Start Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Start Date
+                    Start Date <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
                     <FaCalendarAlt className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -256,7 +317,7 @@ const BookingForm = () => {
                 {/* Duration */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
-                    Duration
+                    Duration <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
                     <FaClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
@@ -281,6 +342,24 @@ const BookingForm = () => {
                   {formErrors.duration && (
                     <p className="mt-1.5 text-sm text-red-500">{formErrors.duration}</p>
                   )}
+                </div>
+
+                {/* Notes (optional) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">
+                    Notes <span className="text-gray-400 text-xs">(optional)</span>
+                  </label>
+                  <div className="relative">
+                    <FaStickyNote className="absolute left-3.5 top-3.5 text-gray-400 w-4 h-4" />
+                    <textarea
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleChange}
+                      placeholder="Any special requests or notes..."
+                      rows={3}
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-purple-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Divider */}
