@@ -112,7 +112,7 @@ const Rooms = () => {
             <div className="w-12 h-1 bg-white/30 rounded-full mb-4"></div>
             {/* Subtitle */}
             <p className="text-base sm:text-lg md:text-xl text-white/80 font-medium mt-4">
-              Find and book comfortable student rooms at Home Treats
+              Browse comfortable student rooms at Home Treats
             </p>
           </div>
         </div>
@@ -210,38 +210,17 @@ const Rooms = () => {
             <p className="text-xl text-gray-500 font-semibold">No rooms found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fadeIn">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 animate-fadeIn">
             {sortedRooms.map((room) => (
               <RoomCard
                 key={room.id}
                 {...room}
                 roomSlug={room.slug}
-                onBookNow={() => alert(`Book now for ${room.title}`)}
-                onQuickView={() => alert(`Quick view for ${room.title}`)}
               />
             ))}
           </div>
         )}
-        {/* Pagination/Load More (Bonus) */}
-        {sortedRooms.length > 0 && (
-          <div className="flex justify-center mt-10">
-            <button
-              className="bg-purple-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 hover:scale-105 hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-              onClick={() => {
-                // Simulate loading spinner
-                const btn = event.currentTarget;
-                btn.disabled = true;
-                btn.innerHTML = '<svg class=\'animate-spin h-5 w-5 mr-2 text-white\' xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\'><circle class=\'opacity-25\' cx=\'12\' cy=\'12\' r=\'10\' stroke=\'currentColor\' strokeWidth=\'4\'></circle><path class=\'opacity-75\' fill=\'currentColor\' d=\'M4 12a8 8 0 018-8v8z\'></path></svg>Loading...';
-                setTimeout(() => {
-                  btn.disabled = false;
-                  btn.innerHTML = 'Load More';
-                }, 1200);
-              }}
-            >
-              Load More
-            </button>
-          </div>
-        )}
+
       </section>
       {/* Hostel Facilities Section */}
       <section className="max-w-5xl mx-auto mt-16 px-4 bg-gradient-to-br from-purple-50 via-white to-purple-100 rounded-2xl py-8 animate-fadeIn">
@@ -359,7 +338,7 @@ const Rooms = () => {
               ),
             },
             {
-              title: "Click Book Now",
+              title: "Click View Details",
               icon: (
                 <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M16 3v4" /><path d="M8 3v4" /></svg>
               ),
