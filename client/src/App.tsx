@@ -15,6 +15,7 @@ import Rooms from './pages/Rooms';
 import RoomDetails from './pages/RoomDetails';
 import RoomDetailsPage from './pages/RoomDetailsPage';
 import RoomSelectionPage from './pages/RoomSelectionPage';
+import BookingForm from './pages/BookingForm';
 import ContactUs from './pages/ContactUs';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -64,6 +65,7 @@ function AppShell() {
               <Route path="/rooms/:id" element={<RoomDetails />} />
               <Route path="/room/:roomId" element={<RoomDetailsPage />} />
               <Route path="/select-room/:roomType" element={<RoomSelectionPage />} />
+              <Route path="/booking-form" element={<BookingForm />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

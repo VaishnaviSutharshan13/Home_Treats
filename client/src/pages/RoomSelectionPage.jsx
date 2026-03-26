@@ -153,7 +153,16 @@ const RoomSelectionPage = () => {
   };
 
   const handleContinueBooking = () => {
-    // Navigate to login if needed, or student booking
+    if (!selectedRoom || !config) return;
+    // Save selected room data to localStorage for post-login redirect
+    const bookingData = {
+      roomId: selectedRoom.roomNumber,
+      building: selectedRoom.building,
+      floor: selectedRoom.floor,
+      roomType: config.title,
+      price: config.price,
+    };
+    localStorage.setItem("selectedRoom", JSON.stringify(bookingData));
     navigate("/login");
   };
 

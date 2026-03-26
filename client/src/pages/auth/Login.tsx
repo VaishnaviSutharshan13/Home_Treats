@@ -26,7 +26,8 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from || '/dashboard';
+      const savedRoom = localStorage.getItem('selectedRoom');
+      const from = savedRoom ? '/booking-form' : (location.state?.from || '/dashboard');
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
@@ -80,7 +81,8 @@ const Login = () => {
       const success = await login(formData.email, formData.password);
       
       if (success) {
-        const from = location.state?.from || '/dashboard';
+        const savedRoom = localStorage.getItem('selectedRoom');
+        const from = savedRoom ? '/booking-form' : (location.state?.from || '/dashboard');
         navigate(from, { replace: true });
       } else {
         setLoginError('Invalid email or password');
