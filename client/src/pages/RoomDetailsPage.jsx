@@ -330,14 +330,14 @@ const RoomDetailsPage = () => {
 
               {/* Book Now Button */}
               <button
-                onClick={() => navigate("/contact")}
-                className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02] shadow-md"
+                onClick={() => navigate(`/select-room/${roomId}`)}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02] shadow-md"
               >
                 Book Now
               </button>
 
               <p className="text-xs text-gray-400 text-center mt-4">
-                Contact admin for booking confirmation
+                Select a specific room to book
               </p>
             </div>
           </div>
