@@ -1,12 +1,21 @@
 {
-  "devDependencies": {
-    "concurrently": "^9.2.1"
-  }
-  ,
+  "name": "hostel-management-system",
+  "version": "1.0.0",
+  "description": "MERN Stack Hostel Management System - Student, Room, Fees & Complaint Management",
+  "main": "index.js",
   "scripts": {
-    "client": "npm run dev --prefix client",
-    "server": "npm run dev --prefix server",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm run build --prefix server && npm run build --prefix client"
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": ["mern", "hostel", "management", "mongodb", "react", "node", "express"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
