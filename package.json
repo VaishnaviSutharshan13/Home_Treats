@@ -1,21 +1,49 @@
 {
   "name": "hostel-management-system",
+  "private": true,
   "version": "1.0.0",
   "description": "MERN Stack Hostel Management System - Student, Room, Fees & Complaint Management",
-  "main": "index.js",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "build:client": "cd client && npm run build",
-    "build:server": "cd server && npm run build",
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "server": "npm run dev --workspace server",
+    "client": "npm run dev --workspace client",
+    "build": "npm run build --workspace server && npm run build --workspace client",
+    "build:server": "npm run build --workspace server",
+    "build:client": "npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "lint": "npm run lint --workspace client",
+    "type-check": "npm run type-check --workspace client && npm run type-check --workspace server",
+    "format": "npm run format --workspace client && npm run format --workspace server",
+    "clean": "npm run clean --workspace server && npm run clean --workspace client",
+    "install-all": "npm install"
   },
-  "keywords": ["mern", "hostel", "management", "mongodb", "react", "node", "express"],
-  "author": "",
+  "keywords": [
+    "mern",
+    "hostel",
+    "management",
+    "mongodb",
+    "react",
+    "node",
+    "express"
+  ],
+  "author": "Hostel Management Team",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.10.1",
+    "concurrently": "^9.2.1"
   }
 }

@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaPlus, FaEdit, FaTrash, FaSearch, FaUser, FaEnvelope, FaPhone, FaCheck, FaTimes, FaSpinner, FaEye, FaChevronLeft, FaBars } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaUser, FaEnvelope, FaPhone, FaCheck, FaTimes, FaSpinner, FaEye, FaChevronLeft, FaBars } from 'react-icons/fa';
 import { studentService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
 
@@ -221,7 +221,7 @@ const StudentManagement = () => {
           >
             {toast.type === 'success' ? <FaCheck /> : <FaTimes />}
             <span>{toast.message}</span>
-            <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+            <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80" aria-label="Close notification">
               <FaTimes className="w-3 h-3" />
             </button>
           </div>
@@ -234,7 +234,7 @@ const StudentManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+                <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition" aria-label="Toggle sidebar">
                   <FaBars className="w-5 h-5" />
                 </button>
               <Link
@@ -458,8 +458,9 @@ const StudentManagement = () => {
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Full Name</label>
+                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-600">Full Name</label>
                             <input
+                              id="fullName"
                               type="text"
                               required
                               value={formData.name}
@@ -469,8 +470,9 @@ const StudentManagement = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Student ID</label>
+                            <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">Student ID</label>
                             <input
+                              id="studentId"
                               type="text"
                               required
                               value={formData.studentId}
@@ -482,8 +484,9 @@ const StudentManagement = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-600">Email</label>
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
                           <input
+                            id="email"
                             type="email"
                             required
                             value={formData.email}
@@ -493,8 +496,9 @@ const StudentManagement = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-600">Phone</label>
+                          <label htmlFor="phone" className="block text-sm font-medium text-gray-600">Phone</label>
                           <input
+                            id="phone"
                             type="tel"
                             required
                             value={formData.phone}
@@ -505,8 +509,9 @@ const StudentManagement = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Room</label>
+                            <label htmlFor="room" className="block text-sm font-medium text-gray-600">Room</label>
                             <input
+                              id="room"
                               type="text"
                               required
                               value={formData.room}
@@ -517,11 +522,13 @@ const StudentManagement = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Status</label>
+                            <label htmlFor="status" className="block text-sm font-medium text-gray-600">Status</label>
                             <select
+                              id="status"
                               value={formData.status}
                               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
+                              aria-label="Student status"
                             >
                               <option value="Active">Active</option>
                               <option value="Inactive">Inactive</option>
@@ -531,11 +538,13 @@ const StudentManagement = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Course</label>
+                            <label htmlFor="course" className="block text-sm font-medium text-gray-600">Course</label>
                             <select
+                              id="course"
                               value={formData.course}
                               onChange={(e) => setFormData({ ...formData, course: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
+                              aria-label="Student course"
                             >
                               <option value="Computer Science">Computer Science</option>
                               <option value="Engineering">Engineering</option>
@@ -547,11 +556,13 @@ const StudentManagement = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-600">Year</label>
+                            <label htmlFor="year" className="block text-sm font-medium text-gray-600">Year</label>
                             <select
+                              id="year"
                               value={formData.year}
                               onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
+                              aria-label="Student academic year"
                             >
                               <option value="1st Year">1st Year</option>
                               <option value="2nd Year">2nd Year</option>
@@ -566,8 +577,9 @@ const StudentManagement = () => {
                           <h4 className="text-sm font-semibold text-gray-700 mb-3">Emergency Contact</h4>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-600">Contact Name</label>
+                              <label htmlFor="contactName" className="block text-sm font-medium text-gray-600">Contact Name</label>
                               <input
+                                id="contactName"
                                 type="text"
                                 required
                                 value={formData.emergencyContact.name}
@@ -577,8 +589,9 @@ const StudentManagement = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-600">Contact Phone</label>
+                              <label htmlFor="emergencyPhone" className="block text-sm font-medium text-gray-600">Contact Phone</label>
                               <input
+                                id="emergencyPhone"
                                 type="tel"
                                 required
                                 value={formData.emergencyContact.phone}
@@ -589,11 +602,13 @@ const StudentManagement = () => {
                             </div>
                           </div>
                           <div className="mt-3">
-                            <label className="block text-sm font-medium text-gray-600">Relationship</label>
+                            <label htmlFor="relationship" className="block text-sm font-medium text-gray-600">Relationship</label>
                             <select
+                              id="relationship"
                               value={formData.emergencyContact.relationship}
                               onChange={(e) => setFormData({ ...formData, emergencyContact: { ...formData.emergencyContact, relationship: e.target.value } })}
                               className="mt-1 block w-full border-gray-200 rounded-md bg-gray-100 focus:ring-purple-500 focus:border-purple-500 sm:text-sm px-3 py-2 border"
+                              aria-label="Emergency contact relationship"
                             >
                               <option value="Parent">Parent</option>
                               <option value="Guardian">Guardian</option>

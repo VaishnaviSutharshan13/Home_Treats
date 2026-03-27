@@ -47,8 +47,10 @@ const MyComplaints = () => {
   const [expandedComplaints, setExpandedComplaints] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchComplaints();
-  }, []);
+    if (user?.studentId) {
+      fetchComplaints();
+    }
+  }, [user?.studentId]);
 
   useEffect(() => {
     if (toast) {
@@ -58,13 +60,16 @@ const MyComplaints = () => {
   }, [toast]);
 
   const fetchComplaints = async () => {
+    if (!user?.studentId) {
+      setError('User information not available');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError('');
-      if (user?.studentId) {
-        const res = await complaintService.getByStudent(user.studentId);
-        if (res.success) setComplaints(res.data || []);
-      }
+      const res = await complaintService.getByStudent(user.studentId);
+      if (res.success) setComplaints(res.data || []);
     } catch (err) {
       setError('Failed to load complaints');
     } finally {

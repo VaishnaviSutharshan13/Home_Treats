@@ -34,7 +34,7 @@ export const seedUsers = async () => {
         roomNumber: 'A-101',
         course: 'Computer Science',
         year: '2nd Year',
-        status: 'Approved',
+        approvalStatus: 'Approved',
       });
       console.log('Default student seeded: student@hostel.com / student123');
     }
@@ -46,14 +46,17 @@ export const seedUsers = async () => {
         email: 'student@hostel.com',
         phone: '+94 76 987 6543',
         studentId: 'STU001',
-        gender: 'Male',
         course: 'Computer Science',
         year: '2nd Year',
-        address: 'Jaffna, Sri Lanka',
-        password: 'student123',
-        roomNumber: 'A-101',
         room: 'A-101',
-        status: 'Approved',
+        status: 'Active',
+        joinDate: new Date(),
+        fees: 'Pending',
+        emergencyContact: {
+          name: 'Amara Perera',
+          phone: '+94 71 123 4567',
+          relationship: 'Parent',
+        },
       });
     }
   } catch (error) {
@@ -109,7 +112,19 @@ export const login = async (req: Request, res: Response) => {
         user.roomNumber = student.roomNumber;
       }
 
-      const latestStatus = student?.status || user.status || 'Pending';
+      const studentStatus = student?.status;
+      let userStatusToSync: 'Pending' | 'Approved' | 'Rejected' | 'Inactive' | undefined;
+      
+      // Convert Student status to User status
+      if (studentStatus === 'Active') {
+        userStatusToSync = 'Approved';
+      } else if (studentStatus === 'Inactive') {
+        userStatusToSync = 'Inactive';
+      } else {
+        userStatusToSync = user.status;
+      }
+
+      const latestStatus = userStatusToSync || user.status || 'Pending';
 
       if (user.status !== latestStatus || (!user.studentId && student?.studentId)) {
         user.status = latestStatus;
@@ -206,14 +221,18 @@ export const register = async (req: Request, res: Response) => {
       name,
       email,
       phone,
-      gender,
       course,
       year,
-      address,
-      password,
       roomNumber: '',
       room: '',
-      status: 'Pending',
+      status: 'Active',
+      joinDate: new Date(),
+      fees: 'Pending',
+      emergencyContact: {
+        name: '',
+        phone: '',
+        relationship: '',
+      },
     });
 
     res.status(201).json({

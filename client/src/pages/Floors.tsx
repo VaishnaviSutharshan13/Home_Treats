@@ -1,6 +1,5 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaHeart, FaBuilding, FaBed, FaWifi } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 
 const floors = [
   {

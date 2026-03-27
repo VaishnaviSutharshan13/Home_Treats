@@ -6,6 +6,7 @@ export interface IStudent extends Document {
   phone: string;
   studentId: string;
   room: string;
+  roomNumber?: string;
   course: string;
   year: string;
   joinDate: Date;
@@ -47,6 +48,10 @@ const StudentSchema: Schema = new Schema({
   room: {
     type: String,
     required: true
+  },
+  roomNumber: {
+    type: String,
+    trim: true
   },
   course: {
     type: String,

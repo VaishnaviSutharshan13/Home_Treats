@@ -6,17 +6,12 @@ import {
   createFee,
   updateFee,
   deleteFee,
-  markAsPaid,
+  payFee,
   getFeesByStudent,
   getRevenueReport,
   getMonthlyReport,
   getReceipt,
   getUnpaidStudents,
-  getStatistics,
-  getStudentsWithRooms,
-  updateOverdueFees,
-  getMonthlyRevenueChart,
-  getFinancialAnalytics,
 } from '../controllers/feesController';
 import { authMiddleware, adminOnly, approvedStudentOrAdmin } from '../middleware/auth';
 
@@ -32,22 +27,16 @@ const validateFee = [
 
 // Routes — List all fees requires admin
 router.get('/', authMiddleware, adminOnly, getAllFees);
-router.get('/statistics', authMiddleware, adminOnly, getStatistics);
 router.get('/revenue', authMiddleware, adminOnly, getRevenueReport);
-router.get('/monthly-chart', authMiddleware, adminOnly, getMonthlyRevenueChart);
-router.get('/analytics', authMiddleware, adminOnly, getFinancialAnalytics);
 router.get('/unpaid', authMiddleware, adminOnly, getUnpaidStudents);
-router.get('/students-rooms', authMiddleware, adminOnly, getStudentsWithRooms);
 router.get('/report/:year/:month', authMiddleware, adminOnly, getMonthlyReport);
-router.post('/update-overdue', authMiddleware, adminOnly, updateOverdueFees);
 router.get('/student/:studentId', authMiddleware, approvedStudentOrAdmin, getFeesByStudent);
-router.get('/:id', authMiddleware, getFeeById);
 router.get('/:id/receipt', authMiddleware, getReceipt);
+router.get('/:id', authMiddleware, getFeeById);
 router.post('/create', authMiddleware, adminOnly, validateFee, createFee);
 router.post('/', authMiddleware, adminOnly, validateFee, createFee);
 router.put('/:id', authMiddleware, adminOnly, updateFee);
 router.delete('/:id', authMiddleware, adminOnly, deleteFee);
-router.put('/:id/pay', authMiddleware, adminOnly, markAsPaid);
-router.patch('/:id/pay', authMiddleware, adminOnly, markAsPaid);
+router.put('/:id/pay', authMiddleware, adminOnly, payFee);
 
 export default router;
