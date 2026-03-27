@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   FaArrowLeft,
   FaBuilding,
   FaLayerGroup,
-  FaDoorOpen,
   FaMoneyBillWave,
   FaUser,
   FaEnvelope,
@@ -26,6 +25,7 @@ const durations = [
 
 const BookingForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [roomData, setRoomData] = useState(null);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -38,19 +38,25 @@ const BookingForm = () => {
   });
   const [formErrors, setFormErrors] = useState({});
 
-  // Load room data from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("selectedRoom");
-    if (!saved) {
-      navigate("/rooms", { replace: true });
+    if (location.state?.room) {
+      setRoomData(location.state.room);
+      localStorage.setItem("selectedRoom", JSON.stringify(location.state.room));
       return;
     }
-    try {
-      setRoomData(JSON.parse(saved));
-    } catch {
-      navigate("/rooms", { replace: true });
+
+    const saved = localStorage.getItem("selectedRoom");
+    if (saved) {
+      try {
+        setRoomData(JSON.parse(saved));
+        return;
+      } catch {
+        // Continue to redirect below
+      }
     }
-  }, [navigate]);
+
+    navigate("/rooms", { replace: true });
+  }, [navigate, location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,9 +92,7 @@ const BookingForm = () => {
       ...formData,
     };
     localStorage.setItem("bookingFormData", JSON.stringify(paymentData));
-    // Clean up booking flow keys from localStorage
     localStorage.removeItem("selectedRoom");
-    localStorage.removeItem("bookingRoomType");
     navigate("/payment");
   };
 
@@ -108,7 +112,7 @@ const BookingForm = () => {
             className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 transition-colors text-sm font-medium"
           >
             <FaArrowLeft className="w-3.5 h-3.5" />
-            Back to Rooms
+            Back to Floors
           </Link>
           <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-7 shadow-lg">
             <div className="uppercase text-xs tracking-widest text-white/70 font-semibold mb-2">
@@ -121,6 +125,7 @@ const BookingForm = () => {
             <p className="text-base text-white/80 font-medium">
               Complete your booking details for{" "}
               <span className="text-white font-semibold">{roomData.roomId}</span>
+              <span className="text-white/70"> on {roomData.floor}</span>
             </p>
           </div>
         </div>
@@ -143,7 +148,7 @@ const BookingForm = () => {
                     <MdMeetingRoom className="w-4 h-4 text-purple-400" />
                     Room ID
                   </span>
-                  <span className="font-semibold text-gray-900 text-sm">{roomData.roomId}</span>
+                  <span className="font-semibold text-gray-900 text-sm">{roomData.roomNumber || roomData.roomId}</span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500 text-sm flex items-center gap-2">
@@ -158,13 +163,6 @@ const BookingForm = () => {
                     Floor
                   </span>
                   <span className="font-semibold text-gray-900 text-sm">{roomData.floor}</span>
-                </div>
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500 text-sm flex items-center gap-2">
-                    <FaDoorOpen className="w-4 h-4 text-purple-400" />
-                    Room Type
-                  </span>
-                  <span className="font-semibold text-gray-900 text-sm">{roomData.roomType}</span>
                 </div>
                 <div className="flex items-center justify-between py-3">
                   <span className="text-gray-500 text-sm flex items-center gap-2">

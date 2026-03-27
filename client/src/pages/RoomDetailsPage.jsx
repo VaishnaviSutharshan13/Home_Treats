@@ -1,6 +1,5 @@
 import React from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import {
   FaWifi,
   FaFan,
@@ -14,27 +13,25 @@ import {
   FaCalendarTimes,
   FaClock,
   FaMapMarkerAlt,
-  FaUserFriends,
   FaStar,
   FaCheckCircle,
 } from "react-icons/fa";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 
-/* ──────────────────────────────────────────────────
-   STATIC ROOM DATA
-   Each key is the URL slug used in /room/:roomId
-────────────────────────────────────────────────── */
-const roomData = {
-  "deluxe-single": {
-    title: "Deluxe Single Room",
-    type: "Single",
-    price: 15000,
+const floorData = {
+  "1st-floor": {
+    id: "1st-floor",
+    title: "1st Floor",
+    totalRooms: 10,
+    availableRooms: 6,
+    priceMin: 12000,
+    priceMax: 20000,
     image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80",
     rating: 4.7,
     reviews: 98,
     location: "Colombo, Sri Lanka",
     description:
-      "A premium single room designed for students who prefer privacy and comfort. This fully furnished room features a comfortable single bed, a spacious study desk with a reading lamp, a personal wardrobe, and an attached bathroom. The room is well-ventilated with a ceiling fan and comes with high-speed WiFi connectivity. Ideal for focused study sessions and a peaceful living experience.",
+      "A calm and student-friendly floor designed for focused learning. This floor offers a mix of private and shared rooms with strong ventilation, study-focused spaces, and easy access to common amenities.",
     facilities: ["WiFi", "Fan", "Study Table", "Attached Bath", "Single Bed", "Power Backup", "Wardrobe", "Locker"],
     checkIn: {
       time: "2:00 PM",
@@ -47,48 +44,79 @@ const roomData = {
       note: "Late check-out subject to availability",
     },
   },
-  "spacious-double": {
-    title: "Spacious Double Room",
-    type: "Double",
-    price: 22000,
+  "2nd-floor": {
+    id: "2nd-floor",
+    title: "2nd Floor",
+    totalRooms: 12,
+    availableRooms: 4,
+    priceMin: 14000,
+    priceMax: 22000,
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&q=80",
     rating: 4.5,
     reviews: 120,
     location: "Colombo, Sri Lanka",
     description:
-      "A spacious double room perfect for two students who enjoy shared living. This room comes equipped with two comfortable beds, individual study tables with reading lamps, a shared wardrobe, and a private bathroom. High-speed WiFi, ceiling fan, and power backup ensure uninterrupted comfort and productivity. The room layout is designed to give each occupant their own personal space while fostering a friendly living environment.",
+      "A balanced floor with multiple room choices suitable for students who prefer a social but organized environment. The floor includes modern facilities and convenient access to shared utility spaces.",
     facilities: ["WiFi", "Fan", "Study Table", "Attached Bath", "Single Bed", "Power Backup", "Wardrobe"],
     checkIn: {
       time: "2:00 PM",
       day: "1st of every month",
-      note: "Coordinate with roommate for shared check-in",
+      note: "Check-in support available from floor warden",
     },
     checkOut: {
       time: "11:00 AM",
       day: "Last day of the month",
-      note: "Both occupants must confirm check-out",
+      note: "Room clearance required before check-out",
     },
   },
-  "modern-dormitory": {
-    title: "Modern Dormitory",
-    type: "Dormitory",
-    price: 9000,
+  "3rd-floor": {
+    id: "3rd-floor",
+    title: "3rd Floor",
+    totalRooms: 8,
+    availableRooms: 2,
+    priceMin: 15000,
+    priceMax: 24000,
     image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80",
     rating: 4.2,
     reviews: 60,
     location: "Colombo, Sri Lanka",
     description:
-      "An affordable dormitory-style room ideal for budget-conscious students. This modern shared space accommodates up to 6 students and includes individual beds with personal lockers for secure storage. The room features high-speed WiFi, ceiling fans for ventilation, and shared study tables. A great option for students who enjoy a social living environment while keeping costs low. Common bathrooms are located on the same floor for easy access.",
+      "A premium upper floor with low room density and better privacy. Best suited for students who want a quieter stay, with full access to essential academic and living facilities.",
     facilities: ["WiFi", "Fan", "Study Table", "Locker", "Common Bathroom"],
     checkIn: {
       time: "2:00 PM",
       day: "1st of every month",
-      note: "Bed assignment provided at check-in",
+      note: "Room assignment confirmed on arrival",
     },
     checkOut: {
       time: "11:00 AM",
       day: "Last day of the month",
-      note: "Clear personal locker before departure",
+      note: "Complete inventory handover before leaving",
+    },
+  },
+  "4th-floor": {
+    id: "4th-floor",
+    title: "4th Floor",
+    totalRooms: 9,
+    availableRooms: 0,
+    priceMin: 16000,
+    priceMax: 25000,
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80",
+    rating: 4.6,
+    reviews: 70,
+    location: "Colombo, Sri Lanka",
+    description:
+      "Top floor accommodation with elevated views and premium atmosphere. It is ideal for long-term students looking for a calm and professional living environment.",
+    facilities: ["WiFi", "Fan", "Study Table", "Attached Bath", "Wardrobe", "Locker"],
+    checkIn: {
+      time: "2:00 PM",
+      day: "1st of every month",
+      note: "Move-in assistance available on request",
+    },
+    checkOut: {
+      time: "11:00 AM",
+      day: "Last day of the month",
+      note: "Finalize check-out at floor desk",
     },
   },
 };
@@ -151,28 +179,26 @@ const InfoCard = ({ icon, title, time, day, note, accentColor }) => (
    MAIN COMPONENT
 ══════════════════════════════════════════════════ */
 const RoomDetailsPage = () => {
-  const { roomId } = useParams();
+  const { floorId } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-
-  const room = roomData[roomId];
+  const floor = floorData[floorId];
 
   /* ---------- ROOM NOT FOUND ---------- */
-  if (!room) {
+  if (!floor) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center px-6">
           <div className="text-7xl mb-6">🏠</div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">Room Not Found</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">Floor Not Found</h2>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">
-            The room you're looking for doesn't exist or may have been removed.
+            The floor you're looking for doesn't exist or may have been removed.
           </p>
           <button
             onClick={() => navigate("/rooms")}
             className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <FaArrowLeft className="w-4 h-4" />
-            Back to Rooms
+            Back to Floors
           </button>
         </div>
       </div>
@@ -185,8 +211,8 @@ const RoomDetailsPage = () => {
       {/* ── HERO IMAGE ───────────────────────────── */}
       <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <img
-          src={room.image}
-          alt={room.title}
+          src={floor.image}
+          alt={floor.title}
           className="w-full h-full object-cover"
         />
         {/* Gradient overlay */}
@@ -201,28 +227,28 @@ const RoomDetailsPage = () => {
               className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors text-sm font-medium"
             >
               <FaArrowLeft className="w-4 h-4" />
-              Back to Rooms
+              Back to Floors
             </Link>
 
             {/* Title */}
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
-              {room.title}
+              {floor.title}
             </h1>
 
             {/* Meta row */}
             <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm">
               <span className="flex items-center gap-2">
                 <FaMapMarkerAlt className="w-4 h-4" />
-                {room.location}
+                {floor.location}
               </span>
               <span className="flex items-center gap-2">
                 <FaBed className="w-4 h-4" />
-                {room.type} Room
+                {floor.totalRooms} Rooms
               </span>
               <span className="flex items-center gap-1.5">
                 <FaStar className="w-4 h-4 text-yellow-400" />
-                <span className="text-white font-semibold">{room.rating}</span>
-                <span className="text-white/60">({room.reviews} reviews)</span>
+                <span className="text-white font-semibold">{floor.rating}</span>
+                <span className="text-white/60">({floor.reviews} reviews)</span>
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/90 text-white">
                 Available
@@ -239,22 +265,17 @@ const RoomDetailsPage = () => {
           {/* ── LEFT COLUMN: Details ─────────────── */}
           <div className="lg:col-span-2 space-y-8">
 
-            {/* Room Type Badge + Description */}
+            {/* Description */}
             <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="px-4 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
-                  {room.type} Room
-                </span>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-3">About This Room</h2>
-              <p className="text-gray-600 leading-relaxed">{room.description}</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">About This Floor</h2>
+              <p className="text-gray-600 leading-relaxed">{floor.description}</p>
             </div>
 
             {/* Facilities Grid */}
             <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
               <h2 className="text-xl font-bold text-gray-900 mb-5">Facilities & Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {room.facilities.map((facility, index) => (
+                {floor.facilities.map((facility, index) => (
                   <FacilityBadge key={index} name={facility} />
                 ))}
               </div>
@@ -267,17 +288,17 @@ const RoomDetailsPage = () => {
                 <InfoCard
                   icon={<FaCalendarCheck className="w-5 h-5" />}
                   title="Check-in"
-                  time={room.checkIn.time}
-                  day={room.checkIn.day}
-                  note={room.checkIn.note}
+                  time={floor.checkIn.time}
+                  day={floor.checkIn.day}
+                  note={floor.checkIn.note}
                   accentColor="bg-green-500"
                 />
                 <InfoCard
                   icon={<FaCalendarTimes className="w-5 h-5" />}
                   title="Check-out"
-                  time={room.checkOut.time}
-                  day={room.checkOut.day}
-                  note={room.checkOut.note}
+                  time={floor.checkOut.time}
+                  day={floor.checkOut.day}
+                  note={floor.checkOut.note}
                   accentColor="bg-red-500"
                 />
               </div>
@@ -290,29 +311,26 @@ const RoomDetailsPage = () => {
 
               {/* Price */}
               <div className="text-center mb-6">
-                <div className="text-sm text-gray-500 mb-1">Monthly Rate</div>
+                <div className="text-sm text-gray-500 mb-1">Monthly Price Range</div>
                 <div className="text-4xl font-bold text-purple-600">
-                  Rs. {room.price.toLocaleString()}
+                  Rs. {floor.priceMin.toLocaleString()} - {floor.priceMax.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-500 mt-1">per month</div>
               </div>
 
-              {/* Room summary */}
+              {/* Floor summary */}
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Room Type</span>
-                  <span className="font-medium text-gray-900">{room.type}</span>
+                  <span className="text-gray-500">Total Rooms</span>
+                  <span className="font-medium text-gray-900">{floor.totalRooms}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Rating</span>
-                  <span className="font-medium text-gray-900 flex items-center gap-1">
-                    <FaStar className="w-4 h-4 text-yellow-400" />
-                    {room.rating}
-                  </span>
+                  <span className="text-gray-500">Available Rooms</span>
+                  <span className="font-medium text-gray-900">{floor.availableRooms}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">Reviews</span>
-                  <span className="font-medium text-gray-900">{room.reviews}</span>
+                  <span className="font-medium text-gray-900">{floor.reviews}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500">Status</span>
@@ -325,29 +343,23 @@ const RoomDetailsPage = () => {
                   <span className="text-gray-500">Location</span>
                   <span className="font-medium text-gray-900 flex items-center gap-1.5">
                     <FaMapMarkerAlt className="w-3.5 h-3.5 text-red-500" />
-                    {room.location}
+                    {floor.location}
                   </span>
                 </div>
               </div>
 
-              {/* Book Now Button */}
+              {/* View Rooms Button */}
               <button
                 onClick={() => {
-                  // Save room type slug for room selection page
-                  localStorage.setItem("bookingRoomType", roomId);
-                  if (isAuthenticated) {
-                    navigate("/room-selection");
-                  } else {
-                    navigate("/login");
-                  }
+                  navigate(`/floor/${floor.id}/rooms`);
                 }}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-xl font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-[1.02] shadow-md"
               >
-                Book Now
+                View Rooms
               </button>
 
               <p className="text-xs text-gray-400 text-center mt-4">
-                {isAuthenticated ? "Select a specific room to book" : "Login required to book"}
+                Select a specific room from this floor
               </p>
             </div>
           </div>
