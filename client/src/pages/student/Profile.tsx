@@ -80,11 +80,6 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-    fetchPaymentSummary();
-  }, []);
-
   const fetchPaymentSummary = async () => {
     try {
       const res = await feesService.getMyFees();
@@ -102,6 +97,13 @@ const Profile = () => {
       // silently fail — not critical
     }
   };
+
+  useEffect(() => {
+    fetchProfile();
+    fetchPaymentSummary();
+  }, []);
+
+
 
   const handleEdit = () => {
     if (profile) {

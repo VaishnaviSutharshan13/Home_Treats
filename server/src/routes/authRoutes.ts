@@ -10,7 +10,7 @@ const validateLogin = [
   body('email').optional(),
   body('studentId').optional(),
   body('identifier').optional(),
-  body().custom((value) => {
+  body().custom((value: any) => {
     const hasIdentifier = value?.email || value?.studentId || value?.identifier;
     if (!hasIdentifier) {
       throw new Error('Email or Student ID is required');

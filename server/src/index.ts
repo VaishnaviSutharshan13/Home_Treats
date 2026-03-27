@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -63,7 +63,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 
 // Health check
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'OK',
     message: 'Hostel Management API is running',

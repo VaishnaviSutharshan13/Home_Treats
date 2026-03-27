@@ -50,42 +50,44 @@ const AdminProfile = () => {
   const avatar = useMemo(() => preview || toImageUrl(profile?.profileImage), [preview, profile?.profileImage]);
   const resolvedHeroImage = useMemo(() => heroPreview || toImageUrl(heroImage), [heroPreview, heroImage]);
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      const res = await authService.getProfile();
-      if (!res.success) throw new Error(res.message || 'Failed to fetch profile');
-
-      const data = res.data as AdminProfileData;
-      setProfile(data);
-      setFullName(data.fullName || '');
-      setPhone(data.phone || '');
-      setGender(data.gender || '');
-      setAddress(data.address || '');
-      setPreview('');
-      setSelectedImageFile(null);
-    } catch (error: any) {
-      setMessage({ text: error?.message || 'Failed to load profile', type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const res = await authService.getProfile();
+        if (!res.success) throw new Error(res.message || 'Failed to fetch profile');
+
+        const data = res.data as AdminProfileData;
+        setProfile(data);
+        setFullName(data.fullName || '');
+        setPhone(data.phone || '');
+        setGender(data.gender || '');
+        setAddress(data.address || '');
+        setPreview('');
+        setSelectedImageFile(null);
+      } catch (error: any) {
+        setMessage({ text: error?.message || 'Failed to load profile', type: 'error' });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const loadHeroImage = async () => {
+      try {
+        const res = await settingsService.getHeroImage();
+        if (res?.success) {
+          setHeroImage(res.heroImage || '');
+        }
+      } catch {
+        setHeroImage('');
+      }
+    };
+
     loadProfile();
     loadHeroImage();
   }, []);
 
-  const loadHeroImage = async () => {
-    try {
-      const res = await settingsService.getHeroImage();
-      if (res?.success) {
-        setHeroImage(res.heroImage || '');
-      }
-    } catch {
-      setHeroImage('');
-    }
-  };
+
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
