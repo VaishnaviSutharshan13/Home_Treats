@@ -1,83 +1,95 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
 import { FaFilter, FaChevronDown, FaRedo, FaWifi, FaBook, FaTshirt, FaShieldAlt, FaTint, FaUtensils } from "react-icons/fa";
 import { MdSort } from "react-icons/md";
 
-const roomTypes = ["Single", "Double", "Triple", "Dormitory"];
-const priceRanges = ["Below 10,000", "10,000 - 20,000", "20,000 - 30,000", "Above 30,000"];
+const floorNames = ["1st Floor", "2nd Floor", "3rd Floor", "4th Floor"];
+const priceRanges = ["Below 15,000", "15,000 - 20,000", "20,000 - 25,000", "Above 25,000"];
 const availabilities = ["Available", "Limited", "Full"];
-const sortOptions = ["Price: Low to High", "Price: High to Low", "Rating", "Newest"];
+const sortOptions = ["Price: Low to High", "Price: High to Low", "Rating"];
 
-// Dummy data for demonstration
-const roomsData = [
+const floorsData = [
   {
-    id: 1,
-    slug: "deluxe-single",
+    id: "1st-floor",
     image: "/images/rooms/room1.jpg",
-    title: "Deluxe Single Room",
-    price: 15000,
-    capacity: 1,
-    location: "Colombo, Sri Lanka",
-    amenities: ["WiFi", "Study Table", "Fan", "Attached Bath"],
-    description: "A cozy single room with all modern amenities, perfect for focused study.",
+    title: "1st Floor",
+    price: 12000,
+    priceMax: 20000,
+    capacity: "10 Rooms",
+    location: "6 Available",
+    amenities: ["WiFi", "Study Table", "Attached Bath", "Power Backup"],
+    description: "Quiet floor for single students with easy access to study areas.",
     availability: "Available",
-    rating: 4.7,
-    reviews: 98,
+    rating: 4.8,
+    reviews: 132,
   },
   {
-    id: 2,
-    slug: "spacious-double",
+    id: "2nd-floor",
     image: "/images/rooms/room2.jpg",
-    title: "Spacious Double Room",
-    price: 22000,
-    capacity: 2,
-    location: "Kandy, Sri Lanka",
-    amenities: ["WiFi", "Fan", "Single Bed", "Power Backup"],
-    description: "Ideal for two students, this room offers comfort and convenience.",
+    title: "2nd Floor",
+    price: 14000,
+    priceMax: 22000,
+    capacity: "12 Rooms",
+    location: "4 Available",
+    amenities: ["WiFi", "Fan", "Study Table", "Locker"],
+    description: "Balanced floor with comfortable sharing options for students.",
     availability: "Limited",
-    rating: 4.5,
-    reviews: 120,
+    rating: 4.6,
+    reviews: 101,
   },
   {
-    id: 3,
-    slug: "modern-dormitory",
+    id: "3rd-floor",
     image: "/images/rooms/room3.jpg",
-    title: "Modern Dormitory",
-    price: 9000,
-    capacity: 6,
-    location: "Galle, Sri Lanka",
-    amenities: ["WiFi", "Fan", "Study Table"],
-    description: "Affordable dormitory with all basic facilities for group living.",
-    availability: "Full",
-    rating: 4.2,
-    reviews: 60,
+    title: "3rd Floor",
+    price: 15000,
+    priceMax: 24000,
+    capacity: "8 Rooms",
+    location: "2 Available",
+    amenities: ["WiFi", "Power Backup", "Attached Bath"],
+    description: "Premium higher floor with better privacy and focused environment.",
+    availability: "Limited",
+    rating: 4.7,
+    reviews: 88,
   },
-  // ...add more rooms as needed
+  {
+    id: "4th-floor",
+    image: "/images/rooms/room2.jpg",
+    title: "4th Floor",
+    price: 16000,
+    priceMax: 25000,
+    capacity: "9 Rooms",
+    location: "0 Available",
+    amenities: ["WiFi", "Study Table", "Fan"],
+    description: "Top floor with city view rooms suitable for long-term stays.",
+    availability: "Full",
+    rating: 4.5,
+    reviews: 76,
+  },
 ];
 
 const Rooms = () => {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
-    roomType: "",
+    floorName: "",
     priceRange: "",
     availability: "",
     sortBy: "",
   });
-  const [rooms, setRooms] = useState(roomsData);
+  const [floors] = useState(floorsData);
 
-  // Filter logic (dummy for now)
-  const filteredRooms = rooms.filter((room) => {
-    const matchType = !filters.roomType || room.title.includes(filters.roomType);
+  const filteredFloors = floors.filter((floor) => {
+    const matchType = !filters.floorName || floor.title === filters.floorName;
     const matchPrice = !filters.priceRange ||
-      (filters.priceRange === "Below 10,000" && room.price < 10000) ||
-      (filters.priceRange === "10,000 - 20,000" && room.price >= 10000 && room.price <= 20000) ||
-      (filters.priceRange === "20,000 - 30,000" && room.price > 20000 && room.price <= 30000) ||
-      (filters.priceRange === "Above 30,000" && room.price > 30000);
-    const matchAvailability = !filters.availability || room.availability === filters.availability;
+      (filters.priceRange === "Below 15,000" && floor.price < 15000) ||
+      (filters.priceRange === "15,000 - 20,000" && floor.price >= 15000 && floor.price <= 20000) ||
+      (filters.priceRange === "20,000 - 25,000" && floor.price > 20000 && floor.price <= 25000) ||
+      (filters.priceRange === "Above 25,000" && floor.price > 25000);
+    const matchAvailability = !filters.availability || floor.availability === filters.availability;
     return matchType && matchPrice && matchAvailability;
   });
 
-  // Sort logic (dummy for now)
-  const sortedRooms = [...filteredRooms].sort((a, b) => {
+  const sortedFloors = [...filteredFloors].sort((a, b) => {
     if (filters.sortBy === "Price: Low to High") return a.price - b.price;
     if (filters.sortBy === "Price: High to Low") return b.price - a.price;
     if (filters.sortBy === "Rating") return b.rating - a.rating;
@@ -89,7 +101,7 @@ const Rooms = () => {
   };
 
   const handleReset = () => {
-    setFilters({ roomType: "", priceRange: "", availability: "", sortBy: "" });
+    setFilters({ floorName: "", priceRange: "", availability: "", sortBy: "" });
   };
 
   return (
@@ -99,20 +111,20 @@ const Rooms = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-2xl mx-auto px-4">
           {/* Breadcrumb */}
-          <div className="text-sm text-white/70 mb-4 tracking-wide">Home &gt; Rooms</div>
+          <div className="text-sm text-white/70 mb-4 tracking-wide">Home &gt; Floors</div>
           {/* Glassmorphism container */}
           <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-10 shadow-lg flex flex-col items-center animate-fadeIn">
             {/* Small label */}
             <div className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-2">HOME TREATS</div>
             {/* Heading */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide text-white drop-shadow-lg mb-2">
-              Our Rooms
+              Our Floors
             </h1>
             {/* Divider */}
             <div className="w-12 h-1 bg-white/30 rounded-full mb-4"></div>
             {/* Subtitle */}
             <p className="text-base sm:text-lg md:text-xl text-white/80 font-medium mt-4">
-              Browse comfortable student rooms at Home Treats
+              Browse hostel floors and room availability at Home Treats
             </p>
           </div>
         </div>
@@ -121,17 +133,17 @@ const Rooms = () => {
       {/* Filter Bar */}
       <section className="max-w-5xl mx-auto mt-8 px-4">
         <div className="bg-purple-50 rounded-2xl shadow flex flex-col md:flex-row items-center gap-4 p-6 md:gap-6 animate-fadeIn">
-          {/* Room Type */}
+          {/* Floor */}
           <div className="flex items-center w-full md:w-auto relative group">
             <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
             <select
-              name="roomType"
-              value={filters.roomType}
+              name="floorName"
+              value={filters.floorName}
               onChange={handleFilterChange}
               className="pl-10 pr-8 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 px-4 py-2 w-full md:w-40 text-gray-700 transition-all duration-200 hover:border-purple-400"
             >
-              <option value="">Room Type</option>
-              {roomTypes.map((type) => (
+              <option value="">Floor</option>
+              {floorNames.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
@@ -198,24 +210,25 @@ const Rooms = () => {
       {/* Results Info */}
       <div className="max-w-5xl mx-auto mt-8 px-4">
         <p className="text-gray-700 font-medium mb-4">
-          Showing {sortedRooms.length} rooms available
+          Showing {sortedFloors.length} floors
         </p>
       </div>
 
-      {/* Room Cards Grid */}
+      {/* Floor Cards Grid */}
       <section className="max-w-5xl mx-auto px-4">
-        {sortedRooms.length === 0 ? (
+        {sortedFloors.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
             <span className="text-5xl text-purple-300 mb-4">😕</span>
-            <p className="text-xl text-gray-500 font-semibold">No rooms found</p>
+            <p className="text-xl text-gray-500 font-semibold">No floors found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 animate-fadeIn">
-            {sortedRooms.map((room) => (
+            {sortedFloors.map((floor) => (
               <RoomCard
-                key={room.id}
-                {...room}
-                roomSlug={room.slug}
+                key={floor.id}
+                {...floor}
+                priceLabel={`Rs. ${floor.price.toLocaleString()} - ${floor.priceMax.toLocaleString()} /month`}
+                onViewDetails={() => navigate(`/floor/${floor.id}`)}
               />
             ))}
           </div>
@@ -332,7 +345,7 @@ const Rooms = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
           {[
             {
-              title: "Choose a room",
+              title: "Choose a floor",
               icon: (
                 <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
               ),
@@ -344,7 +357,7 @@ const Rooms = () => {
               ),
             },
             {
-              title: "Fill the booking form",
+              title: "Select your room",
               icon: (
                 <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 2v4" /><path d="M16 2v4" /></svg>
               ),

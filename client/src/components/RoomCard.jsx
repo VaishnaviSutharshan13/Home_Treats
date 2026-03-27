@@ -38,6 +38,8 @@ const RoomCard = ({
   rating,
   reviews,
   roomSlug,
+  detailsPath,
+  priceLabel,
   onViewDetails,
 }) => {
   const navigate = useNavigate();
@@ -55,7 +57,7 @@ const RoomCard = ({
         <div className="absolute inset-0 rounded-t-2xl bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
         {/* Quick View hover overlay */}
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-2xl cursor-pointer"
-          onClick={() => roomSlug ? navigate(`/room/${roomSlug}`) : onViewDetails?.()}
+          onClick={() => (detailsPath || roomSlug) ? navigate(detailsPath || `/room/${roomSlug}`) : onViewDetails?.()}
         >
           <span className="flex items-center gap-2 bg-white/90 backdrop-blur-sm text-purple-700 font-semibold px-5 py-2.5 rounded-full shadow-lg text-sm">
             <FaEye className="w-4 h-4" /> Quick View
@@ -92,8 +94,10 @@ const RoomCard = ({
         </div>
         {/* Price */}
         <div className="flex items-end mb-3">
-          <span className="text-2xl font-extrabold text-purple-700 mr-1">Rs. {price?.toLocaleString()}</span>
-          <span className="text-sm text-gray-400 mb-0.5">/month</span>
+          <span className="text-2xl font-extrabold text-purple-700 mr-1">
+            {priceLabel || `Rs. ${price?.toLocaleString()}`}
+          </span>
+          {!priceLabel && <span className="text-sm text-gray-400 mb-0.5">/month</span>}
         </div>
         {/* Amenities */}
         <div className="flex flex-wrap gap-2 mb-3">
@@ -111,7 +115,7 @@ const RoomCard = ({
         {/* View Details Button — single primary action */}
         <div className="mt-auto">
           <button
-            onClick={() => roomSlug ? navigate(`/room/${roomSlug}`) : onViewDetails?.()}
+            onClick={() => (detailsPath || roomSlug) ? navigate(detailsPath || `/room/${roomSlug}`) : onViewDetails?.()}
             className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
           >
             View Details
