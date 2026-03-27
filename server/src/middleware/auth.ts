@@ -49,7 +49,17 @@ export const adminOnly = (req: AuthRequest, res: Response, next: NextFunction) =
 };
 
 // ─── Student-only access ─────────────────────────────────────
-export const studentOnly = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const studentOnly = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== 'student') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied. Students only.',
+    });
+  }
+  next();
+};
+
+export const approvedStudentOnly = async (req: AuthRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'student') {
     return res.status(403).json({
       success: false,
@@ -57,23 +67,45 @@ export const studentOnly = async (req: AuthRequest, res: Response, next: NextFun
     });
   }
 
-  try {
-    const student = await User.findById(req.user.id).select('isActive approvalStatus');
-    if (!student) {
-      return res.status(401).json({ success: false, message: 'User not found.' });
-    }
+  const user = await User.findById(req.user.id).select('status');
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'User not found' });
+  }
 
-    if (!student.isActive || student.approvalStatus !== 'Approved') {
-      return res.status(403).json({
-        success: false,
-        message: 'Your account is not approved for student access.',
-      });
-    }
-  } catch (_error) {
-    return res.status(500).json({ success: false, message: 'Authorization check failed.' });
+  if (user.status === 'Pending') {
+    return res.status(403).json({ success: false, message: 'Your account is waiting for admin approval.' });
+  }
+
+  if (user.status === 'Rejected') {
+    return res.status(403).json({ success: false, message: 'Your registration was rejected. Please contact hostel admin.' });
   }
 
   next();
+};
+
+export const approvedStudentOrAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role === 'admin') {
+    return next();
+  }
+
+  if (req.user?.role !== 'student') {
+    return res.status(403).json({ success: false, message: 'Access denied.' });
+  }
+
+  const user = await User.findById(req.user.id).select('status');
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'User not found' });
+  }
+
+  if (user.status === 'Approved') {
+    return next();
+  }
+
+  if (user.status === 'Pending') {
+    return res.status(403).json({ success: false, message: 'Your account is waiting for admin approval.' });
+  }
+
+  return res.status(403).json({ success: false, message: 'Your registration was rejected. Please contact hostel admin.' });
 };
 
 // ─── Admin OR self-access (student accessing own data) ───────

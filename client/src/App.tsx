@@ -13,9 +13,6 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Rooms from './pages/Rooms';
 import RoomDetails from './pages/RoomDetails';
-import FloorDetails from './pages/FloorDetails';
-import RoomSelectionPage from './pages/RoomSelectionPage';
-import BookingForm from './pages/BookingForm';
 import ContactUs from './pages/ContactUs';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -29,6 +26,7 @@ import ComplaintManagement from './pages/admin/ComplaintManagement';
 import FeesManagement from './pages/admin/FeesManagement';
 import AdminProfile from './pages/admin/AdminProfile';
 import ActivityLog from './pages/admin/ActivityLog';
+import StudentApprovalManagement from './pages/admin/StudentApprovalManagement';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -61,12 +59,22 @@ function AppShell() {
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
-              <Route path="/rooms" element={<Rooms />} />
-              <Route path="/rooms/:id" element={<RoomDetails />} />
-              <Route path="/floor/:floorId" element={<FloorDetails />} />
-              <Route path="/floor/:floorId/rooms" element={<RoomSelectionPage />} />
-              <Route path="/booking" element={<ProtectedRoute><BookingForm /></ProtectedRoute>} />
-              <Route path="/booking-form" element={<ProtectedRoute><BookingForm /></ProtectedRoute>} />
+              <Route
+                path="/rooms"
+                element={
+                  <ProtectedRoute requiredRole="student">
+                    <Rooms />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/rooms/:id"
+                element={
+                  <ProtectedRoute requiredRole="student">
+                    <RoomDetails />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -88,6 +96,14 @@ function AppShell() {
                     <StudentManagement />
                   </ProtectedRoute>
                 } 
+              />
+              <Route
+                path="/admin/student-approvals"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <StudentApprovalManagement />
+                  </ProtectedRoute>
+                }
               />
               <Route 
                 path="/admin/room-management" 
