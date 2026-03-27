@@ -28,10 +28,17 @@ const MyRoom = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchRoom();
-  }, []);
+    if (user?.studentId || user?.room) {
+      fetchRoom();
+    }
+  }, [user?.studentId, user?.room]);
 
   const fetchRoom = async () => {
+    if (!user?.studentId && !user?.room) {
+      setError('User information not available');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError('');

@@ -91,3 +91,5 @@ data/
 ############################
 .tmp/
 .temp/
+
+.phase-plan-fixed-useeffect.md

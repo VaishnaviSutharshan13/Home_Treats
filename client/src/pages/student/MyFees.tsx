@@ -48,17 +48,22 @@ const MyFees = () => {
   const [receiptLoading, setReceiptLoading] = useState(false);
 
   useEffect(() => {
-    fetchFees();
-  }, []);
+    if (user?.studentId) {
+      fetchFees();
+    }
+  }, [user?.studentId]);
 
   const fetchFees = async () => {
+    if (!user?.studentId) {
+      setError('User information not available');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError('');
-      if (user?.studentId) {
-        const res = await feesService.getByStudent(user.studentId);
-        if (res.success) setFees(res.data || []);
-      }
+      const res = await feesService.getByStudent(user.studentId);
+      if (res.success) setFees(res.data || []);
     } catch (err) {
       setError('Failed to load fee information');
     } finally {
