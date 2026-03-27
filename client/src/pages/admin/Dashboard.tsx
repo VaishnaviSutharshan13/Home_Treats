@@ -157,10 +157,17 @@ const Dashboard = () => {
         if (statsRes.success) setStats(statsRes.data);
         if (activitiesRes.success) setActivities(activitiesRes.data);
         if (revenueRes.success) {
-          setMonthlyRevenue(revenueRes.data.months);
-          setTotalAnnual(revenueRes.data.totalAnnual);
+          setMonthlyRevenue(Array.isArray(revenueRes.data?.months) ? revenueRes.data.months : []);
+          setTotalAnnual(Number(revenueRes.data?.totalAnnual || 0));
         }
-        if (occupancyRes.success) setOccupancyData(occupancyRes.data.chart);
+        if (occupancyRes.success) {
+          const fallbackChart = [
+            { name: 'Occupied', value: 0, color: '#7c3aed' },
+            { name: 'Available', value: 0, color: '#34d399' },
+            { name: 'Maintenance', value: 0, color: '#f59e0b' },
+          ];
+          setOccupancyData(Array.isArray(occupancyRes.data?.chart) ? occupancyRes.data.chart : fallbackChart);
+        }
         if (studentsRes.success) setRecentStudents(studentsRes.data);
         if (bookingsRes.success) setBookings((bookingsRes.data || []).slice(0, 8));
 

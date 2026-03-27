@@ -174,11 +174,19 @@ export const roomService = {
 
 // ─── Fees Services ───────────────────────────────────────────
 export const feesService = {
-  getAll: async (params?: { status?: string; feeType?: string; semester?: string; floor?: string; search?: string }) => {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    feeType?: string;
+    search?: string;
+    sortBy?: 'amount' | 'dueDate' | 'createdAt';
+    sortOrder?: 'asc' | 'desc';
+  }) => {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
+        if (value !== undefined && value !== null && value !== '') queryParams.append(key, String(value));
       });
     }
     const response = await api.get(`/fees?${queryParams.toString()}`);
@@ -196,7 +204,7 @@ export const feesService = {
   },
 
   create: async (feeData: Record<string, any>) => {
-    const response = await api.post('/fees', feeData);
+    const response = await api.post('/fees/create', feeData);
     return response.data;
   },
 
@@ -211,7 +219,7 @@ export const feesService = {
   },
 
   pay: async (id: string, paymentData: Record<string, any>) => {
-    const response = await api.put(`/fees/${id}/pay`, paymentData);
+    const response = await api.patch(`/fees/${id}/pay`, paymentData);
     return response.data;
   },
 
