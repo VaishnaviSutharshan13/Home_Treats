@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaPlus, FaEdit, FaSearch, FaFilter, FaExclamationTriangle, FaCheckCircle, FaClock, FaTimesCircle, FaSpinner, FaComment, FaEye, FaTrash, FaChevronLeft, FaBars } from 'react-icons/fa';
 import { complaintService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
+import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
 
 interface Comment {
   text: string;
@@ -338,10 +339,17 @@ const ComplaintManagement = () => {
               <h1 className="text-3xl font-bold mb-2 text-gray-900">Complaint Management</h1>
               <p className="text-purple-600">Handle student complaints and maintenance requests</p>
             </div>
-            <button className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors duration-300 flex items-center">
-              <FaPlus className="mr-2" />
-              New Complaint
-            </button>
+            <div className="flex items-center gap-2">
+              <AdminNotificationComposer
+                source="Complaint Management"
+                defaultType="complaint"
+                buttonLabel="Send Response"
+              />
+              <button className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors duration-300 flex items-center">
+                <FaPlus className="mr-2" />
+                New Complaint
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Complaint from '../models/Complaint';
+import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { createNotification } from './notificationController';
 import { logAdminAction } from './adminLogController';
@@ -60,8 +61,35 @@ export const createComplaint = async (req: Request, res: Response) => {
     });
     const savedComplaint = await complaint.save();
 
-    // Notification for new complaint
-    await createNotification('New Complaint', `New complaint submitted for Room ${savedComplaint.room}`, 'complaint');
+    const studentUser = await User.findOne({ role: 'student', studentId: savedComplaint.student }).select('_id name');
+
+    // Notification for admins
+    await createNotification(
+      'Complaint Received',
+      `New complaint from Student ${savedComplaint.student} for Room ${savedComplaint.room}.`,
+      'complaint',
+      {
+        source: 'Complaint Management',
+        recipientType: 'all_admins',
+        relatedModuleId: String(savedComplaint._id),
+        priority: 'important',
+      }
+    );
+
+    // Notification for student
+    if (studentUser) {
+      await createNotification(
+        'Complaint Received',
+        `Your complaint "${savedComplaint.title}" has been received and is pending review.`,
+        'complaint',
+        {
+          source: 'Complaint Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(savedComplaint._id),
+          priority: 'normal',
+        }
+      );
+    }
 
     res.status(201).json({ success: true, message: 'Complaint submitted successfully', data: savedComplaint });
   } catch (error: any) {
@@ -75,6 +103,22 @@ export const updateComplaint = async (req: AuthRequest, res: Response) => {
     const complaint = await Complaint.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found' });
+    }
+
+    const studentUser = await User.findOne({ role: 'student', studentId: complaint.student }).select('_id name');
+
+    if (studentUser) {
+      await createNotification(
+        'Complaint Updated',
+        `Your complaint "${complaint.title}" was updated by administration. Current status: ${complaint.status}.`,
+        'complaint',
+        {
+          source: 'Complaint Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(complaint._id),
+          priority: complaint.status === 'Resolved' ? 'success' : 'important',
+        }
+      );
     }
 
     if (req.user) {
@@ -113,6 +157,22 @@ export const assignComplaint = async (req: Request, res: Response) => {
     complaint.status = 'In Progress';
 
     await complaint.save();
+
+    const studentUser = await User.findOne({ role: 'student', studentId: complaint.student }).select('_id name');
+    if (studentUser) {
+      await createNotification(
+        'Complaint Status Updated',
+        `Your complaint "${complaint.title}" is now In Progress and assigned to ${complaint.assignedTo}.`,
+        'complaint',
+        {
+          source: 'Complaint Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(complaint._id),
+          priority: 'important',
+        }
+      );
+    }
+
     res.json({ success: true, message: 'Complaint assigned successfully', data: complaint });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Error assigning complaint', error: error.message });
@@ -136,6 +196,23 @@ export const resolveComplaint = async (req: AuthRequest, res: Response) => {
     complaint.resolvedDate = new Date();
 
     await complaint.save();
+
+    const studentUser = await User.findOne({ role: 'student', studentId: complaint.student }).select('_id name');
+    if (studentUser) {
+      await createNotification(
+        complaint.status === 'Resolved' ? 'Complaint Resolved' : 'Complaint Rejected',
+        complaint.status === 'Resolved'
+          ? `Your complaint "${complaint.title}" has been resolved.`
+          : `Your complaint "${complaint.title}" was rejected. Reason: ${complaint.rejectionReason || 'Not specified'}.`,
+        'complaint',
+        {
+          source: 'Complaint Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(complaint._id),
+          priority: complaint.status === 'Resolved' ? 'success' : 'urgent',
+        }
+      );
+    }
 
     if (req.user) {
       await logAdminAction(req.user.email, String(req.user.id), `${complaint.status === 'Resolved' ? 'Resolved' : 'Rejected'} a complaint`, 'complaint', String(req.params.id), complaint.title);
@@ -162,6 +239,22 @@ export const addComment = async (req: Request, res: Response) => {
     });
 
     await complaint.save();
+
+    const studentUser = await User.findOne({ role: 'student', studentId: complaint.student }).select('_id name');
+    if (studentUser) {
+      await createNotification(
+        'Admin Response Added',
+        `A new response was added to your complaint "${complaint.title}".`,
+        'complaint',
+        {
+          source: 'Complaint Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(complaint._id),
+          priority: 'normal',
+        }
+      );
+    }
+
     res.json({ success: true, message: 'Comment added', data: complaint });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Error adding comment', error: error.message });

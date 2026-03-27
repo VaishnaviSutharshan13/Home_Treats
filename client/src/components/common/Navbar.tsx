@@ -9,11 +9,19 @@ import { FaHome, FaBed, FaInfoCircle, FaEnvelope, FaSignInAlt, FaBars, FaTimes, 
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
-  const { isAuthenticated, isAdmin, isStudent, logout } = useAuth();
+  const { isAuthenticated, isAdmin, isStudent, user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const apiRoot = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+  const avatarUrl = user?.profileImage
+    ? user.profileImage.startsWith('http://') || user.profileImage.startsWith('https://')
+      ? user.profileImage
+      : `${apiRoot}${user.profileImage}`
+    : '';
+  const profileLink = isAdmin ? '/admin/profile' : '/student/profile';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,6 +107,20 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="hidden md:flex items-center space-x-3">
+                <Link
+                  to={profileLink}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#f5f3ff] transition-colors"
+                  title="Profile"
+                >
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-purple-200" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center text-xs font-semibold">
+                      {(user?.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-700">Profile</span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg transition-all duration-200 hover:bg-red-50"
@@ -163,6 +185,20 @@ const Navbar = () => {
             <div className="pt-4 pb-3 border-t border-gray-200">
               {isAuthenticated ? (
                 <div className="space-y-2 px-2">
+                  <Link
+                    to={profileLink}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff] rounded-lg transition-all duration-200"
+                  >
+                    <span>Profile</span>
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Profile" className="w-7 h-7 rounded-full object-cover border border-purple-200" />
+                    ) : (
+                      <span className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center text-xs font-semibold">
+                        {(user?.name || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-3 w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"

@@ -15,7 +15,12 @@ const validateRegister = [
   body('name').notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('phone').optional().notEmpty().withMessage('Phone is required'),
+  body('phone').notEmpty().withMessage('Phone is required'),
+  body('studentId').notEmpty().withMessage('Student ID is required'),
+  body('university').notEmpty().withMessage('University / College is required'),
+  body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Gender must be Male, Female, or Other'),
+  body('address').notEmpty().withMessage('Address is required'),
+  body('emergencyContact').notEmpty().withMessage('Emergency contact is required'),
 ];
 
 // Public routes

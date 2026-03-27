@@ -5,8 +5,12 @@ import {
   getStudentById,
   createStudent,
   updateStudent,
-  deleteStudent,
+  inactivateStudent,
+  activateStudent,
   searchStudents,
+  getPendingStudents,
+  approveStudent,
+  rejectStudent,
 } from '../controllers/studentController';
 import { authMiddleware, adminOnly } from '../middleware/auth';
 
@@ -18,28 +22,29 @@ const validateStudent = [
   body('email').isEmail().withMessage('Valid email is required'),
   body('phone').notEmpty().withMessage('Phone is required'),
   body('studentId').notEmpty().withMessage('Student ID is required'),
-  body('room').notEmpty().withMessage('Room is required'),
-  body('course').notEmpty().withMessage('Course is required'),
-  body('year').notEmpty().withMessage('Year is required'),
+  body('university').notEmpty().withMessage('University / College is required'),
+  body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Gender must be Male, Female, or Other'),
+  body('address').notEmpty().withMessage('Address is required'),
+  body('emergencyContact').notEmpty().withMessage('Emergency contact is required'),
+  body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('status').optional().isIn(['Pending', 'Approved', 'Rejected', 'Inactive']).withMessage('Status must be Pending, Approved, Rejected, or Inactive'),
 ];
 
 const validateStudentUpdate = [
-  body('name').optional().notEmpty().withMessage('Name is required'),
-  body('email').optional().isEmail().withMessage('Valid email is required'),
-  body('phone').optional().notEmpty().withMessage('Phone is required'),
-  body('room').optional().notEmpty().withMessage('Room is required'),
-  body('course').optional().notEmpty().withMessage('Course is required'),
-  body('year').optional().notEmpty().withMessage('Year is required'),
-  body('status').optional().isIn(['Active', 'Inactive']).withMessage('Status must be Active or Inactive'),
-  body('fees').optional().isIn(['Paid', 'Pending', 'Overdue']).withMessage('Fees status must be Paid, Pending, or Overdue'),
+  body('roomNumber').optional().isString().withMessage('Room number must be a string'),
+  body('status').optional().isIn(['Pending', 'Approved', 'Rejected', 'Inactive']).withMessage('Status must be Pending, Approved, Rejected, or Inactive'),
 ];
 
-// Routes — List & search require admin; individual GET requires auth
+// Routes — List, approval queue, and CRUD require admin
 router.get('/', authMiddleware, adminOnly, getAllStudents);
+router.get('/pending', authMiddleware, adminOnly, getPendingStudents);
 router.get('/search/:query', authMiddleware, adminOnly, searchStudents);
+router.put('/:id/approve', authMiddleware, adminOnly, approveStudent);
+router.put('/:id/reject', authMiddleware, adminOnly, rejectStudent);
+router.put('/:id/inactivate', authMiddleware, adminOnly, inactivateStudent);
+router.put('/:id/activate', authMiddleware, adminOnly, activateStudent);
 router.get('/:id', authMiddleware, getStudentById);
 router.post('/', authMiddleware, adminOnly, validateStudent, createStudent);
 router.put('/:id', authMiddleware, adminOnly, validateStudentUpdate, updateStudent);
-router.delete('/:id', authMiddleware, adminOnly, deleteStudent);
 
 export default router;

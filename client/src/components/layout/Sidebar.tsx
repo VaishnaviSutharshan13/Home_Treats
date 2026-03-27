@@ -106,6 +106,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
       icon: <FaComments className="w-5 h-5" />,
       href: '/student/my-complaints',
       badge: { count: 2, color: 'warning' }
+    },
+    {
+      title: 'Profile',
+      icon: <FaUser className="w-5 h-5" />,
+      href: '/student/profile',
+      badge: null
     }
   ];
 
@@ -164,6 +170,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
           {/* Mobile Close Button */}
           <button
             onClick={onToggle}
+            title="Close sidebar"
+            aria-label="Close sidebar"
             className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <FaTimes className="w-4 h-4" />

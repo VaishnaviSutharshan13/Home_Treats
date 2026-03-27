@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Room from '../models/Room';
+import User from '../models/User';
 import { createNotification } from './notificationController';
 import { logAdminAction } from './adminLogController';
 import { AuthRequest } from '../middleware/auth';
@@ -268,6 +269,7 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
 // UPDATE room (supports multipart/form-data image upload)
 export const updateRoom = async (req: AuthRequest, res: Response) => {
   try {
+    const previousRoom = await Room.findById(req.params.id);
     const body = { ...req.body };
 
     // Parse facilities if sent as JSON string
@@ -294,6 +296,39 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
         success: false,
         message: 'Room not found',
       });
+    }
+
+    if (previousRoom) {
+      const statusChanged = previousRoom.status !== room.status;
+      const roomChanged = previousRoom.roomNumber !== room.roomNumber;
+
+      if (statusChanged && room.status === 'Maintenance') {
+        await createNotification(
+          'Room No Longer Available',
+          `Room ${room.roomNumber} is now under maintenance and temporarily unavailable.`,
+          'room',
+          {
+            source: 'Room Management',
+            recipientType: 'all_students',
+            relatedModuleId: String(room._id),
+            priority: 'important',
+          }
+        );
+      }
+
+      if (roomChanged || statusChanged) {
+        await createNotification(
+          'Room Update',
+          `Room ${previousRoom.roomNumber} has been updated${roomChanged ? ` to ${room.roomNumber}` : ''}. Current status: ${room.status}.`,
+          'room',
+          {
+            source: 'Room Management',
+            recipientType: 'all_students',
+            relatedModuleId: String(room._id),
+            priority: 'normal',
+          }
+        );
+      }
     }
 
     if (req.user) {
@@ -327,6 +362,19 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
     if (req.user) {
       await logAdminAction(req.user.email, String(req.user.id), 'Deleted a room', 'room', String(req.params.id), room.name);
     }
+
+    await createNotification(
+      'Room No Longer Available',
+      `Room ${room.roomNumber} has been deactivated and is no longer available for booking.`,
+      'room',
+      {
+        source: 'Room Management',
+        recipientType: 'all_students',
+        relatedModuleId: String(room._id),
+        priority: 'important',
+      }
+    );
+
     res.json({
       success: true,
       message: 'Room deleted successfully',
@@ -366,8 +414,29 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
 
     await room.save();
 
+    const studentUser = await User.findOne({ role: 'student', studentId: req.body.studentId }).select('_id name studentId');
+
+    if (studentUser) {
+      await createNotification(
+        'Room Assigned',
+        `You have been assigned to Room ${room.roomNumber}.`,
+        'room',
+        {
+          source: 'Room Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(room._id),
+          priority: 'success',
+        }
+      );
+    }
+
     // Notification + Admin Log
-    await createNotification('Room Booked', `Room ${room.roomNumber} booked by Student ID ${req.body.studentId}`, 'booking');
+    await createNotification('Room Assignment Completed', `Room ${room.roomNumber} allocated to Student ID ${req.body.studentId}`, 'room', {
+      source: 'Room Management',
+      recipientType: 'all_admins',
+      relatedModuleId: String(room._id),
+      priority: 'success',
+    });
     if (req.user) {
       await logAdminAction(req.user.email, String(req.user.id), 'Allocated room to student', 'room', String(req.params.id), `Room ${room.roomNumber} → ${req.body.studentId}`);
     }
@@ -394,6 +463,19 @@ export const vacateRoom = async (req: Request, res: Response) => {
     room.status = 'Available';
 
     await room.save();
+
+    await createNotification(
+      'Room Available',
+      `Room ${room.roomNumber} is now available for booking.`,
+      'room',
+      {
+        source: 'Room Management',
+        recipientType: 'all_students',
+        relatedModuleId: String(room._id),
+        priority: 'normal',
+      }
+    );
+
     res.json({
       success: true,
       message: 'Room vacated successfully',

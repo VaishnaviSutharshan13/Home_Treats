@@ -7,7 +7,18 @@ export const authService = {
     return response.data;
   },
 
-  register: async (userData: { name: string; email: string; password: string; phone?: string; studentId?: string; course?: string }) => {
+  register: async (userData: {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    studentId: string;
+    university: string;
+    gender: 'Male' | 'Female' | 'Other';
+    address: string;
+    emergencyContact: string;
+    course?: string;
+  }) => {
     const response = await api.post('/auth/register', userData);
     return response.data;
   },
@@ -28,12 +39,22 @@ export const authService = {
   },
 
   getProfile: async () => {
-    const response = await api.get('/auth/profile');
+    const response = await api.get('/profile');
     return response.data;
   },
 
-  updateProfile: async (data: { name?: string; phone?: string; password?: string }) => {
-    const response = await api.put('/auth/profile', data);
+  updateProfile: async (data: { fullName?: string; name?: string; phone?: string; gender?: string; address?: string; password?: string }) => {
+    const response = await api.put('/profile', data);
+    return response.data;
+  },
+
+  updateProfileImage: async (profileImage: File) => {
+    const formData = new FormData();
+    formData.append('profileImage', profileImage);
+
+    const response = await api.put('/profile/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
@@ -50,8 +71,13 @@ export const authService = {
 
 // ─── Student Services ────────────────────────────────────────
 export const studentService = {
-  getAll: async () => {
-    const response = await api.get('/students');
+  getAll: async (filters?: { search?: string; status?: string; floor?: string; roomNumber?: string }) => {
+    const response = await api.get('/students', { params: filters || {} });
+    return response.data;
+  },
+
+  getPending: async () => {
+    const response = await api.get('/students/pending');
     return response.data;
   },
 
@@ -70,13 +96,45 @@ export const studentService = {
     return response.data;
   },
 
-  delete: async (id: string) => {
-    const response = await api.delete(`/students/${id}`);
+  inactivate: async (id: string) => {
+    const response = await api.put(`/students/${id}/inactivate`);
+    return response.data;
+  },
+
+  activate: async (id: string) => {
+    const response = await api.put(`/students/${id}/activate`);
     return response.data;
   },
 
   search: async (query: string) => {
     const response = await api.get(`/students/search/${query}`);
+    return response.data;
+  },
+
+  approve: async (id: string) => {
+    const response = await api.put(`/students/${id}/approve`);
+    return response.data;
+  },
+
+  reject: async (id: string) => {
+    const response = await api.put(`/students/${id}/reject`);
+    return response.data;
+  },
+};
+
+export const settingsService = {
+  getHeroImage: async () => {
+    const response = await api.get('/settings/hero-image');
+    return response.data;
+  },
+
+  updateHeroImage: async (heroImage: File) => {
+    const formData = new FormData();
+    formData.append('heroImage', heroImage);
+
+    const response = await api.post('/settings/hero-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 };
@@ -292,13 +350,13 @@ export const adminService = {
 
 // ─── Notification Services ───────────────────────────────────
 export const notificationService = {
-  getAll: async (limit?: number) => {
-    const response = await api.get('/notifications', { params: limit ? { limit } : {} });
+  getAll: async (params?: { limit?: number; type?: string; unreadOnly?: boolean }) => {
+    const response = await api.get('/notifications', { params: params || {} });
     return response.data;
   },
 
-  getUnreadCount: async () => {
-    const response = await api.get('/notifications/unread-count');
+  getUnreadCount: async (type?: string) => {
+    const response = await api.get('/notifications/unread-count', { params: type ? { type } : {} });
     return response.data;
   },
 
@@ -309,6 +367,25 @@ export const notificationService = {
 
   markAllAsRead: async () => {
     const response = await api.put('/notifications/mark-all-read');
+    return response.data;
+  },
+
+  sendAdminNotification: async (payload: {
+    title: string;
+    message: string;
+    type: 'announcement' | 'fee' | 'complaint' | 'room' | 'student';
+    source: 'Student Management' | 'Fees Management' | 'Complaint Management' | 'Room Management' | 'General Announcement';
+    recipientType: 'all_students' | 'selected_students';
+    recipientStudentIds?: string[];
+    priority?: 'normal' | 'important' | 'urgent' | 'success';
+    relatedModuleId?: string;
+  }) => {
+    const response = await api.post('/notifications', payload);
+    return response.data;
+  },
+
+  hide: async (id: string) => {
+    const response = await api.delete(`/notifications/${id}`);
     return response.data;
   },
 

@@ -31,6 +31,12 @@ export const seedUsers = async () => {
         studentId: 'STU001',
         room: 'A-101',
         course: 'Computer Science',
+        university: 'University of Jaffna',
+        gender: 'Male',
+        address: 'Jaffna, Sri Lanka',
+        emergencyContact: '+94 77 111 2233',
+        approvalStatus: 'Approved',
+        approvedAt: new Date(),
       });
       console.log('Default student seeded: student@hostel.com / student123');
     }
@@ -44,13 +50,28 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: String(email || '').toLowerCase().trim() });
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     if (!user.isActive) {
       return res.status(403).json({ success: false, message: 'Account is deactivated.' });
+    }
+
+    if (user.role === 'student') {
+      if (user.approvalStatus === 'Pending') {
+        return res.status(403).json({
+          success: false,
+          message: 'Your account is pending admin approval. Please wait for approval before logging in.',
+        });
+      }
+      if (user.approvalStatus === 'Rejected') {
+        return res.status(403).json({
+          success: false,
+          message: 'Your registration was rejected by admin. Please contact hostel administration.',
+        });
+      }
     }
 
     const isMatch = await user.comparePassword(password);
@@ -75,6 +96,11 @@ export const login = async (req: Request, res: Response) => {
       userData.studentId = user.studentId;
       userData.room = user.room;
       userData.course = user.course;
+      userData.university = user.university;
+      userData.gender = user.gender;
+      userData.address = user.address;
+      userData.emergencyContact = user.emergencyContact;
+      userData.approvalStatus = user.approvalStatus;
     }
 
     res.json({ success: true, message: 'Login successful', data: { token, user: userData } });
@@ -86,43 +112,54 @@ export const login = async (req: Request, res: Response) => {
 // REGISTER
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, phone, studentId, course } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: 'User already exists with this email' });
-    }
-
-    const user = await User.create({
+    const {
       name,
       email,
       password,
-      role: 'student',
       phone,
       studentId,
       course,
-    });
+      university,
+      gender,
+      address,
+      emergencyContact,
+    } = req.body;
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const trimmedEmail = String(email || '').toLowerCase().trim();
+    const trimmedStudentId = String(studentId || '').toUpperCase().trim();
+
+    const existingUser = await User.findOne({
+      $or: [{ email: trimmedEmail }, { studentId: trimmedStudentId }],
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: existingUser.email === trimmedEmail
+          ? 'User already exists with this email'
+          : 'Student ID already exists',
+      });
+    }
+
+    await User.create({
+      name,
+      email: trimmedEmail,
+      password,
+      role: 'student',
+      phone,
+      studentId: trimmedStudentId,
+      course,
+      university,
+      gender,
+      address,
+      emergencyContact,
+      room: '',
+      approvalStatus: 'Pending',
+      isActive: true,
+    });
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
-      data: {
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          phone: user.phone,
-          studentId: user.studentId,
-        },
-      },
+      message: 'Registration submitted successfully. Your account is pending admin approval.',
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
@@ -155,6 +192,11 @@ export const verifyToken = async (req: Request, res: Response) => {
         studentId: user.studentId,
         room: user.room,
         course: user.course,
+        university: user.university,
+        gender: user.gender,
+        address: user.address,
+        emergencyContact: user.emergencyContact,
+        approvalStatus: user.approvalStatus,
       },
     });
   } catch (error: any) {
@@ -228,6 +270,11 @@ export const updateProfile = async (req: any, res: Response) => {
         studentId: user.studentId,
         room: user.room,
         course: user.course,
+        university: user.university,
+        gender: user.gender,
+        address: user.address,
+        emergencyContact: user.emergencyContact,
+        approvalStatus: user.approvalStatus,
       },
     });
   } catch (error: any) {

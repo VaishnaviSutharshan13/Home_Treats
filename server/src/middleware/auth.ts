@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import User from '../models/User';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -48,13 +49,30 @@ export const adminOnly = (req: AuthRequest, res: Response, next: NextFunction) =
 };
 
 // ─── Student-only access ─────────────────────────────────────
-export const studentOnly = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const studentOnly = async (req: AuthRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'student') {
     return res.status(403).json({
       success: false,
       message: 'Access denied. Students only.',
     });
   }
+
+  try {
+    const student = await User.findById(req.user.id).select('isActive approvalStatus');
+    if (!student) {
+      return res.status(401).json({ success: false, message: 'User not found.' });
+    }
+
+    if (!student.isActive || student.approvalStatus !== 'Approved') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account is not approved for student access.',
+      });
+    }
+  } catch (_error) {
+    return res.status(500).json({ success: false, message: 'Authorization check failed.' });
+  }
+
   next();
 };
 

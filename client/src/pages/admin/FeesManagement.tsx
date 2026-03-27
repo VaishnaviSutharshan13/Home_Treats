@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa6';
 import { feesService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
+import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
 
 interface Fee {
   _id: string;
@@ -314,6 +315,11 @@ const FeesManagement = () => {
 
             {/* Action buttons */}
             <div className="flex flex-wrap gap-3">
+              <AdminNotificationComposer
+                source="Fees Management"
+                defaultType="fee"
+                buttonLabel="Send Reminder"
+              />
               <button
                 onClick={handleFetchUnpaid}
                 className="group inline-flex items-center gap-2 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 hover:border-red-500/50 text-red-400 hover:text-red-300 rounded-xl text-sm font-semibold transition-all duration-200"

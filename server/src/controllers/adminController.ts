@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import Student from '../models/Student';
 import User from '../models/User';
 import Room from '../models/Room';
 import Complaint from '../models/Complaint';
@@ -10,7 +9,9 @@ export const getStats = async (req: Request, res: Response) => {
   try {
     // Student metrics should come from auth users table, since registered users are stored in User collection.
     const totalStudents = await User.countDocuments({ role: 'student' });
-    const activeStudents = await User.countDocuments({ role: 'student', isActive: true });
+    const approvedStudents = await User.countDocuments({ role: 'student', approvalStatus: 'Approved' });
+    const pendingStudents = await User.countDocuments({ role: 'student', approvalStatus: 'Pending' });
+    const rejectedStudents = await User.countDocuments({ role: 'student', approvalStatus: 'Rejected' });
     const totalRooms = await Room.countDocuments();
     const occupiedRooms = await Room.countDocuments({ status: 'Occupied' });
     const availableRooms = await Room.countDocuments({ status: 'Available' });
@@ -31,7 +32,12 @@ export const getStats = async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: {
-        students: { total: totalStudents, active: activeStudents, inactive: totalStudents - activeStudents },
+        students: {
+          total: totalStudents,
+          approved: approvedStudents,
+          pending: pendingStudents,
+          rejected: rejectedStudents,
+        },
         rooms: {
           total: totalRooms,
           occupied: occupiedRooms,
@@ -84,17 +90,17 @@ function formatTimeAgo(date: Date): string {
 // GET recent activities
 export const getActivities = async (req: Request, res: Response) => {
   try {
-    const recentStudents = await Student.find().sort({ createdAt: -1 }).limit(5);
+    const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 }).limit(5);
     const recentComplaints = await Complaint.find().sort({ createdAt: -1 }).limit(5);
     const recentFees = await Fee.find({ status: 'Paid' }).sort({ paidDate: -1 }).limit(5);
 
     const activities = [
       ...recentStudents.map((student: any) => ({
         type: 'student',
-        action: `New student registered: ${student.name}`,
+        action: `Student registration: ${student.name}`,
         time: formatTimeAgo(student.createdAt),
         icon: 'user',
-        details: student.studentId,
+        details: `${student.studentId || 'N/A'} (${student.approvalStatus || 'Pending'})`,
       })),
       ...recentComplaints.map((complaint: any) => ({
         type: 'complaint',
@@ -127,7 +133,7 @@ export const backupDatabase = async (req: Request, res: Response) => {
   try {
     const backupData = {
       timestamp: new Date().toISOString(),
-      students: await Student.find(),
+      students: await User.find({ role: 'student' }),
       rooms: await Room.find(),
       complaints: await Complaint.find(),
       fees: await Fee.find(),
@@ -207,10 +213,10 @@ export const getRoomOccupancy = async (req: Request, res: Response) => {
 export const getRecentStudents = async (req: Request, res: Response) => {
   try {
     const limit = parseInt(req.query.limit as string) || 5;
-    const students = await Student.find()
+    const students = await User.find({ role: 'student' })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .select('name studentId room createdAt status course year');
+      .select('name studentId room createdAt approvalStatus course university');
 
     res.json({
       success: true,
@@ -219,9 +225,9 @@ export const getRecentStudents = async (req: Request, res: Response) => {
         name: s.name,
         studentId: s.studentId,
         room: s.room,
-        status: s.status,
+        status: s.approvalStatus || 'Pending',
         course: s.course,
-        year: s.year,
+        university: s.university,
         registeredAt: s.createdAt,
       })),
     });
@@ -233,7 +239,7 @@ export const getRecentStudents = async (req: Request, res: Response) => {
 // SYSTEM health check
 export const healthCheck = async (req: Request, res: Response) => {
   try {
-    const dbStats = await Student.db.db!.stats();
+    const dbStats = await User.db.db!.stats();
     res.json({
       success: true,
       message: 'System is healthy',

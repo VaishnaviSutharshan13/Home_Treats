@@ -1,489 +1,340 @@
-/**
- * Admin Profile Page - Home_Treats
- * Admin name, email, phone, role, hostel details, edit profile, dashboard shortcuts
- */
-
-import { useState, useEffect } from 'react';
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaShieldAlt,
-  FaEdit,
-  FaLock,
-  FaSave,
-  FaTimes,
-  FaSpinner,
-  FaTachometerAlt,
-  FaUsers,
-  FaBed,
-  FaDollarSign,
-  FaChevronLeft,
-  FaExclamationTriangle,
-  FaBuilding,
-  FaMapMarkerAlt,
-  FaClock,
-} from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { authService } from '../../services';
+import { useEffect, useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { FaCamera, FaEnvelope, FaIdBadge, FaImage, FaSave, FaShieldAlt, FaSpinner, FaUser } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
+import { authService, settingsService } from '../../services';
+import { useAuth } from '../../context/AuthContext';
 
-interface ProfileData {
-  _id: string;
-  name: string;
+interface AdminProfileData {
+  fullName: string;
   email: string;
   phone: string;
   role: string;
+  gender?: string;
+  address?: string;
+  adminId?: string;
+  dateJoined?: string;
+  profileImage?: string;
 }
 
+const API_ROOT = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
+const toImageUrl = (path?: string) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${API_ROOT}${path}`;
+};
+
 const AdminProfile = () => {
+  const { updateUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [editData, setEditData] = useState({ name: '', phone: '' });
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
+  const [profile, setProfile] = useState<AdminProfileData | null>(null);
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [gender, setGender] = useState('');
+  const [address, setAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [preview, setPreview] = useState('');
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [heroImage, setHeroImage] = useState('');
+  const [heroPreview, setHeroPreview] = useState('');
+  const [selectedHeroFile, setSelectedHeroFile] = useState<File | null>(null);
+  const [heroUploading, setHeroUploading] = useState(false);
 
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
+  const avatar = useMemo(() => preview || toImageUrl(profile?.profileImage), [preview, profile?.profileImage]);
+  const resolvedHeroImage = useMemo(() => heroPreview || toImageUrl(heroImage), [heroPreview, heroImage]);
 
-  const fetchProfile = async () => {
+  const loadProfile = async () => {
     try {
       setLoading(true);
       const res = await authService.getProfile();
-      if (res.success) {
-        setProfile(res.data);
-      } else {
-        showToast('Failed to load profile', 'error');
-      }
-    } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to load profile', 'error');
+      if (!res.success) throw new Error(res.message || 'Failed to fetch profile');
+
+      const data = res.data as AdminProfileData;
+      setProfile(data);
+      setFullName(data.fullName || '');
+      setPhone(data.phone || '');
+      setGender(data.gender || '');
+      setAddress(data.address || '');
+      setPreview('');
+      setSelectedImageFile(null);
+    } catch (error: any) {
+      setMessage({ text: error?.message || 'Failed to load profile', type: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProfile();
+    loadProfile();
+    loadHeroImage();
   }, []);
 
-  const handleEdit = () => {
-    if (profile) {
-      setEditData({ name: profile.name, phone: profile.phone || '' });
-      setIsEditing(true);
+  const loadHeroImage = async () => {
+    try {
+      const res = await settingsService.getHeroImage();
+      if (res?.success) {
+        setHeroImage(res.heroImage || '');
+      }
+    } catch {
+      setHeroImage('');
     }
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditData({ name: '', phone: '' });
-  };
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const handleSave = async () => {
-    if (!editData.name.trim()) {
-      showToast('Name is required', 'error');
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      setMessage({ text: 'Only JPG, JPEG, or PNG images are allowed', type: 'error' });
       return;
     }
+
+    setPreview(URL.createObjectURL(file));
+    setSelectedImageFile(file);
+    setMessage({ text: 'Image selected. Click "Save Image" to update your profile picture.', type: 'success' });
+  };
+
+  const handleSaveImage = async () => {
+    if (!selectedImageFile) {
+      setMessage({ text: 'Please select an image first', type: 'error' });
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const res = await authService.updateProfileImage(selectedImageFile);
+      if (!res.success) throw new Error(res.message || 'Failed to upload image');
+
+      const updatedProfile = res.data || res.user;
+      const profileImage = res.user?.profileImage || res.data?.profileImage;
+      const displayName = res.user?.name || res.data?.fullName || res.data?.name;
+
+      setProfile((prev) => ({ ...(prev as AdminProfileData), ...updatedProfile }));
+      updateUser({ profileImage, name: displayName });
+      setMessage({ text: 'Profile image updated', type: 'success' });
+      setSelectedImageFile(null);
+      setPreview('');
+    } catch (error: any) {
+      setMessage({ text: error?.response?.data?.message || error?.message || 'Image update failed', type: 'error' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleHeroImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
+      setMessage({ text: 'Only JPG, JPEG, PNG, or WEBP images are allowed', type: 'error' });
+      return;
+    }
+
+    setHeroPreview(URL.createObjectURL(file));
+    setSelectedHeroFile(file);
+    setMessage({ text: 'Hero image selected. Click "Update Hero Image" to apply.', type: 'success' });
+  };
+
+  const handleSaveHeroImage = async () => {
+    if (!selectedHeroFile) {
+      setMessage({ text: 'Please select a hero image first', type: 'error' });
+      return;
+    }
+
+    try {
+      setHeroUploading(true);
+      const res = await settingsService.updateHeroImage(selectedHeroFile);
+      if (!res.success) throw new Error(res.message || 'Failed to update hero image');
+
+      setHeroImage(res.heroImage || '');
+      setHeroPreview('');
+      setSelectedHeroFile(null);
+      setMessage({ text: 'Hero image updated successfully', type: 'success' });
+    } catch (error: any) {
+      setMessage({ text: error?.response?.data?.message || error?.message || 'Hero image update failed', type: 'error' });
+    } finally {
+      setHeroUploading(false);
+    }
+  };
+
+  const saveProfile = async () => {
+    if (!fullName.trim()) {
+      setMessage({ text: 'Full name is required', type: 'error' });
+      return;
+    }
+
+    if (password && password !== confirmPassword) {
+      setMessage({ text: 'Password and confirm password do not match', type: 'error' });
+      return;
+    }
+
     try {
       setSaving(true);
-      const res = await authService.updateProfile({
-        name: editData.name.trim(),
-        phone: editData.phone.trim(),
-      });
-      if (res.success) {
-        showToast('Profile updated successfully', 'success');
-        setIsEditing(false);
-        await fetchProfile();
-      } else {
-        showToast(res.message || 'Failed to update profile', 'error');
-      }
-    } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to update profile', 'error');
+      const payload: Record<string, string> = {
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        gender,
+        address: address.trim(),
+      };
+      if (password) payload.password = password;
+
+      const res = await authService.updateProfile(payload);
+      if (!res.success) throw new Error(res.message || 'Failed to update profile');
+
+      setProfile((prev) => ({ ...(prev as AdminProfileData), ...res.data }));
+      updateUser({ name: res.data?.fullName || res.data?.name, phone: res.data?.phone, profileImage: res.data?.profileImage });
+      setPassword('');
+      setConfirmPassword('');
+      setMessage({ text: 'Profile updated successfully', type: 'success' });
+    } catch (error: any) {
+      setMessage({ text: error?.response?.data?.message || error?.message || 'Profile update failed', type: 'error' });
     } finally {
       setSaving(false);
     }
   };
-
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordData.newPassword.length < 6) {
-      showToast('Password must be at least 6 characters', 'error');
-      return;
-    }
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showToast('Passwords do not match', 'error');
-      return;
-    }
-    try {
-      setSaving(true);
-      const res = await authService.updateProfile({ password: passwordData.newPassword });
-      if (res.success) {
-        showToast('Password changed successfully', 'success');
-        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        showToast(res.message || 'Failed to change password', 'error');
-      }
-    } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Failed to change password', 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-
-  // Dashboard shortcut buttons
-  const shortcuts = [
-    { title: 'Dashboard', icon: <FaTachometerAlt className="w-5 h-5" />, href: '/admin/dashboard', color: 'bg-purple-500' },
-    { title: 'Students', icon: <FaUsers className="w-5 h-5" />, href: '/admin/student-management', color: 'bg-purple-500' },
-    { title: 'Rooms', icon: <FaBed className="w-5 h-5" />, href: '/admin/room-management', color: 'bg-purple-500' },
-    { title: 'Fees', icon: <FaDollarSign className="w-5 h-5" />, href: '/admin/fees-management', color: 'bg-amber-500' },
-    { title: 'Complaints', icon: <FaExclamationTriangle className="w-5 h-5" />, href: '/admin/complaint-management', color: 'bg-red-500' },
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="admin" />
-        <div className="lg:ml-64 flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <FaSpinner className="w-10 h-10 text-purple-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">Loading profile...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="admin" />
+      <div className="lg:ml-64 p-6 sm:p-8">
+        <h1 className="text-3xl font-bold text-gray-900">Admin <span className="text-purple-600">Profile</span></h1>
+        <p className="text-gray-600 mt-1">Manage your account details and profile photo</p>
 
-      {/* Toast Notification */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 z-50 px-6 py-3 rounded-lg shadow-lg text-gray-900 text-sm font-medium transition-all duration-300 ${
-            toast.type === 'success' ? 'bg-purple-600' : 'bg-red-600'
-          }`}
-        >
-          {toast.message}
-        </div>
-      )}
+        {message && (
+          <div className={`mt-4 rounded-lg px-4 py-3 text-sm ${message.type === 'success' ? 'bg-purple-100 text-purple-800' : 'bg-red-100 text-red-700'}`}>
+            {message.text}
+          </div>
+        )}
 
-      {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="w-full px-6 sm:px-8 lg:px-10 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <Link
-                  to="/admin/dashboard"
-                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-purple-600 text-sm mb-2 transition-colors duration-200 group"
+        {loading ? (
+          <div className="mt-16 flex items-center justify-center text-gray-600"><FaSpinner className="animate-spin mr-2" />Loading profile...</div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+              <div className="w-36 h-36 rounded-full mx-auto overflow-hidden border-4 border-purple-100 bg-purple-50 flex items-center justify-center">
+                {avatar ? (
+                  <img src={avatar} alt="Admin profile" className="w-full h-full object-cover" />
+                ) : (
+                  <FaUser className="text-4xl text-purple-400" />
+                )}
+              </div>
+
+              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white cursor-pointer transition-colors">
+                <FaCamera className="mr-2" />Choose Image
+                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={handleImageChange} />
+              </label>
+
+              <button
+                onClick={handleSaveImage}
+                disabled={uploading || !selectedImageFile}
+                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-60"
+              >
+                {uploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Image
+              </button>
+
+              <div className="mt-6 space-y-3 text-sm">
+                <p className="flex items-center text-gray-700"><FaIdBadge className="mr-2 text-purple-600" />{profile?.adminId || 'N/A'}</p>
+                <p className="flex items-center text-gray-700"><FaShieldAlt className="mr-2 text-purple-600" />{profile?.role || 'admin'}</p>
+                <p className="text-gray-500">Joined: {profile?.dateJoined ? new Date(profile.dateJoined).toLocaleDateString() : 'N/A'}</p>
+              </div>
+            </div>
+
+            <div className="xl:col-span-2 space-y-6">
+              <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Personal Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Full Name</label>
+                    <input title="Full name" placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Phone</label>
+                    <input title="Phone" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Gender</label>
+                    <select title="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                      <option value="">Select gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm text-gray-600 mb-1">Address</label>
+                    <input title="Address" placeholder="Enter address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Account Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Email (Read-only)</label>
+                    <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600"><FaEnvelope className="mr-2" />{profile?.email}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Role (Read-only)</label>
+                    <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600"><FaShieldAlt className="mr-2" />{profile?.role || 'admin'}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">New Password</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Leave blank to keep current" className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Confirm Password</label>
+                    <input type="password" title="Confirm password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  </div>
+                </div>
+
+                <button onClick={saveProfile} disabled={saving} className="mt-5 inline-flex items-center px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-70 text-white">
+                  {saving ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Changes
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Change Hero Image</h2>
+              <p className="text-sm text-gray-600 mb-4">Update the Home page hero background image shown to all users.</p>
+
+              <div className="w-full h-44 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center mb-4">
+                {resolvedHeroImage ? (
+                  <img src={resolvedHeroImage} alt="Current hero background" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[linear-gradient(to_right,_#6a11cb,_#2575fc)]" />
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white cursor-pointer transition-colors">
+                  <FaImage className="mr-2" />Choose Hero Image
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handleHeroImageChange}
+                  />
+                </label>
+
+                <button
+                  onClick={handleSaveHeroImage}
+                  disabled={heroUploading || !selectedHeroFile}
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-60"
                 >
-                  <FaChevronLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform duration-200" />
-                  <span>Dashboard</span>
-                  <span className="text-gray-600 mx-0.5">/</span>
-                  <span className="text-gray-500">Admin Profile</span>
-                </Link>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Admin <span className="text-purple-600">Profile</span>
-                </h1>
-                <p className="text-gray-500 mt-1">Manage your admin account and hostel settings</p>
+                  {heroUploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Update Hero Image
+                </button>
               </div>
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100"
-              >
-                <FaUser className="w-5 h-5" />
-              </button>
             </div>
           </div>
-        </div>
-
-        <div className="w-full px-6 sm:px-8 lg:px-10 py-8">
-          {/* Tab Navigation */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex rounded-lg bg-gray-100 p-1">
-              <button
-                onClick={() => setActiveTab('profile')}
-                className={`flex items-center px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'profile'
-                    ? 'bg-gray-100 text-purple-600 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                <FaUser className="w-4 h-4 mr-2" />
-                Profile
-              </button>
-              <button
-                onClick={() => setActiveTab('password')}
-                className={`flex items-center px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'password'
-                    ? 'bg-gray-100 text-purple-600 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                <FaLock className="w-4 h-4 mr-2" />
-                Password
-              </button>
-            </div>
-          </div>
-
-          {/* Profile Tab */}
-          {activeTab === 'profile' && profile && (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Profile Picture Card */}
-                <div className="lg:col-span-1">
-                  <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8 text-center">
-                    <div className="mb-6">
-                      <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full mx-auto flex items-center justify-center shadow-xl ring-4 ring-white">
-                        <span className="text-4xl font-bold text-gray-900">
-                          {getInitials(profile.name)}
-                        </span>
-                      </div>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1">{profile.name}</h3>
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <FaShieldAlt className="w-4 h-4 text-purple-600" />
-                      <span className="text-purple-600 font-semibold text-sm">Administrator</span>
-                    </div>
-                    <p className="text-gray-500 text-sm mb-6">{profile.email}</p>
-                    {!isEditing && (
-                      <button onClick={handleEdit} className="bg-purple-500 hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors w-full">
-                        <FaEdit className="w-4 h-4 mr-2" />
-                        Edit Profile
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Hostel Details Card */}
-                  <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 mt-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <FaBuilding className="w-5 h-5 text-purple-600" />
-                      Hostel Details
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <FaBuilding className="w-4 h-4 text-gray-500 mt-1" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">Home_Treats</p>
-                          <p className="text-xs text-gray-500">Premium Student Accommodation</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <FaMapMarkerAlt className="w-4 h-4 text-gray-500 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">No. 45, Hostel Lane</p>
-                          <p className="text-sm text-gray-600">Peradeniya Road, Kandy</p>
-                          <p className="text-sm text-gray-500">Sri Lanka</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <FaClock className="w-4 h-4 text-gray-500 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Mon-Fri: 8:00 AM – 8:00 PM</p>
-                          <p className="text-sm text-gray-600">Sat: 9:00 AM – 6:00 PM</p>
-                          <p className="text-sm text-gray-500">Sun: 10:00 AM – 4:00 PM</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Profile Information Card */}
-                <div className="lg:col-span-2">
-                  <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-gray-900">Profile Information</h2>
-                      {isEditing && (
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
-                          >
-                            {saving ? (
-                              <FaSpinner className="w-4 h-4 mr-1 animate-spin" />
-                            ) : (
-                              <FaSave className="w-4 h-4 mr-1" />
-                            )}
-                            Save
-                          </button>
-                          <button onClick={handleCancel} className="flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
-                            <FaTimes className="w-4 h-4 mr-1" />
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Full Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">Full Name</label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            value={editData.name}
-                            onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                          />
-                        ) : (
-                          <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl">
-                            <FaUser className="w-4 h-4 text-gray-500" />
-                            <span className="text-gray-900">{profile.name}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Email (read-only) */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">Email Address</label>
-                        <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl">
-                          <FaEnvelope className="w-4 h-4 text-gray-500" />
-                          <span className="text-gray-900">{profile.email}</span>
-                        </div>
-                      </div>
-
-                      {/* Phone */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">Phone Number</label>
-                        {isEditing ? (
-                          <input
-                            type="tel"
-                            value={editData.phone}
-                            onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                            placeholder="+94 77 123 4567"
-                          />
-                        ) : (
-                          <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-xl">
-                            <FaPhone className="w-4 h-4 text-gray-500" />
-                            <span className="text-gray-900">{profile.phone || 'Not provided'}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Role (read-only) */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-2">Role</label>
-                        <div className="flex items-center gap-3 px-4 py-3 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                          <FaShieldAlt className="w-4 h-4 text-purple-600" />
-                          <span className="text-purple-600 font-semibold">Administrator</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dashboard Shortcut Buttons */}
-              <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Quick Access</h2>
-                <p className="text-gray-500 mb-6">Navigate to key management sections</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {shortcuts.map((shortcut, i) => (
-                    <Link
-                      key={i}
-                      to={shortcut.href}
-                      className="group flex flex-col items-center gap-3 p-6 bg-gray-100 rounded-2xl hover:bg-gray-600 border border-gray-200/50 hover:border-purple-500/30 transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <div className={`w-14 h-14 ${shortcut.color} rounded-2xl flex items-center justify-center text-gray-900 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        {shortcut.icon}
-                      </div>
-                      <span className="text-sm font-semibold text-gray-600 group-hover:text-purple-600 transition-colors">
-                        {shortcut.title}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Password Tab */}
-          {activeTab === 'password' && (
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Change Password</h2>
-                  <p className="text-gray-500">Update your password to keep your account secure</p>
-                </div>
-
-                <form onSubmit={handlePasswordChange} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">New Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Confirm New Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className="p-4 bg-gray-100 rounded-xl">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Password Requirements:</h4>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• At least 6 characters long</li>
-                      <li>• Use a mix of letters, numbers, and symbols</li>
-                    </ul>
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="bg-purple-500 hover:bg-purple-600 text-white font-medium px-4 py-2 rounded-lg transition-colors w-full flex items-center justify-center"
-                  >
-                    {saving ? (
-                      <FaSpinner className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <FaLock className="w-4 h-4 mr-2" />
-                    )}
-                    {saving ? 'Changing...' : 'Change Password'}
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
