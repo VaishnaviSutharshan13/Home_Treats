@@ -45,6 +45,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
         setIsAuthenticated(true);
+
+        // Backfill missing studentId for legacy sessions/users.
+        if (parsedUser?.role === 'student' && !parsedUser?.studentId) {
+          fetch('http://localhost:5000/api/auth/verify', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then(async (res) => {
+              const data = await res.json();
+              if (data?.success && data?.data) {
+                const mergedUser = { ...parsedUser, ...data.data };
+                localStorage.setItem('user', JSON.stringify(mergedUser));
+                setUser(mergedUser);
+              }
+            })
+            .catch(() => {
+              // Silent fallback; existing session handling remains intact.
+            });
+        }
       } catch (error) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');

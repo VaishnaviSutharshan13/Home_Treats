@@ -3,14 +3,16 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IFee extends Document {
   studentName: string;
   studentId: string;
-  roomNumber?: string;
+  email?: string;
+  roomNumber: string;
   room: string;
-  floor?: string;
-  feeType: 'Monthly Hostel Fee' | 'Maintenance Fee' | 'Mess Fee' | 'Library Fee' | 'Other';
+  floor: string;
+  feeType: 'Monthly' | 'Hostel' | 'Fine' | 'Other' | 'Monthly Hostel Fee' | 'Maintenance Fee' | 'Mess Fee' | 'Library Fee';
   amount: number;
   dueDate: Date;
   status: 'Paid' | 'Pending' | 'Overdue' | 'Partial';
-  paymentStatus?: 'Paid' | 'Pending' | 'Overdue' | 'Partial';
+  paymentStatus: 'Paid' | 'Pending' | 'Overdue' | 'Partial';
+  paymentDate?: Date;
   paidDate?: Date;
   paymentMethod?: string;
   transactionId?: string;
@@ -37,27 +39,35 @@ const FeeSchema: Schema = new Schema({
     required: true,
     ref: 'Student'
   },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
   room: {
     type: String,
     required: true
   },
   roomNumber: {
     type: String,
-    default: ''
+    required: true,
+    trim: true
   },
   floor: {
     type: String,
-    trim: true
+    required: true,
+    trim: true,
+    default: ''
   },
   feeType: {
     type: String,
     required: true,
-    enum: ['Monthly Hostel Fee', 'Maintenance Fee', 'Mess Fee', 'Library Fee', 'Other']
+    enum: ['Monthly', 'Hostel', 'Fine', 'Other', 'Monthly Hostel Fee', 'Maintenance Fee', 'Mess Fee', 'Library Fee']
   },
   amount: {
     type: Number,
     required: true,
-    min: [4000, 'Minimum fee amount is LKR 4,000']
+    min: [1, 'Amount must be greater than 0']
   },
   dueDate: {
     type: Date,
@@ -76,13 +86,17 @@ const FeeSchema: Schema = new Schema({
   paidDate: {
     type: Date
   },
+  paymentDate: {
+    type: Date
+  },
   paymentMethod: {
     type: String,
     enum: ['Online Transfer', 'Cash', 'Credit Card', 'Bank Transfer', 'Debit Card']
   },
   transactionId: {
     type: String,
-    sparse: true
+    trim: true,
+    default: undefined
   },
   semester: {
     type: String,
@@ -120,5 +134,15 @@ const FeeSchema: Schema = new Schema({
 }, {
   timestamps: true
 });
+
+FeeSchema.index({ studentId: 1 });
+// Unique only when transactionId exists (and is not an empty string).
+FeeSchema.index(
+  { transactionId: 1 },
+  {
+    unique: true,
+    sparse: true,
+  }
+);
 
 export default mongoose.model<IFee>('Fee', FeeSchema);

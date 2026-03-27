@@ -6,7 +6,7 @@ import {
   createFee,
   updateFee,
   deleteFee,
-  payFee,
+  markAsPaid,
   getFeesByStudent,
   getRevenueReport,
   getMonthlyReport,
@@ -24,19 +24,10 @@ const router = Router();
 
 // Validation middleware
 const validateFee = [
-  body('studentName').notEmpty().withMessage('Student name is required'),
   body('studentId').notEmpty().withMessage('Student ID is required'),
-  body('room').notEmpty().withMessage('Room is required'),
   body('feeType').notEmpty().withMessage('Fee type is required'),
-  body('amount').isFloat({ min: 4000 }).withMessage('Minimum fee amount is LKR 4,000'),
+  body('amount').isFloat({ min: 1 }).withMessage('Amount must be greater than 0'),
   body('dueDate').notEmpty().withMessage('Due date is required'),
-  body('semester').notEmpty().withMessage('Semester is required'),
-];
-
-const validatePayment = [
-  body('paymentMethod').notEmpty().withMessage('Payment method is required'),
-  body('paidAmount').isFloat({ min: 0 }).withMessage('Paid amount must be a positive number'),
-  body('paidDate').notEmpty().withMessage('Paid date is required'),
 ];
 
 // Routes — List all fees requires admin
@@ -52,9 +43,11 @@ router.post('/update-overdue', authMiddleware, adminOnly, updateOverdueFees);
 router.get('/student/:studentId', authMiddleware, approvedStudentOrAdmin, getFeesByStudent);
 router.get('/:id', authMiddleware, getFeeById);
 router.get('/:id/receipt', authMiddleware, getReceipt);
+router.post('/create', authMiddleware, adminOnly, validateFee, createFee);
 router.post('/', authMiddleware, adminOnly, validateFee, createFee);
 router.put('/:id', authMiddleware, adminOnly, updateFee);
 router.delete('/:id', authMiddleware, adminOnly, deleteFee);
-router.put('/:id/pay', authMiddleware, adminOnly, validatePayment, payFee);
+router.put('/:id/pay', authMiddleware, adminOnly, markAsPaid);
+router.patch('/:id/pay', authMiddleware, adminOnly, markAsPaid);
 
 export default router;

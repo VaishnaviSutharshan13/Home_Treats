@@ -96,11 +96,22 @@ export const login = async (req: Request, res: Response) => {
           user.studentId ? { studentId: user.studentId } : null,
           { email: user.email },
         ].filter(Boolean) as any,
-      }).select('status');
+      }).select('studentId room roomNumber status');
+
+      // Backfill legacy student users that don't have studentId stored on User.
+      if (!user.studentId && student?.studentId) {
+        user.studentId = String(student.studentId).trim().toUpperCase();
+      }
+      if (!user.room && student?.room) {
+        user.room = student.room;
+      }
+      if (!user.roomNumber && student?.roomNumber) {
+        user.roomNumber = student.roomNumber;
+      }
 
       const latestStatus = student?.status || user.status || 'Pending';
 
-      if (user.status !== latestStatus) {
+      if (user.status !== latestStatus || (!user.studentId && student?.studentId)) {
         user.status = latestStatus;
         await user.save();
       }

@@ -44,12 +44,21 @@ const StudentDashboard = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [booking, setBooking] = useState<Booking | null>(null);
 
+  const resolveStudentId = () => {
+    const fromUser = String(user?.studentId || '').trim();
+    if (fromUser) return fromUser;
+    const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+    return String(localUser?.studentId || '').trim();
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const studentId = resolveStudentId();
+
         const [feesRes, complaintsRes, bookingRes] = await Promise.all([
-          user?.studentId ? feesService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
-          user?.studentId ? complaintService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
+          studentId ? feesService.getByStudent(studentId) : Promise.resolve({ data: [] }),
+          studentId ? complaintService.getByStudent(studentId) : Promise.resolve({ data: [] }),
           bookingService.getMyBooking(),
         ]);
 
@@ -67,7 +76,7 @@ const StudentDashboard = () => {
   }, [user?.studentId]);
 
   const pendingFees = Array.isArray(fees)
-    ? fees.filter((f) => f.status === 'pending' || f.status === 'unpaid' || f.status === 'overdue')
+    ? fees.filter((f) => ['pending', 'unpaid', 'overdue', 'partial'].includes(String(f.status || '').toLowerCase()))
     : [];
   const totalPendingAmount = pendingFees.reduce((sum, f) => sum + (f.amount || 0), 0);
 
