@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User';
+import Student from '../models/Student';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
 
@@ -30,15 +31,30 @@ export const seedUsers = async () => {
         phone: '+94 76 987 6543',
         studentId: 'STU001',
         room: 'A-101',
+        roomNumber: 'A-101',
         course: 'Computer Science',
-        university: 'University of Jaffna',
-        gender: 'Male',
-        address: 'Jaffna, Sri Lanka',
-        emergencyContact: '+94 77 111 2233',
-        approvalStatus: 'Approved',
-        approvedAt: new Date(),
+        year: '2nd Year',
+        status: 'Approved',
       });
       console.log('Default student seeded: student@hostel.com / student123');
+    }
+
+    const studentProfileExists = await Student.findOne({ studentId: 'STU001' });
+    if (!studentProfileExists) {
+      await Student.create({
+        name: 'Kavindu Perera',
+        email: 'student@hostel.com',
+        phone: '+94 76 987 6543',
+        studentId: 'STU001',
+        gender: 'Male',
+        course: 'Computer Science',
+        year: '2nd Year',
+        address: 'Jaffna, Sri Lanka',
+        password: 'student123',
+        roomNumber: 'A-101',
+        room: 'A-101',
+        status: 'Approved',
+      });
     }
   } catch (error) {
     console.error('Error seeding users:', error);
@@ -48,35 +64,65 @@ export const seedUsers = async () => {
 // LOGIN
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, studentId, identifier, password } = req.body;
+    const loginIdentifier = (identifier || email || studentId || '').trim();
 
-    const user = await User.findOne({ email: String(email || '').toLowerCase().trim() });
+    if (!loginIdentifier) {
+      return res.status(400).json({ success: false, message: 'Email or Student ID is required' });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { email: loginIdentifier.toLowerCase() },
+        { studentId: loginIdentifier.toUpperCase() },
+      ],
+    });
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     if (!user.isActive) {
       return res.status(403).json({ success: false, message: 'Account is deactivated.' });
     }
 
-    if (user.role === 'student') {
-      if (user.approvalStatus === 'Pending') {
-        return res.status(403).json({
-          success: false,
-          message: 'Your account is pending admin approval. Please wait for approval before logging in.',
-        });
-      }
-      if (user.approvalStatus === 'Rejected') {
-        return res.status(403).json({
-          success: false,
-          message: 'Your registration was rejected by admin. Please contact hostel administration.',
-        });
-      }
-    }
-
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    if (user.role === 'student') {
+      const student = await Student.findOne({
+        $or: [
+          user.studentId ? { studentId: user.studentId } : null,
+          { email: user.email },
+        ].filter(Boolean) as any,
+      }).select('studentId room roomNumber status');
+
+      // Backfill legacy student users that don't have studentId stored on User.
+      if (!user.studentId && student?.studentId) {
+        user.studentId = String(student.studentId).trim().toUpperCase();
+      }
+      if (!user.room && student?.room) {
+        user.room = student.room;
+      }
+      if (!user.roomNumber && student?.roomNumber) {
+        user.roomNumber = student.roomNumber;
+      }
+
+      const latestStatus = student?.status || user.status || 'Pending';
+
+      if (user.status !== latestStatus || (!user.studentId && student?.studentId)) {
+        user.status = latestStatus;
+        await user.save();
+      }
+
+      if (latestStatus === 'Pending') {
+        return res.status(403).json({ success: false, message: 'Your registration is waiting for admin approval.' });
+      }
+
+      if (latestStatus === 'Rejected') {
+        return res.status(403).json({ success: false, message: 'Your registration was rejected by the hostel administration.' });
+      }
     }
 
     const token = jwt.sign(
@@ -95,12 +141,12 @@ export const login = async (req: Request, res: Response) => {
     if (user.role === 'student') {
       userData.studentId = user.studentId;
       userData.room = user.room;
+      userData.roomNumber = user.roomNumber;
       userData.course = user.course;
-      userData.university = user.university;
+      userData.year = user.year;
       userData.gender = user.gender;
       userData.address = user.address;
-      userData.emergencyContact = user.emergencyContact;
-      userData.approvalStatus = user.approvalStatus;
+      userData.status = user.status;
     }
 
     res.json({ success: true, message: 'Login successful', data: { token, user: userData } });
@@ -116,50 +162,67 @@ export const register = async (req: Request, res: Response) => {
       name,
       email,
       password,
+      confirmPassword,
       phone,
       studentId,
-      course,
-      university,
       gender,
+      course,
+      year,
       address,
-      emergencyContact,
     } = req.body;
 
-    const trimmedEmail = String(email || '').toLowerCase().trim();
-    const trimmedStudentId = String(studentId || '').toUpperCase().trim();
-
-    const existingUser = await User.findOne({
-      $or: [{ email: trimmedEmail }, { studentId: trimmedStudentId }],
-    });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: existingUser.email === trimmedEmail
-          ? 'User already exists with this email'
-          : 'Student ID already exists',
-      });
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'Passwords do not match' });
     }
 
-    await User.create({
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'User already exists with this email' });
+    }
+
+    const existingStudentId = await User.findOne({ studentId });
+    if (existingStudentId) {
+      return res.status(400).json({ success: false, message: 'Student ID already exists' });
+    }
+
+    const user = await User.create({
       name,
-      email: trimmedEmail,
+      email,
       password,
       role: 'student',
       phone,
-      studentId: trimmedStudentId,
-      course,
-      university,
+      studentId,
       gender,
+      course,
+      year,
       address,
-      emergencyContact,
       room: '',
-      approvalStatus: 'Pending',
-      isActive: true,
+      roomNumber: '',
+      status: 'Pending',
+    });
+
+    await Student.create({
+      studentId,
+      name,
+      email,
+      phone,
+      gender,
+      course,
+      year,
+      address,
+      password,
+      roomNumber: '',
+      room: '',
+      status: 'Pending',
     });
 
     res.status(201).json({
       success: true,
-      message: 'Registration submitted successfully. Your account is pending admin approval.',
+      message: 'Your registration request has been submitted. Please wait for admin approval.',
+      data: {
+        id: user._id,
+        status: user.status,
+      },
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
@@ -191,12 +254,12 @@ export const verifyToken = async (req: Request, res: Response) => {
         phone: user.phone,
         studentId: user.studentId,
         room: user.room,
+        roomNumber: user.roomNumber,
         course: user.course,
-        university: user.university,
+        year: user.year,
         gender: user.gender,
         address: user.address,
-        emergencyContact: user.emergencyContact,
-        approvalStatus: user.approvalStatus,
+        status: user.status,
       },
     });
   } catch (error: any) {
@@ -269,12 +332,12 @@ export const updateProfile = async (req: any, res: Response) => {
         phone: user.phone,
         studentId: user.studentId,
         room: user.room,
+        roomNumber: user.roomNumber,
         course: user.course,
-        university: user.university,
+        year: user.year,
         gender: user.gender,
         address: user.address,
-        emergencyContact: user.emergencyContact,
-        approvalStatus: user.approvalStatus,
+        status: user.status,
       },
     });
   } catch (error: any) {

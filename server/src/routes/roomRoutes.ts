@@ -9,7 +9,7 @@ import {
   allocateRoom,
   vacateRoom,
 } from '../controllers/roomController';
-import { authMiddleware, adminOnly } from '../middleware/auth';
+import { authMiddleware, adminOnly, approvedStudentOrAdmin } from '../middleware/auth';
 import { uploadRoomImage } from '../middleware/upload';
 
 const router = Router();
@@ -40,9 +40,9 @@ const validateAllocate = [
   body('studentId').notEmpty().withMessage('Student ID is required'),
 ];
 
-// Public routes (no auth needed for browsing)
-router.get('/', getAllRooms);
-router.get('/:id', getRoomById);
+// Protected routes (approved students or admins)
+router.get('/', authMiddleware, approvedStudentOrAdmin, getAllRooms);
+router.get('/:id', authMiddleware, approvedStudentOrAdmin, getRoomById);
 
 // Admin routes with Multer image upload
 router.post('/', authMiddleware, adminOnly, uploadRoomImage.single('image'), validateRoom, createRoom);
