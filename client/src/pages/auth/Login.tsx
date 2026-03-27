@@ -26,7 +26,7 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from || '/dashboard';
+      const from = location.state?.redirectTo || location.state?.from || '/student/dashboard';
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
@@ -90,8 +90,13 @@ const Login = () => {
       const success = await login(formData.email, formData.password);
       
       if (success) {
-        const from = location.state?.from || '/dashboard';
-        navigate(from, { replace: true });
+        const from = location.state?.redirectTo || location.state?.from || '/student/dashboard';
+        navigate(from, {
+          replace: true,
+          state: location.state?.selectedRoom
+            ? { selectedRoom: location.state.selectedRoom }
+            : undefined,
+        });
       } else {
         setLoginError(authError || 'Invalid email or password');
         setIsLoading(false);

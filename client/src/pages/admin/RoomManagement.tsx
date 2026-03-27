@@ -33,6 +33,12 @@ import {
   FaEye,
   FaChevronLeft,
   FaBars,
+  FaClock,
+  FaCalendarAlt,
+  FaRedo,
+  FaBuilding,
+  FaLayerGroup,
+  FaClipboardList,
 } from 'react-icons/fa';
 import { roomService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
@@ -48,7 +54,7 @@ interface Room {
   capacity: number;
   occupied: number;
   type: 'Single Room' | 'Double Room' | 'Dormitory';
-  status: 'Available' | 'Occupied' | 'Maintenance';
+  status: 'Available' | 'Limited' | 'Occupied' | 'Maintenance';
   students: string[];
   facilities: string[];
   price: number;
@@ -130,6 +136,10 @@ const RoomManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('All');
+  const [filterType, setFilterType] = useState<string>('All');
+  const [filterBlock, setFilterBlock] = useState<string>('All');
+  const [filterFloor, setFilterFloor] = useState<string>('All');
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [formData, setFormData] = useState<RoomFormData>(INITIAL_FORM);
@@ -175,16 +185,43 @@ const RoomManagement = () => {
       room.type.toLowerCase().includes(term) ||
       room.block.toLowerCase().includes(term);
     const matchesStatus = filterStatus === 'All' || room.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    const matchesType = filterType === 'All' || room.type === filterType;
+    const matchesBlock = filterBlock === 'All' || room.block === filterBlock;
+    const matchesFloor = filterFloor === 'All' || room.floor === filterFloor;
+    return matchesSearch && matchesStatus && matchesType && matchesBlock && matchesFloor;
   });
+
+  const totalBeds = rooms.reduce((sum, r) => sum + r.capacity, 0);
+  const occupiedBeds = rooms.reduce((sum, r) => sum + r.occupied, 0);
+  const availableBeds = totalBeds - occupiedBeds;
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setFilterStatus('All');
+    setFilterType('All');
+    setFilterBlock('All');
+    setFilterFloor('All');
+    setSelectedCardId(null);
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Available': return 'bg-purple-100 text-purple-700 border border-purple-200';
+      case 'Available': return 'bg-green-100 text-green-700 border border-green-200';
+      case 'Limited': return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
       case 'Occupied': return 'bg-red-100 text-red-700 border border-red-200';
-      case 'Maintenance': return 'bg-amber-100 text-amber-700 border border-amber-200';
+      case 'Maintenance': return 'bg-orange-100 text-orange-700 border border-orange-200';
       default: return 'bg-gray-100 text-gray-700 border border-gray-200';
     }
+  };
+
+  const getTimeAgo = (dateStr: string) => {
+    if (!dateStr) return 'N/A';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   };
 
   // ─── Modal helpers ───────────────────────────────────────
@@ -404,19 +441,20 @@ const RoomManagement = () => {
 
       {/* ── Summary Stats ───────────────────────────────── */}
       <div className="w-full px-6 sm:px-8 lg:px-10 pt-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
-            { label: 'Total Rooms', count: rooms.length, icon: <FaBed className="text-xl" />, color: 'bg-purple-500/10 text-purple-600', accent: 'border-purple-500/20' },
-            { label: 'Available', count: rooms.filter((r) => r.status === 'Available').length, icon: <FaCheck className="text-xl" />, color: 'bg-purple-50 text-purple-700', accent: 'border-purple-200' },
-            { label: 'Occupied', count: rooms.filter((r) => r.status === 'Occupied').length, icon: <FaUsers className="text-xl" />, color: 'bg-red-50 text-red-700', accent: 'border-red-200' },
-            { label: 'Maintenance', count: rooms.filter((r) => r.status === 'Maintenance').length, icon: <FaWrench className="text-xl" />, color: 'bg-amber-50 text-amber-700', accent: 'border-amber-200' },
+            { label: 'Total Rooms', count: rooms.length, icon: <FaBed className="text-xl" />, color: 'bg-purple-500/10 text-purple-600' },
+            { label: 'Total Beds', count: totalBeds, icon: <FaLayerGroup className="text-xl" />, color: 'bg-blue-50 text-blue-600' },
+            { label: 'Occupied Beds', count: occupiedBeds, icon: <FaUsers className="text-xl" />, color: 'bg-red-50 text-red-600' },
+            { label: 'Available Beds', count: availableBeds, icon: <FaCheck className="text-xl" />, color: 'bg-green-50 text-green-600' },
+            { label: 'Maintenance', count: rooms.filter((r) => r.status === 'Maintenance').length, icon: <FaWrench className="text-xl" />, color: 'bg-orange-50 text-orange-600' },
           ].map((stat) => (
-            <div key={stat.label} className={`bg-gray-50 rounded-xl border border-gray-200 p-4 flex items-center gap-4`}>
+            <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
               <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
                 {stat.icon}
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
                 <p className="text-2xl font-bold text-gray-900">{stat.count}</p>
               </div>
             </div>
@@ -426,32 +464,77 @@ const RoomManagement = () => {
 
       {/* ── Search & Filter Bar ─────────────────────────── */}
       <div className="w-full px-6 sm:px-8 lg:px-10 pt-6">
-        <div className="bg-gray-50 rounded-xl border border-purple-500/20 p-4 flex flex-col sm:flex-row gap-3 shadow-sm">
-          <div className="relative flex-1">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by name, room number, type or block..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
-            />
+        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <FaFilter className="text-purple-500 w-4 h-4" />
+            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Filter Rooms</h3>
           </div>
-          <div className="flex items-center gap-2">
-            <FaFilter className="text-gray-500" />
-            {['All', 'Available', 'Occupied', 'Maintenance'].map((s) => (
-              <button
-                key={s}
-                onClick={() => setFilterStatus(s)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  filterStatus === s
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            {/* Search */}
+            <div className="relative lg:col-span-2">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search name or room number..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+              />
+            </div>
+            {/* Room Type */}
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+            >
+              <option value="All">All Types</option>
+              <option value="Single Room">Single Room</option>
+              <option value="Double Room">Double Room</option>
+              <option value="Dormitory">Dormitory</option>
+            </select>
+            {/* Block */}
+            <select
+              value={filterBlock}
+              onChange={(e) => setFilterBlock(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+            >
+              <option value="All">All Blocks</option>
+              {['Block A', 'Block B', 'Block C', 'Block D'].map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            {/* Floor */}
+            <select
+              value={filterFloor}
+              onChange={(e) => setFilterFloor(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+            >
+              <option value="All">All Floors</option>
+              {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+            {/* Status + Reset */}
+            <div className="flex gap-2">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
               >
-                {s}
+                <option value="All">All Status</option>
+                <option value="Available">Available</option>
+                <option value="Limited">Limited</option>
+                <option value="Occupied">Occupied</option>
+                <option value="Maintenance">Maintenance</option>
+              </select>
+              <button
+                onClick={resetFilters}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-purple-400 text-purple-600 font-semibold rounded-lg bg-white hover:bg-purple-50 transition-all text-sm shrink-0"
+                title="Reset all filters"
+              >
+                <FaRedo className="w-3 h-3" />
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </div>
@@ -490,14 +573,19 @@ const RoomManagement = () => {
 
         {/* ── Room Cards Grid ─────────────────────────────── */}
         {!loading && !error && filteredRooms.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
-            {filteredRooms.map((room) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredRooms.map((room) => {
+              const isSelected = selectedCardId === room._id;
+              return (
               <div
                 key={room._id}
-                className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg hover:shadow-purple-500/10 transition-shadow duration-300 group"
+                onClick={() => setSelectedCardId(isSelected ? null : room._id)}
+                className={`bg-white rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${
+                  isSelected ? 'border-purple-500 ring-2 ring-purple-200' : 'border-gray-100'
+                }`}
               >
                 {/* Image */}
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-40 overflow-hidden">
                   <img
                     src={resolveImageUrl(room.image)}
                     alt={room.name || room.roomNumber}
@@ -509,93 +597,106 @@ const RoomManagement = () => {
                   <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStatusStyle(room.status)}`}>
                     {room.status}
                   </span>
-                  <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-gray-100 shadow-sm">
-                    {formatLKR(room.price)}
+                  <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-purple-700 shadow-sm">
+                    {formatLKR(room.price)} / night
                   </span>
                 </div>
 
                 {/* Details */}
                 <div className="p-4">
-                  <h3 className="text-base font-semibold text-purple-600 leading-tight line-clamp-1 mb-1">
-                    {room.name || room.roomNumber}
+                  {/* Room Number = Primary, Room Name = Subtitle */}
+                  <h3 className="text-lg font-bold text-gray-900 leading-tight mb-0.5">
+                    {room.roomNumber}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
-                    <FaMapMarkerAlt className="text-gray-500" />
-                    {room.block} &middot; {room.floor} &middot; {room.roomNumber}
+                  <p className="text-sm text-purple-600 font-medium line-clamp-1 mb-2">
+                    {room.name || 'Unnamed Room'}
                   </p>
 
-                  <div className="flex items-center gap-3 mb-3 text-sm text-gray-500">
-                    <span className="inline-flex items-center gap-1 bg-gray-100/60 px-2 py-0.5 rounded-md text-gray-600">
-                      <FaBed className="text-gray-500 text-xs" />
+                  {/* Location */}
+                  <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5">
+                    <FaMapMarkerAlt className="text-gray-400 shrink-0" />
+                    {room.block} &middot; {room.floor}
+                  </p>
+
+                  {/* Type + Occupancy row */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs font-medium">
+                      <FaBed className="text-gray-400 text-xs" />
                       {room.type}
                     </span>
-                    <span className="inline-flex items-center gap-1 bg-gray-100/60 px-2 py-0.5 rounded-md text-gray-600">
-                      <FaUsers className="text-gray-500 text-xs" />
+                    <span className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs font-medium">
+                      <FaUsers className="text-gray-400 text-xs" />
                       {room.occupied}/{room.capacity} beds
                     </span>
                   </div>
 
+                  {/* Facilities tags */}
                   {room.facilities && room.facilities.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
-                      {room.facilities.slice(0, 4).map((f) => (
-                        <span key={f} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-600 text-xs font-medium">
+                      {room.facilities.slice(0, 3).map((f) => (
+                        <span key={f} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 text-xs font-medium border border-purple-100">
                           {FACILITY_ICONS[f] || null}
                           {f}
                         </span>
                       ))}
-                      {room.facilities.length > 4 && (
-                        <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-500 text-xs font-medium">
-                          +{room.facilities.length - 4} more
+                      {room.facilities.length > 3 && (
+                        <span className="px-2 py-0.5 rounded-md bg-gray-50 text-gray-500 text-xs font-medium border border-gray-200">
+                          +{room.facilities.length - 3}
                         </span>
                       )}
                     </div>
                   )}
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200">
+                  {/* Last Updated */}
+                  <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+                    <FaClock className="w-3 h-3" />
+                    Updated {getTimeAgo(room.createdAt)}
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                     <button
-                      onClick={() => setViewingRoom(room)}
-                      className="flex items-center justify-center gap-1.5 text-sm font-medium text-purple-600 bg-purple-500/10 hover:bg-purple-500/20 py-2 px-3 rounded-lg transition-colors"
+                      onClick={(e) => { e.stopPropagation(); setViewingRoom(room); }}
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 py-2 px-2.5 rounded-lg transition-colors border border-purple-100"
                       title="View Room"
                     >
                       <FaEye className="text-xs" /> View
                     </button>
                     <button
-                      onClick={() => handleEditRoom(room)}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium text-purple-600 bg-purple-500/10 hover:bg-purple-500/20 py-2 px-3 rounded-lg transition-colors"
+                      onClick={(e) => { e.stopPropagation(); handleEditRoom(room); }}
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 py-2 px-2.5 rounded-lg transition-colors border border-blue-100"
                       title="Edit Room"
                     >
                       <FaEdit className="text-xs" /> Edit
                     </button>
                     <button
-                      onClick={() => setDeleteTarget(room)}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 py-2 px-3 rounded-lg transition-colors"
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(room); }}
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-red-500 bg-red-50 hover:bg-red-100 py-2 px-2.5 rounded-lg transition-colors border border-red-100"
                       title="Delete Room"
                     >
-                      <FaTrash className="text-xs" /> Delete
+                      <FaTrash className="text-xs" />
                     </button>
-                    {room.occupied < room.capacity && room.status !== 'Maintenance' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); showToast(`Bookings for ${room.roomNumber} — coming soon`, 'success'); }}
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 py-2 px-2.5 rounded-lg transition-colors border border-green-100"
+                      title="View Bookings"
+                    >
+                      <FaClipboardList className="text-xs" />
+                    </button>
+                    {room.occupied < room.capacity && room.status !== 'Maintenance' && room.status !== 'Occupied' && (
                       <button
-                        onClick={() => openAllocateModal(room._id)}
-                        className="flex items-center justify-center text-purple-600 bg-purple-500/10 hover:bg-purple-500/20 p-2.5 rounded-lg transition-colors"
+                        onClick={(e) => { e.stopPropagation(); openAllocateModal(room._id); }}
+                        className="flex items-center justify-center text-purple-600 bg-purple-50 hover:bg-purple-100 p-2 rounded-lg transition-colors border border-purple-100 ml-auto"
                         title="Allocate Student"
                       >
-                        <FaUserPlus />
-                      </button>
-                    )}
-                    {room.occupied > 0 && (
-                      <button
-                        onClick={() => handleVacate(room._id)}
-                        className="flex items-center justify-center text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 p-2.5 rounded-lg transition-colors"
-                        title="Vacate Room"
-                      >
-                        <FaSignOutAlt />
+                        <FaUserPlus className="text-xs" />
                       </button>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -789,6 +890,7 @@ const RoomManagement = () => {
                           className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
                         >
                           <option value="Available">Available</option>
+                          <option value="Limited">Limited</option>
                           <option value="Occupied">Occupied</option>
                           <option value="Maintenance">Maintenance</option>
                         </select>
