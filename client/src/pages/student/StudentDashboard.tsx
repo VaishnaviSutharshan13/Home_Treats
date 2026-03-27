@@ -53,13 +53,20 @@ const StudentDashboard = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const normalizedStudentId = user?.studentId?.trim();
+  const normalizeStatus = (value?: string) => value?.trim().toLowerCase() || '';
 
   useEffect(() => {
+    if (!normalizedStudentId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
         const [feesRes, complaintsRes, bookingRes, notifRes] = await Promise.all([
-          user?.studentId ? feesService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
-          user?.studentId ? complaintService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
+          feesService.getByStudent(normalizedStudentId),
+          complaintService.getByStudent(normalizedStudentId),
           bookingService.getMyBooking(),
           notificationService.getAll({ limit: 6 }),
         ]);
@@ -76,19 +83,19 @@ const StudentDashboard = () => {
     };
 
     fetchData();
-  }, [user?.studentId]);
+  }, [normalizedStudentId]);
 
   const pendingFees = Array.isArray(fees)
-    ? fees.filter((f) => f.status === 'pending' || f.status === 'unpaid' || f.status === 'overdue')
+    ? fees.filter((f) => ['pending', 'unpaid', 'overdue', 'partial'].includes(normalizeStatus(f.status)))
     : [];
   const totalPendingAmount = pendingFees.reduce((sum, f) => sum + (f.amount || 0), 0);
 
   const complaintCount = Array.isArray(complaints) ? complaints.length : 0;
   const pendingComplaints = Array.isArray(complaints)
-    ? complaints.filter((c) => c.status === 'pending' || c.status === 'open' || c.status === 'in-progress')
+    ? complaints.filter((c) => ['pending', 'open', 'in progress', 'in-progress'].includes(normalizeStatus(c.status)))
     : [];
   const resolvedComplaints = Array.isArray(complaints)
-    ? complaints.filter((c) => c.status === 'resolved' || c.status === 'closed')
+    ? complaints.filter((c) => ['resolved', 'closed'].includes(normalizeStatus(c.status)))
     : [];
 
   const complaintDerivedNotifications = [
@@ -221,8 +228,8 @@ const StudentDashboard = () => {
                   <p className="text-sm font-medium text-gray-900">{user?.name || 'Student'}</p>
                   <p className="text-xs text-gray-500">{user?.email || ''}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-gray-900 font-semibold">{userInitials}</span>
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                  <span className="text-white font-semibold">{userInitials}</span>
                 </div>
               </div>
             </div>
@@ -365,7 +372,7 @@ const StudentDashboard = () => {
           <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
             <div className="flex items-start space-x-3">
               <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-gray-900 text-xs font-bold">i</span>
+                <span className="text-white text-xs font-bold">i</span>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-blue-900 mb-1">Important Notice</h4>

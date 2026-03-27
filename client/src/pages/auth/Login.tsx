@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, authError, clearAuthError } = useAuth();
+  const { login, isAuthenticated, authError, clearAuthError, user } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -26,10 +26,19 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.redirectTo || location.state?.from || '/student/dashboard';
-      navigate(from, { replace: true });
+      const from = location.state?.redirectTo || location.state?.from;
+      if (from) {
+        navigate(from, { replace: true });
+        return;
+      }
+
+      if (user?.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/student/dashboard', { replace: true });
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user, navigate, location.state]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -84,21 +93,15 @@ const Login = () => {
       const success = await login(formData.email, formData.password);
       
       if (success) {
-        const from = location.state?.redirectTo || location.state?.from || '/student/dashboard';
-        navigate(from, {
-          replace: true,
-          state: location.state?.selectedRoom
-            ? { selectedRoom: location.state.selectedRoom }
-            : undefined,
-        });
+        // The useEffect will handle redirection
       } else {
         setLoginError(authError || 'Invalid email or password');
-        setIsLoading(false);
       }
     } catch (error) {
       setLoginError('Login failed. Please try again.');
-      setIsLoading(false);
       console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

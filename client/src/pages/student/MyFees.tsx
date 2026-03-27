@@ -144,7 +144,7 @@ const MyFees = () => {
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchFees} className="px-4 py-2 bg-indigo-600 text-gray-900 rounded-lg hover:bg-indigo-700">Retry</button>
+              <button onClick={fetchFees} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm">Retry</button>
             </div>
           ) : (
             <div className="space-y-6">

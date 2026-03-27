@@ -16,6 +16,28 @@ import {
 } from "react-icons/fa";
 import { MdMeetingRoom } from "react-icons/md";
 
+interface RoomData {
+  roomId: string;
+  roomNumber?: string;
+  floor: string;
+  building: string;
+  price: number;
+}
+
+interface FormData {
+  fullName: string;
+  email: string;
+  phone: string;
+  nic: string;
+  startDate: string;
+  duration: string;
+  notes: string;
+}
+
+interface FormErrors {
+  [key: string]: string;
+}
+
 const durations = [
   "1 Month",
   "3 Months",
@@ -23,11 +45,11 @@ const durations = [
   "12 Months",
 ];
 
-const BookingForm = () => {
+const BookingForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [roomData, setRoomData] = useState(null);
-  const [formData, setFormData] = useState({
+  const [roomData, setRoomData] = useState<RoomData | null>(null);
+  const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
     phone: "",
@@ -36,7 +58,7 @@ const BookingForm = () => {
     duration: "",
     notes: "",
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (location.state?.room) {
@@ -58,7 +80,7 @@ const BookingForm = () => {
     navigate("/rooms", { replace: true });
   }, [navigate, location.state]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (formErrors[name]) {
@@ -66,8 +88,8 @@ const BookingForm = () => {
     }
   };
 
-  const validate = () => {
-    const errors = {};
+  const validate = (): boolean => {
+    const errors: FormErrors = {};
     if (!formData.fullName.trim()) errors.fullName = "Full name is required";
     if (!formData.email.trim()) errors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
@@ -82,7 +104,7 @@ const BookingForm = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
 
