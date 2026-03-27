@@ -21,7 +21,6 @@ import {
   FaClock,
   FaMoneyBillWave,
 } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
 import { authService, feesService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
 
@@ -44,7 +43,6 @@ interface PaymentSummary {
 }
 
 const Profile = () => {
-  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
   const [loading, setLoading] = useState(true);

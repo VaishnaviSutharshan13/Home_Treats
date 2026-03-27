@@ -29,13 +29,7 @@ const Login = () => {
       const from = location.state?.redirectTo || location.state?.from || '/student/dashboard';
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, location]);
-
-  useEffect(() => {
-    if (authError) {
-      setLoginError(authError);
-    }
-  }, [authError]);
+  }, [isAuthenticated]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

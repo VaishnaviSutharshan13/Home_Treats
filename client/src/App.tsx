@@ -59,22 +59,8 @@ function AppShell() {
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
-              <Route
-                path="/rooms"
-                element={
-                  <ProtectedRoute requiredRole="student">
-                    <Rooms />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/rooms/:id"
-                element={
-                  <ProtectedRoute requiredRole="student">
-                    <RoomDetails />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/rooms" element={<Rooms />} />
+              <Route path="/rooms/:id" element={<RoomDetails />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

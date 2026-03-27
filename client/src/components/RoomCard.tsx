@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaBed, FaUsers, FaWifi, FaCar, FaDumbbell } from 'react-icons/fa';
+import { FaBed, FaUsers } from 'react-icons/fa';
 
 interface RoomCardProps {
   room: {

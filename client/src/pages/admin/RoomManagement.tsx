@@ -34,9 +34,7 @@ import {
   FaChevronLeft,
   FaBars,
   FaClock,
-  FaCalendarAlt,
   FaRedo,
-  FaBuilding,
   FaLayerGroup,
   FaClipboardList,
 } from 'react-icons/fa';
@@ -690,6 +688,15 @@ const RoomManagement = () => {
                         title="Allocate Student"
                       >
                         <FaUserPlus className="text-xs" />
+                      </button>
+                    )}
+                    {room.occupied > 0 && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleVacate(room._id); }}
+                        className="flex items-center justify-center text-amber-600 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg transition-colors border border-amber-100"
+                        title="Vacate Room"
+                      >
+                        <FaSignOutAlt className="text-xs" />
                       </button>
                     )}
                   </div>

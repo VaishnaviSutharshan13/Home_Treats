@@ -15,7 +15,10 @@ export interface IUser extends Document {
   emergencyContact?: string;
   profileImage?: string;
   room?: string;
+  roomNumber?: string;
   course?: string;
+  year?: string;
+  status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
   approvalStatus?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
   approvedAt?: Date;
   rejectedAt?: Date;
@@ -87,8 +90,20 @@ const UserSchema: Schema = new Schema(
     room: {
       type: String,
     },
+    roomNumber: {
+      type: String,
+      trim: true,
+    },
     course: {
       type: String,
+    },
+    year: {
+      type: String,
+      enum: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+    },
+    status: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected', 'Inactive'],
     },
     approvalStatus: {
       type: String,

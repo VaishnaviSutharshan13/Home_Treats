@@ -120,6 +120,16 @@ export const studentService = {
     const response = await api.put(`/students/${id}/reject`);
     return response.data;
   },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/students/${id}`);
+    return response.data;
+  },
+
+  getApprovals: async () => {
+    const response = await api.get('/students/approvals');
+    return response.data;
+  },
 };
 
 export const settingsService = {
@@ -258,6 +268,11 @@ export const feesService = {
 
   getUnpaid: async () => {
     const response = await api.get('/fees/unpaid');
+    return response.data;
+  },
+
+  getMyFees: async () => {
+    const response = await api.get('/fees/my-fees');
     return response.data;
   },
 };

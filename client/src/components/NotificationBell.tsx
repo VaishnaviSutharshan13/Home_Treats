@@ -59,7 +59,7 @@ const NotificationBell = () => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  }, [typeFilter]);
 
   // Close dropdown on outside click
   useEffect(() => {
