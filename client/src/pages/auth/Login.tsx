@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, authError, clearAuthError } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -31,12 +31,22 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, location]);
 
+  useEffect(() => {
+    if (authError) {
+      setLoginError(authError);
+    }
+  }, [authError]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    if (authError) {
+      clearAuthError();
+    }
     
     // Clear field-specific error when user starts typing
     if (formErrors[name]) {
@@ -83,7 +93,7 @@ const Login = () => {
         const from = location.state?.from || '/dashboard';
         navigate(from, { replace: true });
       } else {
-        setLoginError('Invalid email or password');
+        setLoginError(authError || 'Invalid email or password');
         setIsLoading(false);
       }
     } catch (error) {

@@ -6,10 +6,19 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: 'admin' | 'student';
+  adminId?: string;
   phone?: string;
   studentId?: string;
+  university?: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  address?: string;
+  emergencyContact?: string;
+  profileImage?: string;
   room?: string;
   course?: string;
+  approvalStatus?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
+  approvedAt?: Date;
+  rejectedAt?: Date;
   isActive: boolean;
   resetToken?: string;
   resetExpires?: Date;
@@ -40,6 +49,12 @@ const UserSchema: Schema = new Schema(
       enum: ['admin', 'student'],
       default: 'student',
     },
+    adminId: {
+      type: String,
+      trim: true,
+      sparse: true,
+      unique: true,
+    },
     phone: {
       type: String,
       trim: true,
@@ -48,11 +63,44 @@ const UserSchema: Schema = new Schema(
       type: String,
       trim: true,
     },
+    university: {
+      type: String,
+      trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female', 'Other'],
+    },
+    address: {
+      type: String,
+      trim: true,
+    },
+    emergencyContact: {
+      type: String,
+      trim: true,
+    },
+    profileImage: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     room: {
       type: String,
     },
     course: {
       type: String,
+    },
+    approvalStatus: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected', 'Inactive'],
+      default: 'Pending',
+      index: true,
+    },
+    approvedAt: {
+      type: Date,
+    },
+    rejectedAt: {
+      type: Date,
     },
     isActive: {
       type: Boolean,

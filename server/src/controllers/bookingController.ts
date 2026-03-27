@@ -67,6 +67,18 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== 'student') {
+      return res.status(403).json({ success: false, message: 'Only students can book rooms' });
+    }
+
+    if (user.approvalStatus !== 'Approved') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only approved students can book rooms. Please contact admin.',
+      });
+    }
+
     let availableRoom = null as any;
 
     if (roomId) {
@@ -103,7 +115,6 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     }
 
     const bedNumber = availableRoom.occupied + 1;
-    const user = await User.findById(req.user.id);
 
     availableRoom.occupied = bedNumber;
     availableRoom.students = [
@@ -141,9 +152,27 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     }
 
     await createNotification(
+      'Booking Confirmed',
+      `Your booking is confirmed: Room ${availableRoom.roomNumber}, Bed ${bedNumber}, ${floor}.`,
+      'room',
+      {
+        source: 'Room Management',
+        recipientUserId: String(user._id),
+        relatedModuleId: String(booking._id),
+        priority: 'success',
+      }
+    );
+
+    await createNotification(
       'New Room Booking',
-      `Student: ${fullName} | Email: ${email} | Room: ${availableRoom.roomNumber} | Floor: ${floor} | Bed: ${bedNumber} | Date: ${new Date().toLocaleString('en-LK')}`,
-      'booking'
+      `Student Name: ${fullName} | Student ID: ${user.studentId || 'N/A'} | Room Number: ${availableRoom.roomNumber} | Floor: ${floor}`,
+      'room',
+      {
+        source: 'Room Management',
+        recipientType: 'all_admins',
+        relatedModuleId: String(booking._id),
+        priority: 'important',
+      }
     );
 
     return res.status(201).json({
@@ -249,6 +278,23 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
 
     booking.status = status;
     await booking.save();
+
+    const studentUser = await User.findById(booking.userId).select('_id name');
+    if (studentUser) {
+      await createNotification(
+        status === 'Confirmed' ? 'Booking Confirmed' : 'Booking Cancelled',
+        status === 'Confirmed'
+          ? `Your room booking for ${booking.roomNumber} has been confirmed by administration.`
+          : `Your room booking for ${booking.roomNumber} has been cancelled by administration.`,
+        'room',
+        {
+          source: 'Room Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(booking._id),
+          priority: status === 'Confirmed' ? 'success' : 'important',
+        }
+      );
+    }
 
     return res.json({ success: true, message: 'Booking status updated', data: booking });
   } catch (error: any) {

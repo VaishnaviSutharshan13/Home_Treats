@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Fee from '../models/Fee';
+import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { createNotification } from './notificationController';
 import { logAdminAction } from './adminLogController';
@@ -51,6 +52,22 @@ export const createFee = async (req: AuthRequest, res: Response) => {
     });
     const savedFee = await fee.save();
 
+    const studentUser = await User.findOne({ role: 'student', studentId: savedFee.studentId }).select('_id name');
+
+    if (studentUser) {
+      await createNotification(
+        'New Fee Added',
+        `A new ${savedFee.feeType} of LKR ${savedFee.amount.toLocaleString()} has been added. Due date: ${new Date(savedFee.dueDate).toLocaleDateString()}.`,
+        'fee',
+        {
+          source: 'Fees Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(savedFee._id),
+          priority: 'important',
+        }
+      );
+    }
+
     if (req.user) {
       await logAdminAction(req.user.email, String(req.user.id), 'Created a fee', 'fee', String(savedFee._id), `${savedFee.feeType} for ${savedFee.studentName}`);
     }
@@ -72,6 +89,8 @@ export const createFee = async (req: AuthRequest, res: Response) => {
 // UPDATE fee
 export const updateFee = async (req: AuthRequest, res: Response) => {
   try {
+    const previousFee = await Fee.findById(req.params.id);
+
     const fee = await Fee.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -81,6 +100,31 @@ export const updateFee = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({
         success: false,
         message: 'Fee not found',
+      });
+    }
+
+    const studentUser = await User.findOne({ role: 'student', studentId: fee.studentId }).select('_id name');
+
+    if (studentUser && previousFee && previousFee.status !== fee.status) {
+      let title = 'Fee Status Updated';
+      let message = `Your ${fee.feeType} status changed to ${fee.status}.`;
+      let priority: 'normal' | 'important' | 'urgent' | 'success' = 'normal';
+
+      if (fee.status === 'Overdue') {
+        title = 'Payment Overdue Alert';
+        message = `Your ${fee.feeType} payment is overdue. Please settle LKR ${fee.amount.toLocaleString()} as soon as possible.`;
+        priority = 'urgent';
+      } else if (fee.status === 'Paid') {
+        title = 'Payment Confirmed';
+        message = `Payment confirmed for ${fee.feeType}. Thank you.`;
+        priority = 'success';
+      }
+
+      await createNotification(title, message, 'fee', {
+        source: 'Fees Management',
+        recipientUserId: String(studentUser._id),
+        relatedModuleId: String(fee._id),
+        priority,
       });
     }
 
@@ -151,8 +195,31 @@ export const payFee = async (req: AuthRequest, res: Response) => {
 
     await fee.save();
 
+    const studentUser = await User.findOne({ role: 'student', studentId: fee.studentId }).select('_id name');
+
+    if (studentUser) {
+      await createNotification(
+        fee.status === 'Paid' ? 'Payment Confirmed' : 'Partial Payment Recorded',
+        fee.status === 'Paid'
+          ? `Your ${fee.feeType} payment has been confirmed.`
+          : `Partial payment received for ${fee.feeType}. Remaining amount: LKR ${Math.max(0, fee.remainingAmount || 0).toLocaleString()}.`,
+        'fee',
+        {
+          source: 'Fees Management',
+          recipientUserId: String(studentUser._id),
+          relatedModuleId: String(fee._id),
+          priority: fee.status === 'Paid' ? 'success' : 'important',
+        }
+      );
+    }
+
     // Notification + Admin Log
-    await createNotification('Payment Received', `Fee payment completed by Student ${fee.studentId}`, 'payment');
+    await createNotification('Payment Received', `Fee payment completed by Student ${fee.studentId}`, 'fee', {
+      source: 'Fees Management',
+      recipientType: 'all_admins',
+      relatedModuleId: String(fee._id),
+      priority: 'success',
+    });
     if (req.user) {
       await logAdminAction(req.user.email, String(req.user.id), 'Recorded fee payment', 'fee', String(req.params.id), `${fee.feeType} by ${fee.studentName}`);
     }

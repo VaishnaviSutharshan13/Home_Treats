@@ -23,6 +23,8 @@ import adminRoutes from './routes/adminRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import adminLogRoutes from './routes/adminLogRoutes';
 import bookingRoutes from './routes/bookingRoutes';
+import profileRoutes from './routes/profileRoutes';
+import settingsRoutes from './routes/settingsRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +37,7 @@ connectDB().then(() => {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const uploadsDir = path.join(process.cwd(), 'uploads');
 
 // ---------- Middleware ----------
 app.use(helmet());
@@ -44,7 +47,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Static files for uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(uploadsDir));
 
 // ---------- API Routes ----------
 app.use('/api/auth', authRoutes);
@@ -56,6 +59,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin-logs', adminLogRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

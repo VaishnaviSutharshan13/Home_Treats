@@ -7,8 +7,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBed, FaDollarSign, FaExclamationTriangle, FaUser, FaSpinner } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import { feesService, complaintService, bookingService } from '../../services';
+import { feesService, complaintService, bookingService, notificationService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
+import NotificationBell from '../../components/NotificationBell';
 
 interface Fee {
   _id: string;
@@ -36,6 +37,14 @@ interface Booking {
   status: 'Confirmed' | 'Cancelled';
 }
 
+interface NotificationItem {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'announcement' | 'fee' | 'complaint' | 'room' | 'student' | 'booking' | 'payment';
+  createdAt: string;
+}
+
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,19 +52,22 @@ const StudentDashboard = () => {
   const [fees, setFees] = useState<Fee[]>([]);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [booking, setBooking] = useState<Booking | null>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [feesRes, complaintsRes, bookingRes] = await Promise.all([
+        const [feesRes, complaintsRes, bookingRes, notifRes] = await Promise.all([
           user?.studentId ? feesService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
           user?.studentId ? complaintService.getByStudent(user.studentId) : Promise.resolve({ data: [] }),
           bookingService.getMyBooking(),
+          notificationService.getAll({ limit: 6 }),
         ]);
 
         setFees(feesRes.data || feesRes || []);
         setComplaints(complaintsRes.data || complaintsRes || []);
         setBooking(bookingRes?.data || null);
+        setNotifications(notifRes?.data || []);
       } catch (error) {
         console.error('Failed to fetch student data:', error);
       } finally {
@@ -79,8 +91,7 @@ const StudentDashboard = () => {
     ? complaints.filter((c) => c.status === 'resolved' || c.status === 'closed')
     : [];
 
-  // Derive notifications from real complaints
-  const recentNotifications = [
+  const complaintDerivedNotifications = [
     ...resolvedComplaints.slice(0, 3).map((c) => ({
       type: 'resolved' as const,
       title: 'Complaint Resolved',
@@ -98,6 +109,15 @@ const StudentDashboard = () => {
   ]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
+
+  const recentNotifications = notifications.length > 0
+    ? notifications.slice(0, 5).map((n) => ({
+        title: n.title,
+        description: n.message,
+        date: n.createdAt,
+        color: n.type === 'student' ? 'green' : 'orange',
+      }))
+    : complaintDerivedNotifications;
 
   const formatTimeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -179,6 +199,8 @@ const StudentDashboard = () => {
             <div className="flex items-center justify-between h-16">
               {/* Mobile Menu Button */}
               <button
+                title="Open sidebar"
+                aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               >
@@ -194,6 +216,7 @@ const StudentDashboard = () => {
 
               {/* Student Profile */}
               <div className="flex items-center space-x-4">
+                <NotificationBell />
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-gray-900">{user?.name || 'Student'}</p>
                   <p className="text-xs text-gray-500">{user?.email || ''}</p>

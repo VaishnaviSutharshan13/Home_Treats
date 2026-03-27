@@ -36,6 +36,7 @@ import {
 } from 'react-icons/fa';
 import { roomService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
+import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
 
 // ─── Types ───────────────────────────────────────────────────
 interface Room {
@@ -383,13 +384,20 @@ const RoomManagement = () => {
                 <p className="text-sm text-gray-500">Manage hostel rooms, allocations & availability</p>
               </div>
             </div>
-            <button
-              onClick={handleAddRoom}
-              className="bg-purple-600 text-white px-5 py-2.5 rounded-xl hover:bg-purple-600 transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
-            >
-              <FaPlus className="mr-2" />
-              Add New Room
-            </button>
+            <div className="flex items-center gap-2">
+              <AdminNotificationComposer
+                source="Room Management"
+                defaultType="room"
+                buttonLabel="Send Room Update"
+              />
+              <button
+                onClick={handleAddRoom}
+                className="bg-purple-600 text-white px-5 py-2.5 rounded-xl hover:bg-purple-600 transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
+              >
+                <FaPlus className="mr-2" />
+                Add New Room
+              </button>
+            </div>
           </div>
         </div>
       </div>

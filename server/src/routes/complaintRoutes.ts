@@ -11,7 +11,7 @@ import {
   resolveComplaint,
   addComment,
 } from '../controllers/complaintController';
-import { authMiddleware, adminOnly } from '../middleware/auth';
+import { authMiddleware, adminOnly, studentOnly } from '../middleware/auth';
 
 const router = Router();
 
@@ -39,7 +39,7 @@ const validateComment = [
 router.get('/', authMiddleware, adminOnly, getAllComplaints);
 router.get('/student/:studentId', authMiddleware, getComplaintsByStudent);
 router.get('/:id', authMiddleware, getComplaintById);
-router.post('/', authMiddleware, validateComplaint, createComplaint);
+router.post('/', authMiddleware, studentOnly, validateComplaint, createComplaint);
 router.put('/:id', authMiddleware, adminOnly, updateComplaint);
 router.delete('/:id', authMiddleware, adminOnly, deleteComplaint);
 router.put('/:id/assign', authMiddleware, adminOnly, validateAssign, assignComplaint);

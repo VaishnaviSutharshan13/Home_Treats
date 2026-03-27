@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   FaBell,
+  FaBullhorn,
   FaUserGraduate,
   FaExclamationTriangle,
   FaBed,
@@ -21,7 +22,9 @@ interface Notification {
   _id: string;
   title: string;
   message: string;
-  type: 'student' | 'complaint' | 'booking' | 'payment';
+  type: 'announcement' | 'fee' | 'complaint' | 'room' | 'student' | 'booking' | 'payment';
+  source: 'Student Management' | 'Fees Management' | 'Complaint Management' | 'Room Management' | 'General Announcement';
+  priority: 'normal' | 'important' | 'urgent' | 'success';
   isRead: boolean;
   createdAt: string;
 }
@@ -33,21 +36,23 @@ const NotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<'all' | 'announcement' | 'fee' | 'complaint' | 'room' | 'student'>('all');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
     try {
+      const typeParam = typeFilter === 'all' ? undefined : typeFilter;
       const [notifRes, countRes] = await Promise.all([
-        notificationService.getAll(20),
-        notificationService.getUnreadCount(),
+        notificationService.getAll({ limit: 30, type: typeParam }),
+        notificationService.getUnreadCount(typeParam),
       ]);
       if (notifRes.success) setNotifications(notifRes.data);
       if (countRes.success) setUnreadCount(countRes.unreadCount);
     } catch {
       // Silently fail during polling
     }
-  }, []);
+  }, [typeFilter]);
 
   // Initial fetch + polling
   useEffect(() => {
@@ -97,11 +102,29 @@ const NotificationBell = () => {
     }
   };
 
+  const hideNotification = async (id: string) => {
+    try {
+      await notificationService.hide(id);
+      setNotifications((prev) => {
+        const target = prev.find((n) => n._id === id);
+        if (target && !target.isRead) {
+          setUnreadCount((count) => Math.max(count - 1, 0));
+        }
+        return prev.filter((n) => n._id !== id);
+      });
+    } catch {
+      // ignore
+    }
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
+      case 'announcement': return <FaBullhorn className="w-4 h-4" />;
       case 'student': return <FaUserGraduate className="w-4 h-4" />;
       case 'complaint': return <FaExclamationTriangle className="w-4 h-4" />;
+      case 'room':
       case 'booking': return <FaBed className="w-4 h-4" />;
+      case 'fee':
       case 'payment': return <FaMoneyBillWave className="w-4 h-4" />;
       default: return <FaBell className="w-4 h-4" />;
     }
@@ -109,12 +132,22 @@ const NotificationBell = () => {
 
   const getIconColor = (type: string) => {
     switch (type) {
-      case 'student': return 'bg-blue-100 text-blue-600';
+      case 'announcement': return 'bg-purple-100 text-purple-600';
+      case 'student': return 'bg-purple-100 text-purple-700';
       case 'complaint': return 'bg-amber-100 text-amber-600';
-      case 'booking': return 'bg-purple-100 text-purple-600';
-      case 'payment': return 'bg-violet-100 text-violet-600';
+      case 'room':
+      case 'booking': return 'bg-indigo-100 text-indigo-600';
+      case 'fee':
+      case 'payment': return 'bg-emerald-100 text-emerald-600';
       default: return 'bg-gray-100 text-gray-600';
     }
+  };
+
+  const getPriorityPill = (priority: Notification['priority']) => {
+    if (priority === 'urgent') return 'bg-red-100 text-red-700';
+    if (priority === 'important') return 'bg-yellow-100 text-yellow-700';
+    if (priority === 'success') return 'bg-green-100 text-green-700';
+    return 'bg-purple-100 text-purple-700';
   };
 
   const timeAgo = (dateStr: string) => {
@@ -161,6 +194,19 @@ const NotificationBell = () => {
             )}
           </div>
           <div className="flex items-center gap-1">
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
+              className="text-xs border border-gray-200 rounded-md px-2 py-1 bg-white text-gray-600"
+              title="Filter notifications"
+            >
+              <option value="all">All</option>
+              <option value="announcement">Announcements</option>
+              <option value="student">Student</option>
+              <option value="fee">Fees</option>
+              <option value="complaint">Complaints</option>
+              <option value="room">Room</option>
+            </select>
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
@@ -183,6 +229,8 @@ const NotificationBell = () => {
             )}
             <button
               onClick={() => setIsOpen(false)}
+              title="Close notifications"
+              aria-label="Close notifications"
               className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition"
             >
               <FaTimes className="w-3 h-3" />
@@ -215,18 +263,41 @@ const NotificationBell = () => {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm leading-snug ${notif.isRead ? 'text-gray-600' : 'text-gray-900 font-medium'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className={`text-sm leading-snug ${notif.isRead ? 'text-gray-700' : 'text-gray-900 font-semibold'}`}>
+                      {notif.title}
+                    </p>
+                    <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold ${getPriorityPill(notif.priority)}`}>
+                      {notif.priority}
+                    </span>
+                  </div>
+                  <p className={`text-xs leading-snug ${notif.isRead ? 'text-gray-500' : 'text-gray-700'}`}>
                     {notif.message}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.createdAt)}</p>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-[11px] text-purple-600 font-medium">{notif.source}</span>
+                    <p className="text-[11px] text-gray-400">{timeAgo(notif.createdAt)}</p>
+                  </div>
                 </div>
 
                 {/* Unread indicator */}
-                {!notif.isRead && (
-                  <div className="flex-shrink-0 mt-1.5">
+                <div className="flex-shrink-0 mt-1.5 flex items-center gap-2">
+                  {!notif.isRead && (
                     <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  </div>
-                )}
+                  )}
+                  <button
+                    type="button"
+                    title="Remove from my view"
+                    aria-label="Remove from my view"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      hideNotification(notif._id);
+                    }}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    <FaTimes className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             ))
           )}

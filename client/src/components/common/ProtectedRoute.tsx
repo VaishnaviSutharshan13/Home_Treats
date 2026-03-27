@@ -37,9 +37,13 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
       return <Navigate to="/student/dashboard" replace />;
     }
 
-    // Student route → students or admins (admin can view student pages too)
-    if (requiredRole === 'student' && userRole !== 'student' && userRole !== 'admin') {
+    // Student route -> approved students only
+    if (requiredRole === 'student' && userRole !== 'student') {
       return <Navigate to="/login" replace />;
+    }
+
+    if (requiredRole === 'student' && userRole === 'student' && user?.approvalStatus !== 'Approved') {
+      return <Navigate to="/login" state={{ message: 'Your account is not approved yet. Please wait for admin approval.' }} replace />;
     }
   }
 

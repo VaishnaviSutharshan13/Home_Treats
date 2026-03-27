@@ -6,6 +6,7 @@
  * Room listings have been moved exclusively to the Rooms Page.
  */
 
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FaWifi,
@@ -26,6 +27,8 @@ import {
   FaHome,
   FaQuoteLeft,
 } from 'react-icons/fa';
+import { settingsService } from '../services';
+import heroBg from '../assets/hero_bg.png';
 
 /* ──────────────────────────────────────────────────
    DATA
@@ -149,6 +152,32 @@ const testimonials = [
    COMPONENT
 ────────────────────────────────────────────────── */
 const Home = () => {
+  const [heroImage, setHeroImage] = useState('');
+  const apiRoot = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
+  useEffect(() => {
+    const loadHeroImage = async () => {
+      try {
+        const res = await settingsService.getHeroImage();
+        if (res?.success) {
+          setHeroImage(String(res.heroImage || ''));
+        }
+      } catch {
+        setHeroImage('');
+      }
+    };
+
+    loadHeroImage();
+  }, []);
+
+  const resolvedHeroImage = useMemo(() => {
+    if (!heroImage) return heroBg;
+    if (heroImage.startsWith('http://') || heroImage.startsWith('https://')) {
+      return heroImage;
+    }
+    return `${apiRoot}${heroImage}`;
+  }, [heroImage, apiRoot]);
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -156,26 +185,15 @@ const Home = () => {
           1. HERO SECTION
           Soft purple gradient overlay — bright and welcoming
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-
-        {/* Background image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1600&q=80')",
-            filter: 'brightness(0.85)',
-          }}
-        />
-
-        {/* Soft purple gradient overlay — replaces heavy black */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(160deg, rgba(109,40,217,0.55) 0%, rgba(139,92,246,0.30) 50%, rgba(109,40,217,0.50) 100%)',
-          }}
-        />
+      <section
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(124,58,237,0.25)), url(${resolvedHeroImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
 
         {/* Content */}
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
@@ -342,7 +360,7 @@ const Home = () => {
                 <FaShieldAlt className="w-8 h-8 text-white" />
               </div>
               {/* Floating badge bottom-left */}
-              <div className="absolute -bottom-4 -left-4 bg-white border border-purple-500/20 rounded-2xl px-5 py-3 shadow-xl">
+              <div className="absolute -bottom-16 left-2 sm:-bottom-16 sm:left-3 md:-bottom-20 md:left-4 bg-white border border-purple-500/20 rounded-2xl px-5 py-3 shadow-xl z-20">
                 <div className="text-3xl font-extrabold text-purple-600 leading-none">8+</div>
                 <div className="text-xs text-gray-500 font-medium mt-0.5">Years of Trust</div>
               </div>
