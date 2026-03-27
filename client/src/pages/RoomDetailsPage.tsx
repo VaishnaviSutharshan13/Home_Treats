@@ -18,7 +18,45 @@ import {
 } from "react-icons/fa";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 
-const floorData = {
+interface FloorInfo {
+  id: string;
+  title: string;
+  totalRooms: number;
+  availableRooms: number;
+  priceMin: number;
+  priceMax: number;
+  image: string;
+  rating: number;
+  reviews: number;
+  location: string;
+  description: string;
+  facilities: string[];
+  checkIn: {
+    time: string;
+    day: string;
+    note: string;
+  };
+  checkOut: {
+    time: string;
+    day: string;
+    note: string;
+  };
+}
+
+interface FacilityBadgeProps {
+  name: string;
+}
+
+interface InfoCardProps {
+  icon: React.ReactNode;
+  title: string;
+  time: string;
+  day: string;
+  note: string;
+  accentColor: string;
+}
+
+const floorData: Record<string, FloorInfo> = {
   "1st-floor": {
     id: "1st-floor",
     title: "1st Floor",
@@ -124,7 +162,7 @@ const floorData = {
 /* ──────────────────────────────────────────────────
    FACILITY ICON MAP
 ────────────────────────────────────────────────── */
-const facilityIcons = {
+const facilityIcons: Record<string, React.ReactNode> = {
   WiFi: <FaWifi />,
   Fan: <FaFan />,
   "Study Table": <FaTable />,
@@ -139,7 +177,7 @@ const facilityIcons = {
 /* ──────────────────────────────────────────────────
    REUSABLE: FACILITY BADGE
 ────────────────────────────────────────────────── */
-const FacilityBadge = ({ name }) => (
+const FacilityBadge: React.FC<FacilityBadgeProps> = ({ name }) => (
   <div className="flex items-center gap-3 bg-purple-50 border border-purple-100 rounded-xl px-4 py-3 hover:shadow-md hover:border-purple-300 transition-all duration-200 group">
     <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600 shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-all duration-200">
       {facilityIcons[name] || <FaCheckCircle />}
@@ -151,7 +189,7 @@ const FacilityBadge = ({ name }) => (
 /* ──────────────────────────────────────────────────
    REUSABLE: INFO CARD (Check-in / Check-out)
 ────────────────────────────────────────────────── */
-const InfoCard = ({ icon, title, time, day, note, accentColor }) => (
+const InfoCard: React.FC<InfoCardProps> = ({ icon, title, time, day, note, accentColor }) => (
   <div className={`bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow duration-300 p-6`}>
     <div className="flex items-center gap-3 mb-4">
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${accentColor} text-white shadow-md`}>
@@ -178,10 +216,10 @@ const InfoCard = ({ icon, title, time, day, note, accentColor }) => (
 /* ══════════════════════════════════════════════════
    MAIN COMPONENT
 ══════════════════════════════════════════════════ */
-const RoomDetailsPage = () => {
-  const { floorId } = useParams();
+const RoomDetailsPage: React.FC = () => {
+  const { floorId } = useParams<{ floorId: string }>();
   const navigate = useNavigate();
-  const floor = floorData[floorId];
+  const floor = floorId ? floorData[floorId] : undefined;
 
   /* ---------- ROOM NOT FOUND ---------- */
   if (!floor) {

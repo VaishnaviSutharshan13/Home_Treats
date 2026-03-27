@@ -96,7 +96,7 @@ const MyRoom = () => {
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchRoom} className="px-4 py-2 bg-indigo-600 text-gray-900 rounded-lg hover:bg-indigo-700">
+              <button onClick={fetchRoom} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm">
                 Retry
               </button>
             </div>

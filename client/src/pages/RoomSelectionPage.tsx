@@ -17,7 +17,41 @@ import {
 import { MdMeetingRoom } from "react-icons/md";
 import { useAuth } from "../context/AuthContext";
 
-const floorConfig = {
+interface FloorConfig {
+  id: string;
+  title: string;
+  minPrice: number;
+  maxPrice: number;
+}
+
+interface Room {
+  id: string;
+  roomNumber: string;
+  building: string;
+  floor: string;
+  floorId: string;
+  status: "Available" | "Limited" | "Not Available";
+  totalBeds: number;
+  occupiedBeds: number;
+  price: number;
+  note?: string;
+}
+
+interface Filters {
+  building: string;
+  floor: string;
+  availability: string;
+  search: string;
+}
+
+interface StatusConfigItem {
+  bg: string;
+  text: string;
+  border: string;
+  icon: React.ReactNode;
+}
+
+const floorConfig: Record<string, FloorConfig> = {
   "1st-floor": {
     id: "1st-floor",
     title: "1st Floor",
@@ -44,7 +78,7 @@ const floorConfig = {
   },
 };
 
-const allRooms = [
+const allRooms: Room[] = [
   { id: "r-101", roomNumber: "B01-101", building: "Building 01", floor: "1st Floor", floorId: "1st-floor", status: "Available", totalBeds: 1, occupiedBeds: 0, price: 15000 },
   { id: "r-102", roomNumber: "B01-102", building: "Building 01", floor: "1st Floor", floorId: "1st-floor", status: "Limited", totalBeds: 2, occupiedBeds: 1, price: 18000, note: "Only 1 left" },
   { id: "r-103", roomNumber: "B02-103", building: "Building 02", floor: "1st Floor", floorId: "1st-floor", status: "Not Available", totalBeds: 2, occupiedBeds: 2, price: 17000 },
@@ -66,7 +100,7 @@ const statuses = ["Available", "Limited", "Not Available"];
 /* ──────────────────────────────────────────────────
    STATUS STYLING
 ────────────────────────────────────────────────── */
-const statusConfig = {
+const statusConfig: Record<string, StatusConfigItem> = {
   Available: {
     bg: "bg-green-50",
     text: "text-green-700",
@@ -87,8 +121,8 @@ const statusConfig = {
   },
 };
 
-const RoomSelectionPage = () => {
-  const { floorId } = useParams();
+const RoomSelectionPage: React.FC = () => {
+  const { floorId } = useParams<{ floorId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -99,8 +133,8 @@ const RoomSelectionPage = () => {
     [floorId]
   );
 
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [filters, setFilters] = useState({
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [filters, setFilters] = useState<Filters>({
     building: "",
     floor: "",
     availability: "",
@@ -112,7 +146,7 @@ const RoomSelectionPage = () => {
       navigate("/rooms", { replace: true });
       return;
     }
-    const restoredRoom = location.state?.selectedRoom;
+    const restoredRoom = (location.state as any)?.selectedRoom;
     if (restoredRoom && restoredRoom.floorId === floorId) {
       setSelectedRoom(restoredRoom);
     }
@@ -130,7 +164,7 @@ const RoomSelectionPage = () => {
     });
   }, [floorRooms, filters]);
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
@@ -139,7 +173,7 @@ const RoomSelectionPage = () => {
     setSelectedRoom(null);
   };
 
-  const handleSelectRoom = (room) => {
+  const handleSelectRoom = (room: Room) => {
     if (room.status === "Not Available") return;
     if (!isAuthenticated) {
       navigate("/login", {

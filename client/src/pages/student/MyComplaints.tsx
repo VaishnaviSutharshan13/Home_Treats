@@ -155,7 +155,7 @@ const MyComplaints = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowNewComplaint(true)}
-                className="bg-blue-600 text-gray-900 px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-sm flex items-center gap-2"
               >
                 <FaPlus className="w-3 h-3" />
                 New Complaint
@@ -187,7 +187,7 @@ const MyComplaints = () => {
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchComplaints} className="px-4 py-2 bg-indigo-600 text-gray-900 rounded-lg hover:bg-indigo-700">Retry</button>
+              <button onClick={fetchComplaints} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm">Retry</button>
             </div>
           ) : (
             <div className="space-y-6">
@@ -410,7 +410,7 @@ const MyComplaints = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-blue-600 text-gray-900 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm disabled:opacity-50 flex items-center gap-2"
                   >
                     {submitting && <FaSpinner className="animate-spin w-3 h-3" />}
                     Submit

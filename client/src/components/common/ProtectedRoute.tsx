@@ -1,12 +1,11 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
   requiredRole?: 'admin' | 'student';
 }
 
-const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
@@ -24,12 +23,13 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
 
   // 2. Not logged in → redirect to login
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location, message: 'You must be logged in to view this page.' }} replace />;
   }
 
-  // 2. Role-based access check
+  // 3. Role-based access check
   if (requiredRole) {
     const userRole = user?.role?.toLowerCase();
+    const approvalStatus = (user?.approvalStatus || user?.status || '').toLowerCase();
 
     // Admin route → only admins
     if (requiredRole === 'admin' && userRole !== 'admin') {
@@ -42,12 +42,12 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
       return <Navigate to="/login" replace />;
     }
 
-    if (requiredRole === 'student' && userRole === 'student' && user?.approvalStatus !== 'Approved') {
+    if (requiredRole === 'student' && userRole === 'student' && approvalStatus !== 'approved') {
       return <Navigate to="/login" state={{ message: 'Your account is not approved yet. Please wait for admin approval.' }} replace />;
     }
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

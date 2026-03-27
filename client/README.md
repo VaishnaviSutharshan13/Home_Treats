@@ -1,47 +1,11 @@
 # React + TypeScript + Vite
 
-> **This project has been upgraded with TailwindCSS, MUI icons, and
-> a more opinionated folder layout.**
-
-
-
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Tailwind & MUI
-
-The client contains the following enhancements:
-
-- TailwindCSS configured via `tailwind.config.cjs` (custom screens/breakpoints).
-- Global CSS variables for breakpoints in `src/index.css`.
-- `@mui/material` + `@mui/icons-material` installed for icons/components.
-- An example `Header` component using the `Home` icon and responsive
-  typography.
-- Path aliases (`@components`, `@pages`, etc.) defined in
-  `tsconfig.app.json` and mirrored in `vite.config.ts`.
-- Basic service (`src/services/api.ts`) and utility (`src/utils/`) scaffolding.
-
-Folder structure:
-
-```
-client/src/
-  components/
-  pages/
-  services/
-  utils/
-  hooks/
-  layouts/
-  styles/
-  App.tsx
-  main.tsx
-  index.css
-```
-
-Continue editing this README with project-specific documentation.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
 ## React Compiler
 

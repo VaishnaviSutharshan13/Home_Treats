@@ -1,58 +1,43 @@
 {
-  "name": "hostel-management-server",
-  "private": true,
+  "name": "server",
   "version": "1.0.0",
-  "description": "Hostel Management System - Backend (Node.js + Express + MongoDB)",
-  "main": "dist/index.js",
-  "type": "commonjs",
+  "description": "Express + TypeScript API for the HostelMng application.",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc -b",
+    "dev": "nodemon --watch src --ext ts --exec node -r ts-node/register src/index.ts",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write .",
-    "clean": "rimraf dist",
-    "lint": "tsc --noEmit"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "hostel",
-    "management",
-    "mongodb",
-    "express",
-    "mern",
-    "api",
-    "rest"
-  ],
-  "author": "Hostel Management Team",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-validator": "^7.3.0",
+    "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^9.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.3",
     "morgan": "^1.10.1",
-    "multer": "^2.0.2",
-    "zod": "^4.1.12"
+    "multer": "^2.1.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.10.1",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.1.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.7.2"
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.5.0",
+    "autoprefixer": "^10.4.27",
+    "nodemon": "^3.1.14",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

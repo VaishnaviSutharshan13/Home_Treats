@@ -14,6 +14,7 @@ interface User {
   gender?: 'Male' | 'Female' | 'Other';
   address?: string;
   emergencyContact?: string;
+  status?: 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
   approvalStatus?: 'Pending' | 'Approved' | 'Rejected';
   room?: string;
   course?: string;
@@ -48,14 +49,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
+  const normalizeUser = (rawUser: User | null): User | null => {
+    if (!rawUser) return null;
+
+    const normalizedApprovalStatus = rawUser.approvalStatus || rawUser.status;
+
+    return {
+      ...rawUser,
+      approvalStatus: normalizedApprovalStatus as User['approvalStatus'],
+    };
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
     if (token && userData) {
       try {
-        const parsedUser = JSON.parse(userData);
+        const parsedUser = normalizeUser(JSON.parse(userData));
         setUser(parsedUser);
+        localStorage.setItem('user', JSON.stringify(parsedUser));
         setIsAuthenticated(true);
       } catch (error) {
         localStorage.removeItem('token');
@@ -79,9 +92,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
 
       if (data.success) {
+        const normalizedUser = normalizeUser(data.data.user);
         localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify(data.data.user));
-        setUser(data.data.user);
+        localStorage.setItem('user', JSON.stringify(normalizedUser));
+        setUser(normalizedUser);
         setIsAuthenticated(true);
         return true;
       }
@@ -104,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUser = (nextUser: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return prev;
-      const merged = { ...prev, ...nextUser };
+      const merged = normalizeUser({ ...prev, ...nextUser } as User);
       localStorage.setItem('user', JSON.stringify(merged));
       return merged;
     });
