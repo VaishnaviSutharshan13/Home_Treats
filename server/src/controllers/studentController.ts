@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import Booking from '../models/Booking';
 import Fee from '../models/Fee';
+import Room from '../models/Room';
 import { createNotification } from './notificationController';
 import { logAdminAction } from './adminLogController';
 import { AuthRequest } from '../middleware/auth';
@@ -239,6 +240,7 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
     }
 
     const { roomNumber, status } = req.body;
+    const nextRoomNumber = typeof roomNumber === 'string' ? roomNumber.trim() : undefined;
 
     const student = await User.findOne({ _id: req.params.id, role: 'student' });
     if (!student) {
@@ -246,9 +248,38 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
     }
 
     const previousStatus = student.approvalStatus || 'Pending';
-    const previousRoom = student.room || '';
+    const previousRoom = String(student.room || '').trim();
+    const studentRoomKey = student.studentId || String(student._id);
 
-    if (roomNumber !== undefined) student.room = roomNumber;
+    let targetRoomDoc: any = null;
+    let previousRoomDoc: any = null;
+
+    if (roomNumber !== undefined) {
+      if (nextRoomNumber) {
+        targetRoomDoc = await Room.findOne({ roomNumber: nextRoomNumber });
+        if (!targetRoomDoc) {
+          return res.status(404).json({ success: false, message: 'Selected room not found' });
+        }
+
+        if (targetRoomDoc.status === 'Maintenance') {
+          return res.status(400).json({ success: false, message: 'Selected room is under maintenance' });
+        }
+
+        const isRoomChanged = previousRoom !== nextRoomNumber;
+        if (isRoomChanged && targetRoomDoc.occupied >= targetRoomDoc.capacity) {
+          return res.status(409).json({
+            success: false,
+            message: `Room ${nextRoomNumber} is full. Please select a vacant room.`,
+          });
+        }
+      }
+
+      if (previousRoom && previousRoom !== nextRoomNumber) {
+        previousRoomDoc = await Room.findOne({ roomNumber: previousRoom });
+      }
+
+      student.room = nextRoomNumber || '';
+    }
 
     if (status && APPROVAL_STATUSES.includes(status)) {
       student.approvalStatus = status;
@@ -260,11 +291,32 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
 
     await student.save();
 
-    if (roomNumber !== undefined && roomNumber !== previousRoom) {
+    if (roomNumber !== undefined && previousRoom !== (nextRoomNumber || '')) {
+      if (previousRoomDoc) {
+        previousRoomDoc.students = (previousRoomDoc.students || []).filter((entry: string) => entry !== studentRoomKey);
+        previousRoomDoc.occupied = Math.max(0, Number(previousRoomDoc.occupied || 0) - 1);
+        if (previousRoomDoc.status !== 'Maintenance') {
+          previousRoomDoc.status = previousRoomDoc.occupied >= previousRoomDoc.capacity ? 'Occupied' : 'Available';
+        }
+        await previousRoomDoc.save();
+      }
+
+      if (targetRoomDoc && nextRoomNumber) {
+        const currentStudents = targetRoomDoc.students || [];
+        if (!currentStudents.includes(studentRoomKey)) {
+          targetRoomDoc.students = [...currentStudents, studentRoomKey];
+        }
+        targetRoomDoc.occupied = Math.min(targetRoomDoc.capacity, Number(targetRoomDoc.occupied || 0) + 1);
+        targetRoomDoc.status = targetRoomDoc.occupied >= targetRoomDoc.capacity ? 'Occupied' : 'Available';
+        await targetRoomDoc.save();
+      }
+    }
+
+    if (roomNumber !== undefined && (nextRoomNumber || '') !== previousRoom) {
       await createNotification(
         'Room Assignment Updated',
-        roomNumber
-          ? `Hi ${student.name}, your room assignment has been updated to ${roomNumber}.`
+        nextRoomNumber
+          ? `Hi ${student.name}, your room assignment has been updated to ${nextRoomNumber}.`
           : `Hi ${student.name}, your room assignment has been removed by administration.`,
         'room',
         {
