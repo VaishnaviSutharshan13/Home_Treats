@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 import {
   getAllComplaints,
   getComplaintById,
+  getCurrentUserComplaints,
   getComplaintsByStudent,
   createComplaint,
   updateComplaint,
@@ -11,39 +12,77 @@ import {
   resolveComplaint,
   addComment,
 } from '../controllers/complaintController';
-import { authMiddleware, adminOnly, approvedStudentOnly, approvedStudentOrAdmin } from '../middleware/auth';
+import { authMiddleware, adminOnly, approvedStudentOrAdmin } from '../middleware/auth';
+import { validateRequest } from '../middleware/validateRequest';
 
 const router = Router();
 
 // Validation middleware
 const validateComplaint = [
-  body('title').notEmpty().withMessage('Title is required'),
-  body('description').notEmpty().withMessage('Description is required'),
-  body('student').notEmpty().withMessage('Student name is required'),
-  body('room').notEmpty().withMessage('Room number is required'),
-  body('category').notEmpty().withMessage('Category is required'),
+  body('title')
+    .trim()
+    .notEmpty()
+    .withMessage('Title is required')
+    .isLength({ min: 5 })
+    .withMessage('Title must be at least 5 characters'),
+  body('description')
+    .trim()
+    .notEmpty()
+    .withMessage('Description is required')
+    .isLength({ min: 20 })
+    .withMessage('Description must be at least 20 characters'),
+  body('category')
+    .trim()
+    .notEmpty()
+    .withMessage('Category is required')
+    .isIn(['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'])
+    .withMessage('Invalid category'),
+  body('priority')
+    .optional()
+    .isIn(['Low', 'Medium', 'High'])
+    .withMessage('Priority must be one of Low, Medium, High'),
+];
+
+const validateComplaintUpdate = [
+  body('title').optional().trim().isLength({ min: 5 }).withMessage('Title must be at least 5 characters'),
+  body('description').optional().trim().isLength({ min: 20 }).withMessage('Description must be at least 20 characters'),
+  body('category')
+    .optional()
+    .trim()
+    .isIn(['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'])
+    .withMessage('Invalid category'),
+  body('priority').optional().isIn(['Low', 'Medium', 'High']).withMessage('Invalid priority'),
+  body('status').optional().isIn(['Pending', 'In Progress', 'Resolved', 'Rejected']).withMessage('Invalid status'),
+  body('assignedTo').optional().trim().isLength({ min: 2 }).withMessage('Assigned to must be at least 2 characters'),
+  body('resolutionNotes').optional().trim().isLength({ min: 5 }).withMessage('Resolution notes must be at least 5 characters'),
+  body('rejectionReason').optional().trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
 ];
 
 const validateAssign = [
-  body('assignedTo').notEmpty().withMessage('Assigned to is required'),
+  body('assignedTo').trim().notEmpty().withMessage('Assigned to is required'),
+  body('estimatedResolution').optional().isISO8601().withMessage('Estimated resolution must be a valid date'),
 ];
 
-const validateResolve: any[] = [];
+const validateResolve: any[] = [
+  body('resolutionNotes').optional().trim().isLength({ min: 5 }).withMessage('Resolution notes must be at least 5 characters'),
+  body('rejectionReason').optional().trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
+];
 
 const validateComment = [
-  body('text').notEmpty().withMessage('Comment text is required'),
-  body('author').notEmpty().withMessage('Author is required'),
+  body('text').trim().notEmpty().withMessage('Comment text is required').isLength({ min: 2 }).withMessage('Comment is too short'),
+  body('author').optional().trim(),
 ];
 
 // Routes — List all complaints requires admin
 router.get('/', authMiddleware, adminOnly, getAllComplaints);
+router.get('/user', authMiddleware, approvedStudentOrAdmin, getCurrentUserComplaints);
 router.get('/student/:studentId', authMiddleware, approvedStudentOrAdmin, getComplaintsByStudent);
 router.get('/:id', authMiddleware, getComplaintById);
-router.post('/', authMiddleware, approvedStudentOnly, validateComplaint, createComplaint);
-router.put('/:id', authMiddleware, adminOnly, updateComplaint);
-router.delete('/:id', authMiddleware, adminOnly, deleteComplaint);
-router.put('/:id/assign', authMiddleware, adminOnly, validateAssign, assignComplaint);
-router.put('/:id/resolve', authMiddleware, adminOnly, validateResolve, resolveComplaint);
-router.post('/:id/comment', authMiddleware, validateComment, addComment);
+router.post('/', authMiddleware, approvedStudentOrAdmin, validateComplaint, validateRequest, createComplaint);
+router.put('/:id', authMiddleware, approvedStudentOrAdmin, validateComplaintUpdate, validateRequest, updateComplaint);
+router.delete('/:id', authMiddleware, approvedStudentOrAdmin, deleteComplaint);
+router.put('/:id/assign', authMiddleware, adminOnly, validateAssign, validateRequest, assignComplaint);
+router.put('/:id/resolve', authMiddleware, adminOnly, validateResolve, validateRequest, resolveComplaint);
+router.post('/:id/comment', authMiddleware, validateComment, validateRequest, addComment);
 
 export default router;

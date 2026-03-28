@@ -271,8 +271,13 @@ export const feesService = {
 
 // ─── Complaint Services ──────────────────────────────────────
 export const complaintService = {
-  getAll: async () => {
-    const response = await api.get('/complaints');
+  getAll: async (params?: { search?: string; category?: string; status?: string; priority?: string }) => {
+    const response = await api.get('/complaints', { params });
+    return response.data;
+  },
+
+  getMy: async () => {
+    const response = await api.get('/complaints/user');
     return response.data;
   },
 

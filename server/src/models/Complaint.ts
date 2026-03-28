@@ -9,6 +9,7 @@ export interface IComplaintComment {
 export interface IComplaint extends Document {
   title: string;
   description: string;
+  createdBy?: mongoose.Types.ObjectId;
   student: string;
   room: string;
   category: 'Maintenance' | 'IT Support' | 'Plumbing' | 'Electrical' | 'Housekeeping';
@@ -18,6 +19,7 @@ export interface IComplaint extends Document {
   assignedTo?: string;
   estimatedResolution?: Date;
   resolvedDate?: Date;
+  resolutionNotes?: string;
   rejectionReason?: string;
   comments: IComplaintComment[];
 }
@@ -33,14 +35,19 @@ const ComplaintSchema: Schema = new Schema({
     required: true,
     trim: true
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   student: {
     type: String,
     required: true,
-    ref: 'Student'
+    trim: true,
   },
   room: {
     type: String,
-    required: true
+    required: true,
+    trim: true,
   },
   category: {
     type: String,
@@ -63,7 +70,8 @@ const ComplaintSchema: Schema = new Schema({
   },
   assignedTo: {
     type: String,
-    default: ''
+    default: '',
+    trim: true,
   },
   estimatedResolution: {
     type: Date
@@ -71,8 +79,13 @@ const ComplaintSchema: Schema = new Schema({
   resolvedDate: {
     type: Date
   },
+  resolutionNotes: {
+    type: String,
+    trim: true,
+  },
   rejectionReason: {
-    type: String
+    type: String,
+    trim: true,
   },
   comments: [{
     text: { type: String, required: true },
