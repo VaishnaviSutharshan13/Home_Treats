@@ -19,7 +19,7 @@ import {
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar';
 import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
-import { studentService } from '../../services';
+import { roomService, studentService } from '../../services';
 
 type StudentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
 
@@ -54,6 +54,14 @@ interface StudentForm {
   roomNumber: string;
   course: string;
   status: StudentStatus;
+}
+
+interface RoomOption {
+  _id: string;
+  roomNumber: string;
+  status: 'Available' | 'Occupied' | 'Maintenance';
+  occupied: number;
+  capacity: number;
 }
 
 type StudentFormErrors = Partial<Record<'email' | 'phone' | 'emergencyContact', string>>;
@@ -107,6 +115,8 @@ const StudentManagement = () => {
   const [viewing, setViewing] = useState<StudentRow | null>(null);
   const [form, setForm] = useState<StudentForm>(emptyForm);
   const [formErrors, setFormErrors] = useState<StudentFormErrors>({});
+  const [rooms, setRooms] = useState<RoomOption[]>([]);
+  const [roomsLoading, setRoomsLoading] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ type, message });
@@ -137,8 +147,24 @@ const StudentManagement = () => {
     }
   };
 
+  const fetchRooms = async () => {
+    try {
+      setRoomsLoading(true);
+      const res = await roomService.getAll();
+      setRooms(res?.data || []);
+    } catch {
+      setRooms([]);
+    } finally {
+      setRoomsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    fetchRooms();
   }, []);
 
   useEffect(() => {
@@ -212,6 +238,11 @@ const StudentManagement = () => {
   };
 
   const validateForm = () => {
+    if (editing) {
+      setFormErrors({});
+      return true;
+    }
+
     const nextErrors: StudentFormErrors = {};
 
     if (!isEmailFormatValid(form.email)) {
@@ -238,7 +269,7 @@ const StudentManagement = () => {
     try {
       if (editing) {
         const payload = {
-          roomNumber: form.roomNumber,
+          roomNumber: form.roomNumber.trim(),
           status: form.status,
         };
         await studentService.update(editing._id, payload);
@@ -311,6 +342,20 @@ const StudentManagement = () => {
       inactive: students.filter((s) => s.status === 'Inactive').length,
     };
   }, [students]);
+
+  const roomOptions = useMemo(() => {
+    const currentRoom = form.roomNumber.trim();
+    const baseOptions = rooms.filter((room) => room.status === 'Available' && room.occupied < room.capacity);
+
+    if (currentRoom) {
+      const selectedRoom = rooms.find((room) => room.roomNumber === currentRoom);
+      if (selectedRoom && !baseOptions.some((room) => room.roomNumber === selectedRoom.roomNumber)) {
+        baseOptions.unshift(selectedRoom);
+      }
+    }
+
+    return [...baseOptions].sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+  }, [rooms, form.roomNumber]);
 
   return (
     <div className="min-h-screen bg-[#faf8ff]">
@@ -532,7 +577,37 @@ const StudentManagement = () => {
                 error={formErrors.emergencyContact}
                 helper={form.emergencyContact ? `${form.emergencyContact.length}/10 digits` : 'Enter exactly 10 digits'}
               />
-              <Input label="Room Number" value={form.roomNumber} onChange={(v) => setForm((f) => ({ ...f, roomNumber: v }))} />
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Room Number</label>
+                <select
+                  title="Room Number"
+                  value={form.roomNumber}
+                  onChange={(e) => setForm((f) => ({ ...f, roomNumber: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">Not Assigned</option>
+                  {roomOptions.map((room) => {
+                    const isCurrentRoom = room.roomNumber === form.roomNumber.trim();
+                    const isVacant = room.status === 'Available' && room.occupied < room.capacity;
+                    const label = isVacant
+                      ? `${room.roomNumber} (${room.capacity - room.occupied} vacant)`
+                      : `${room.roomNumber} (current assignment)`;
+
+                    return (
+                      <option key={room._id} value={room.roomNumber}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  {roomsLoading
+                    ? 'Loading available rooms...'
+                    : roomOptions.length > 0
+                      ? 'Only vacant rooms are listed.'
+                      : 'No vacant rooms available right now.'}
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
