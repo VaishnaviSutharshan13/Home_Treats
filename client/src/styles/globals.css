@@ -1,9 +1,9 @@
 /* Global Design System Styles */
 /* Modern White & Purple Theme */
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Custom CSS Variables for Design System */
 :root {

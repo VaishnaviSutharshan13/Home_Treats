@@ -1,139 +1,216 @@
-import { useState, useEffect } from 'react';
-import { FaExclamationTriangle, FaCheckCircle, FaClock, FaTimesCircle, FaSpinner, FaSearch, FaPlus, FaComment } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
-import { complaintService } from '../../services';
+import { useEffect, useMemo, useState } from 'react';
+import { FaBars, FaPlus, FaSearch, FaSpinner, FaTimes } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
+import ComplaintForm from '../../components/complaints/ComplaintForm';
+import type { ComplaintFormValues } from '../../components/complaints/ComplaintForm';
+import ComplaintList from '../../components/complaints/ComplaintList';
+import type { ComplaintItem } from '../../components/complaints/ComplaintCard';
+import { complaintService } from '../../services';
 
-interface Comment {
-  text: string;
-  author: string;
-  createdAt: string;
-}
+const initialFormValues: ComplaintFormValues = {
+  title: '',
+  description: '',
+  category: 'Maintenance',
+  priority: 'Medium',
+};
 
-interface Complaint {
-  _id: string;
-  title: string;
-  description: string;
-  student: string;
-  room: string;
-  category: string;
-  priority: string;
-  status: string;
-  assignedTo: string;
-  estimatedResolution: string;
-  resolvedDate: string;
-  rejectionReason: string;
-  comments: Comment[];
-  createdAt: string;
-}
+const validateComplaintForm = (values: ComplaintFormValues) => {
+  const errors: Partial<Record<keyof ComplaintFormValues, string>> = {};
+  const title = values.title.trim();
+  const description = values.description.trim();
+
+  if (!title) {
+    errors.title = 'Title is required';
+  } else if (title.length < 5) {
+    errors.title = 'Title must be at least 5 characters';
+  }
+
+  if (!description) {
+    errors.description = 'Description is required';
+  } else if (description.length < 20) {
+    errors.description = 'Description must be at least 20 characters';
+  }
+
+  if (!values.category.trim()) {
+    errors.category = 'Category is required';
+  }
+
+  if (!['Low', 'Medium', 'High'].includes(values.priority)) {
+    errors.priority = 'Priority must be Low, Medium, or High';
+  }
+
+  return errors;
+};
 
 const MyComplaints = () => {
-  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [complaints, setComplaints] = useState<ComplaintItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState('');
+
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingComplaint, setEditingComplaint] = useState<ComplaintItem | null>(null);
+  const [formValues, setFormValues] = useState<ComplaintFormValues>(initialFormValues);
+  const [formTouched, setFormTouched] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [showNewComplaint, setShowNewComplaint] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [toast, setToast] = useState<{ type: string; message: string } | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'Maintenance',
-    priority: 'Medium',
-  });
-  const [expandedComplaints, setExpandedComplaints] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [expandedComments, setExpandedComments] = useState<string[]>([]);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const res = await complaintService.getMy();
+      setComplaints(res.data || []);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to fetch your complaints');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchComplaints();
   }, []);
 
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
+    if (!showFormModal) return;
 
-  const fetchComplaints = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      if (user?.studentId) {
-        const res = await complaintService.getByStudent(user.studentId);
-        if (res.success) setComplaints(res.data || []);
-      }
-    } catch (err) {
-      setError('Failed to load complaints');
-    } finally {
-      setLoading(false);
-    }
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [showFormModal]);
+
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((complaint) => {
+      const matchesSearch =
+        complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus = statusFilter === 'All' || complaint.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [complaints, searchTerm, statusFilter]);
+
+  const summary = {
+    pending: complaints.filter((c) => c.status === 'Pending').length,
+    inProgress: complaints.filter((c) => c.status === 'In Progress').length,
+    resolved: complaints.filter((c) => c.status === 'Resolved').length,
+    rejected: complaints.filter((c) => c.status === 'Rejected').length,
   };
 
-  const handleSubmitComplaint = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const openCreateModal = () => {
+    setEditingComplaint(null);
+    setFormValues(initialFormValues);
+    setShowFormModal(true);
+    setFormTouched(false);
+  };
+
+  const openEditModal = (complaint: ComplaintItem) => {
+    if (complaint.status !== 'Pending') {
+      showToast('Only pending complaints can be edited', 'error');
+      return;
+    }
+
+    setEditingComplaint(complaint);
+    setFormValues({
+      title: complaint.title,
+      description: complaint.description,
+      category: complaint.category,
+      priority: complaint.priority,
+    });
+    setShowFormModal(true);
+    setFormTouched(false);
+  };
+
+  const closeModal = () => {
+    setShowFormModal(false);
+    setEditingComplaint(null);
+    setFormValues(initialFormValues);
+    setFormTouched(false);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormTouched(true);
+
+    const validationErrors = validateComplaintForm(formValues);
+    if (Object.keys(validationErrors).length) {
+      const firstError =
+        validationErrors.description ||
+        validationErrors.title ||
+        validationErrors.category ||
+        validationErrors.priority ||
+        'Please fix the highlighted fields';
+      showToast(firstError, 'error');
+      return;
+    }
+
+    const payload = {
+      ...formValues,
+      title: formValues.title.trim(),
+      description: formValues.description.trim(),
+    };
+
     try {
-      setSubmitting(true);
-      const res = await complaintService.create({
-        ...formData,
-        student: user?.name || '',
-        room: user?.room || '',
-      });
-      if (res.success) {
-        setToast({ type: 'success', message: 'Complaint submitted successfully' });
-        setShowNewComplaint(false);
-        setFormData({ title: '', description: '', category: 'Maintenance', priority: 'Medium' });
-        fetchComplaints();
+      setActionLoading(true);
+
+      if (editingComplaint) {
+        await complaintService.update(editingComplaint._id, payload);
+        showToast('Complaint updated successfully', 'success');
+      } else {
+        await complaintService.create(payload);
+        showToast('Complaint submitted successfully', 'success');
       }
+
+      closeModal();
+      await fetchComplaints();
     } catch (err: any) {
-      setToast({ type: 'error', message: err.response?.data?.message || 'Failed to submit complaint' });
+      showToast(err?.response?.data?.message || 'Unable to save complaint', 'error');
     } finally {
-      setSubmitting(false);
+      setActionLoading(false);
     }
   };
+
+  const handleDelete = async (id: string) => {
+    const complaint = complaints.find((item) => item._id === id);
+    if (!complaint) return;
+    if (complaint.status !== 'Pending') {
+      showToast('Only pending complaints can be deleted', 'error');
+      return;
+    }
+
+    try {
+      setDeletingId(id);
+      await complaintService.delete(id);
+      showToast('Complaint deleted', 'success');
+      await fetchComplaints();
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Unable to delete complaint', 'error');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const formErrors = formTouched ? validateComplaintForm(formValues) : {};
+  const isFormValid = Object.keys(validateComplaintForm(formValues)).length === 0;
 
   const toggleComments = (id: string) => {
-    setExpandedComplaints(prev =>
-      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
-    );
-  };
-
-  const filteredComplaints = complaints.filter(c => {
-    const matchesSearch = c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'All' || c.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Pending': return 'bg-yellow-100 text-yellow-800';
-      case 'In Progress': return 'bg-blue-100 text-blue-800';
-      case 'Resolved': return 'bg-purple-100 text-purple-800';
-      case 'Rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Pending': return <FaClock className="text-yellow-600" />;
-      case 'In Progress': return <FaExclamationTriangle className="text-blue-600" />;
-      case 'Resolved': return <FaCheckCircle className="text-purple-600" />;
-      case 'Rejected': return <FaTimesCircle className="text-red-600" />;
-      default: return <FaClock className="text-gray-600" />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'High': return 'bg-red-100 text-red-800';
-      case 'Medium': return 'bg-orange-100 text-orange-800';
-      case 'Low': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    setExpandedComments((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
   };
 
   return (
@@ -141,281 +218,188 @@ const MyComplaints = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       <div className="lg:ml-64">
-        <header className="bg-white shadow-sm border-b px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">My Complaints</h1>
-              <p className="text-gray-500 text-sm mt-1">Submit and track your complaints</p>
-            </div>
+        <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setShowNewComplaint(true)}
-                className="bg-blue-600 text-gray-900 px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                onClick={() => setSidebarOpen(true)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 lg:hidden"
               >
-                <FaPlus className="w-3 h-3" />
-                New Complaint
+                <FaBars />
               </button>
-              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Complaint Management</h1>
+                <p className="text-sm text-gray-500">Create, track, and manage your complaints</p>
+              </div>
             </div>
+            <button
+              onClick={openCreateModal}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:from-purple-700 hover:to-pink-600"
+            >
+              <FaPlus />
+              New Complaint
+            </button>
           </div>
         </header>
 
-        {/* Toast */}
-        {toast && (
-          <div className={`mx-6 mt-4 p-3 rounded-lg text-sm ${
-            toast.type === 'success' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-            'bg-red-50 text-red-700 border border-red-200'
-          }`}>
-            {toast.message}
-          </div>
-        )}
-
-        <div className="p-6">
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <FaSpinner className="animate-spin text-4xl text-indigo-600" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchComplaints} className="px-4 py-2 bg-indigo-600 text-gray-900 rounded-lg hover:bg-indigo-700">Retry</button>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-xl shadow-sm border p-4 text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{complaints.filter(c => c.status === 'Pending').length}</p>
-                  <p className="text-xs text-gray-500">Pending</p>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border p-4 text-center">
-                  <p className="text-2xl font-bold text-blue-600">{complaints.filter(c => c.status === 'In Progress').length}</p>
-                  <p className="text-xs text-gray-500">In Progress</p>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border p-4 text-center">
-                  <p className="text-2xl font-bold text-purple-600">{complaints.filter(c => c.status === 'Resolved').length}</p>
-                  <p className="text-xs text-gray-500">Resolved</p>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border p-4 text-center">
-                  <p className="text-2xl font-bold text-red-600">{complaints.filter(c => c.status === 'Rejected').length}</p>
-                  <p className="text-xs text-gray-500">Rejected</p>
-                </div>
-              </div>
-
-              {/* Search & Filter */}
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search complaints..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="All">All Status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-              </div>
-
-              {/* Complaints List */}
-              {filteredComplaints.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm border">
-                  <FaExclamationTriangle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500">No complaints found</p>
-                  <button
-                    onClick={() => setShowNewComplaint(true)}
-                    className="mt-3 text-blue-600 hover:text-blue-700 text-sm"
-                  >
-                    Submit your first complaint
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {filteredComplaints.map((complaint) => (
-                    <div key={complaint._id} className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                      <div className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(complaint.status)}
-                            <h3 className="font-semibold text-gray-900">{complaint.title}</h3>
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getPriorityColor(complaint.priority)}`}>
-                              {complaint.priority}
-                            </span>
-                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(complaint.status)}`}>
-                              {complaint.status}
-                            </span>
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-gray-600 mb-4">{complaint.description}</p>
-
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <p className="text-gray-500 text-xs">Category</p>
-                            <p className="text-gray-700">{complaint.category}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Submitted</p>
-                            <p className="text-gray-700">{new Date(complaint.createdAt).toLocaleDateString()}</p>
-                          </div>
-                          {complaint.assignedTo && (
-                            <div>
-                              <p className="text-gray-500 text-xs">Assigned To</p>
-                              <p className="text-gray-700">{complaint.assignedTo}</p>
-                            </div>
-                          )}
-                          {complaint.estimatedResolution && (
-                            <div>
-                              <p className="text-gray-500 text-xs">Est. Resolution</p>
-                              <p className="text-gray-700">{new Date(complaint.estimatedResolution).toLocaleDateString()}</p>
-                            </div>
-                          )}
-                          {complaint.resolvedDate && (
-                            <div>
-                              <p className="text-gray-500 text-xs">Resolved On</p>
-                              <p className="text-purple-600 font-medium">{new Date(complaint.resolvedDate).toLocaleDateString()}</p>
-                            </div>
-                          )}
-                          {complaint.rejectionReason && (
-                            <div className="col-span-2">
-                              <p className="text-gray-500 text-xs">Rejection Reason</p>
-                              <p className="text-red-600">{complaint.rejectionReason}</p>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Comments */}
-                        {complaint.comments && complaint.comments.length > 0 && (
-                          <div className="mt-4 border-t pt-3">
-                            <button
-                              onClick={() => toggleComments(complaint._id)}
-                              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-                            >
-                              <FaComment className="w-3 h-3" />
-                              {expandedComplaints.includes(complaint._id) ? 'Hide' : 'Show'} {complaint.comments.length} comment{complaint.comments.length !== 1 ? 's' : ''}
-                            </button>
-                            {expandedComplaints.includes(complaint._id) && (
-                              <div className="mt-2 space-y-2">
-                                {complaint.comments.map((comment, idx) => (
-                                  <div key={idx} className="bg-gray-50 rounded-lg p-3">
-                                    <div className="flex justify-between items-center mb-1">
-                                      <span className="text-xs font-semibold text-gray-700">{comment.author}</span>
-                                      <span className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleDateString()}</span>
-                                    </div>
-                                    <p className="text-sm text-gray-600">{comment.text}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+        <main className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8">
+          {toast && (
+            <div
+              className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${
+                toast.type === 'success'
+                  ? 'border-green-200 bg-green-50 text-green-700'
+                  : 'border-red-200 bg-red-50 text-red-700'
+              }`}
+            >
+              {toast.message}
             </div>
           )}
-        </div>
 
-        {/* New Complaint Modal */}
-        {showNewComplaint && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-              <form onSubmit={handleSubmitComplaint}>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">Submit New Complaint</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Brief description of the issue"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Detailed description of the problem"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="Maintenance">Maintenance</option>
-                          <option value="IT Support">IT Support</option>
-                          <option value="Plumbing">Plumbing</option>
-                          <option value="Electrical">Electrical</option>
-                          <option value="Housekeeping">Housekeeping</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                        <select
-                          value={formData.priority}
-                          onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="Low">Low</option>
-                          <option value="Medium">Medium</option>
-                          <option value="High">High</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-6 py-3 flex justify-end gap-3 rounded-b-xl">
-                  <button
-                    type="button"
-                    onClick={() => setShowNewComplaint(false)}
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-4 py-2 bg-blue-600 text-gray-900 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {submitting && <FaSpinner className="animate-spin w-3 h-3" />}
-                    Submit
-                  </button>
-                </div>
-              </form>
+          <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-2xl font-bold text-yellow-600">{summary.pending}</p>
+              <p className="mt-1 text-sm text-gray-500">Pending</p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-2xl font-bold text-blue-600">{summary.inProgress}</p>
+              <p className="mt-1 text-sm text-gray-500">In Progress</p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-2xl font-bold text-green-600">{summary.resolved}</p>
+              <p className="mt-1 text-sm text-gray-500">Resolved</p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-2xl font-bold text-red-600">{summary.rejected}</p>
+              <p className="mt-1 text-sm text-gray-500">Rejected</p>
+            </div>
+          </section>
+
+          <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px_140px]">
+              <div className="relative">
+                <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                  placeholder="Search by title, description, or category"
+                />
+              </div>
+
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+              >
+                <option value="All">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+
+              <button
+                onClick={fetchComplaints}
+                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Refresh
+              </button>
+            </div>
+          </section>
+
+          {loading ? (
+            <div className="rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">
+              <FaSpinner className="mx-auto mb-3 animate-spin text-2xl text-purple-600" />
+              <p className="text-sm text-gray-500">Loading complaints...</p>
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-red-200 bg-white p-16 text-center shadow-sm">
+              <p className="text-sm font-semibold text-red-600">{error}</p>
+              <button
+                onClick={fetchComplaints}
+                className="mt-4 h-11 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <ComplaintList
+              complaints={filteredComplaints}
+              expandedIds={expandedComments}
+              onToggleComments={toggleComments}
+              onEdit={openEditModal}
+              onDelete={setConfirmDeleteId}
+              onCreateClick={openCreateModal}
+              emptyMessage="No complaints match your filters"
+            />
+          )}
+
+          {deletingId && <div className="mt-3 text-sm text-gray-500">Deleting complaint...</div>}
+        </main>
+      </div>
+
+      {showFormModal && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 px-4"
+          onClick={closeModal}
+        >
+          <div
+            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-6 shadow-lg sm:p-8"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              onClick={closeModal}
+              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+              aria-label="Close complaint form"
+            >
+              <FaTimes className="h-4 w-4" />
+            </button>
+
+            <h2 className="mb-6 pr-12 text-xl font-bold text-gray-900">
+              {editingComplaint ? 'Edit Complaint' : 'Create Complaint'}
+            </h2>
+            <ComplaintForm
+              values={formValues}
+              onChange={setFormValues}
+              onSubmit={handleSubmit}
+              errors={formErrors}
+              submitDisabled={!isFormValid}
+              onCancel={closeModal}
+              loading={actionLoading}
+              submitLabel={editingComplaint ? 'Update Complaint' : 'Submit Complaint'}
+            />
+          </div>
+        </div>
+      )}
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-gray-900">Delete Complaint</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Are you sure you want to delete this complaint? This action cannot be undone.
+            </p>
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="h-11 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  const id = confirmDeleteId;
+                  setConfirmDeleteId(null);
+                  if (id) await handleDelete(id);
+                }}
+                className="h-11 rounded-xl bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700"
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
