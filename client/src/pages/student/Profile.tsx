@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { FaBed, FaCamera, FaEnvelope, FaIdBadge, FaMapMarkerAlt, FaSave, FaShieldAlt, FaSpinner, FaUser } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaBed, FaEnvelope, FaIdBadge, FaMapMarkerAlt, FaSave, FaShieldAlt, FaSpinner, FaUser } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
 import { authService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
@@ -20,20 +19,11 @@ interface StudentProfileData {
   profileImage?: string;
 }
 
-const API_ROOT = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
-
-const toImageUrl = (path?: string) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  return `${API_ROOT}${path}`;
-};
-
 const Profile = () => {
   const { updateUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
@@ -43,10 +33,6 @@ const Profile = () => {
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [preview, setPreview] = useState('');
-  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
-
-  const avatar = useMemo(() => preview || toImageUrl(profile?.profileImage), [preview, profile?.profileImage]);
 
   const loadProfile = async () => {
     try {
@@ -60,8 +46,6 @@ const Profile = () => {
       setPhone(data.phone || '');
       setGender(data.gender || '');
       setAddress(data.address || '');
-      setPreview('');
-      setSelectedImageFile(null);
     } catch (error: any) {
       setMessage({ text: error?.message || 'Failed to load profile', type: 'error' });
     } finally {
@@ -72,47 +56,6 @@ const Profile = () => {
   useEffect(() => {
     loadProfile();
   }, []);
-
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-      setMessage({ text: 'Only JPG, JPEG, or PNG images are allowed', type: 'error' });
-      return;
-    }
-
-    setPreview(URL.createObjectURL(file));
-    setSelectedImageFile(file);
-    setMessage({ text: 'Image selected. Click "Save Image" to update your profile picture.', type: 'success' });
-  };
-
-  const handleSaveImage = async () => {
-    if (!selectedImageFile) {
-      setMessage({ text: 'Please select an image first', type: 'error' });
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const res = await authService.updateProfileImage(selectedImageFile);
-      if (!res.success) throw new Error(res.message || 'Failed to upload image');
-
-      const updatedProfile = res.data || res.user;
-      const profileImage = res.user?.profileImage || res.data?.profileImage;
-      const displayName = res.user?.name || res.data?.fullName || res.data?.name;
-
-      setProfile((prev) => ({ ...(prev as StudentProfileData), ...updatedProfile }));
-      updateUser({ profileImage, name: displayName });
-      setMessage({ text: 'Profile image updated', type: 'success' });
-      setSelectedImageFile(null);
-      setPreview('');
-    } catch (error: any) {
-      setMessage({ text: error?.response?.data?.message || error?.message || 'Image update failed', type: 'error' });
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const saveProfile = async () => {
     if (!fullName.trim()) {
@@ -168,26 +111,12 @@ const Profile = () => {
         ) : (
           <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
-              <div className="w-36 h-36 rounded-full mx-auto overflow-hidden border-4 border-purple-100 bg-purple-50 flex items-center justify-center">
-                {avatar ? (
-                  <img src={avatar} alt="Student profile" className="w-full h-full object-cover" />
-                ) : (
-                  <FaUser className="text-4xl text-purple-400" />
-                )}
+              <div className="w-20 h-20 rounded-full mx-auto border-2 border-purple-100 bg-purple-50 flex items-center justify-center">
+                <FaUser className="text-2xl text-purple-400" />
               </div>
 
-              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white cursor-pointer transition-colors">
-                <FaCamera className="mr-2" />Choose Image
-                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={handleImageChange} />
-              </label>
-
-              <button
-                onClick={handleSaveImage}
-                disabled={uploading || !selectedImageFile}
-                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-60"
-              >
-                {uploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Image
-              </button>
+              <p className="mt-4 text-center text-lg font-semibold text-gray-900">{fullName || profile?.fullName || 'Student'}</p>
+              <p className="text-center text-sm text-gray-500">Student Profile</p>
 
               <div className="mt-6 space-y-3 text-sm">
                 <p className="flex items-center text-gray-700"><FaIdBadge className="mr-2 text-purple-600" />{profile?.studentId || 'N/A'}</p>
