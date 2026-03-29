@@ -5,6 +5,8 @@ import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsFillDoorOpenFill } from "react-icons/bs";
 import { IoIosCheckmarkCircle, IoIosCloseCircle, IoMdRemoveCircle } from "react-icons/io";
 
+const FALLBACK_ROOM_IMAGE = "/images/hostel-room.jpg";
+
 const badgeStyles = {
   Available: "bg-green-100 text-green-700 border-green-400",
   Limited: "bg-yellow-100 text-yellow-700 border-yellow-400",
@@ -44,26 +46,35 @@ const RoomCard = ({
 }) => {
   const navigate = useNavigate();
   const [favorite, setFavorite] = useState(false);
+  const [imgSrc, setImgSrc] = useState(image || FALLBACK_ROOM_IMAGE);
+
+  const handleImageError = () => {
+    if (imgSrc !== FALLBACK_ROOM_IMAGE) {
+      setImgSrc(FALLBACK_ROOM_IMAGE);
+    }
+  };
+
   return (
-    <div className="relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group animate-fadeIn flex flex-col overflow-hidden border border-gray-100 hover:border-purple-200">
-      {/* Image with overlay, favorite, and Quick View */}
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-purple-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-200/40">
       <div className="relative overflow-hidden">
         <img
-          src={image}
+          src={imgSrc}
           alt={title}
-          className="w-full h-56 object-cover rounded-t-2xl transition-transform duration-500 group-hover:scale-105"
+          className="h-56 w-full rounded-t-2xl object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          onError={handleImageError}
         />
-        {/* Overlay gradient */}
         <div className="absolute inset-0 rounded-t-2xl bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-        {/* Quick View hover overlay */}
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-2xl cursor-pointer"
+
+        <div
+          className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-t-2xl bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           onClick={() => (detailsPath || roomSlug) ? navigate(detailsPath || `/room/${roomSlug}`) : onViewDetails?.()}
         >
-          <span className="flex items-center gap-2 bg-white/90 backdrop-blur-sm text-purple-700 font-semibold px-5 py-2.5 rounded-full shadow-lg text-sm">
+          <span className="flex items-center gap-2 rounded-full bg-white/90 px-5 py-2.5 text-sm font-semibold text-purple-700 shadow-lg backdrop-blur-sm">
             <FaEye className="w-4 h-4" /> Quick View
           </span>
         </div>
-        {/* Favorite icon */}
+
         <button
           onClick={(e) => { e.stopPropagation(); setFavorite((f) => !f); }}
           className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow hover:bg-purple-100 transition-all duration-200 hover:scale-110"
@@ -77,29 +88,32 @@ const RoomCard = ({
           {badgeIcons[availability]} {availability}
         </span>
       </div>
+
       <div className="p-6 flex flex-col flex-1">
-        {/* Title and Rating */}
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-extrabold text-gray-900 truncate">{title}</h3>
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <h3 className="truncate text-lg font-extrabold text-gray-900">{title}</h3>
+            <p className="text-xs font-medium uppercase tracking-wide text-purple-500">Student Floor</p>
+          </div>
           <div className="flex items-center gap-1 shrink-0 ml-2">
             <FaStar className="text-yellow-400 w-5 h-5" />
             <span className="font-bold text-gray-800 text-base">{rating}</span>
             <span className="text-xs text-gray-400">({reviews})</span>
           </div>
         </div>
-        {/* Compact info row */}
+
         <div className="flex items-center text-gray-500 text-sm mb-3 gap-4">
           <span className="flex items-center gap-1"><FaMapMarkerAlt className="text-purple-400" /> {location}</span>
           <span className="flex items-center gap-1"><FaUserFriends className="text-purple-400" /> {capacity}</span>
         </div>
-        {/* Price */}
+
         <div className="flex items-end mb-3">
           <span className="text-2xl font-extrabold text-purple-700 mr-1">
             {priceLabel || `Rs. ${price?.toLocaleString()}`}
           </span>
           {!priceLabel && <span className="text-sm text-gray-400 mb-0.5">/month</span>}
         </div>
-        {/* Amenities */}
+
         <div className="flex flex-wrap gap-2 mb-3">
           {amenities.map((amenity) => (
             <span
@@ -110,9 +124,9 @@ const RoomCard = ({
             </span>
           ))}
         </div>
-        {/* Description */}
+
         <p className="text-gray-500 text-sm mb-5 line-clamp-2 leading-relaxed">{description}</p>
-        {/* View Details Button — single primary action */}
+
         <div className="mt-auto">
           <button
             onClick={() => (detailsPath || roomSlug) ? navigate(detailsPath || `/room/${roomSlug}`) : onViewDetails?.()}
@@ -122,7 +136,7 @@ const RoomCard = ({
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
