@@ -5,6 +5,7 @@ import {
   FaCoins,
   FaEdit,
   FaExclamationTriangle,
+  FaEye,
   FaMoneyBillWave,
   FaSearch,
   FaSpinner,
@@ -13,7 +14,7 @@ import {
   FaWallet,
 } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
-import { feesService, studentService } from '../../services';
+import { feesService, paymentService, studentService } from '../../services';
 
 type FeeStatus = 'Paid' | 'Pending' | 'Overdue';
 
@@ -63,6 +64,17 @@ interface FeeQuery {
   sortOrder: 'asc' | 'desc';
 }
 
+interface PaymentRecord {
+  _id: string;
+  studentName: string;
+  bankName: 'BOC' | 'HNB';
+  amount: number;
+  paymentDate: string;
+  slipUrl: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  transactionId: string;
+}
+
 const statusBadgeStyles: Record<FeeStatus, string> = {
   Paid: 'bg-green-100 text-green-700 border border-green-200',
   Pending: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
@@ -102,6 +114,11 @@ const FeesManagement = () => {
 
   const [studentSearch, setStudentSearch] = useState('');
   const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
+  const [paymentActionId, setPaymentActionId] = useState<string | null>(null);
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
+  const [paymentDateFilter, setPaymentDateFilter] = useState('');
   const [addForm, setAddForm] = useState({
     studentId: '',
     studentName: '',
@@ -143,6 +160,11 @@ const FeesManagement = () => {
     const dynamic = fees.map((f) => f.feeType).filter(Boolean);
     return ['All', ...Array.from(new Set([...builtIn, ...dynamic]))];
   }, [fees]);
+
+  const apiOrigin = useMemo(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    return apiUrl.replace(/\/api\/?$/, '');
+  }, []);
 
   const filteredStudents = useMemo(() => {
     const term = studentSearch.trim().toLowerCase();
@@ -201,6 +223,21 @@ const FeesManagement = () => {
     }
   };
 
+  const loadPayments = async () => {
+    setPaymentsLoading(true);
+    try {
+      const params: { status?: 'Pending' | 'Approved' | 'Rejected'; date?: string } = {};
+      if (paymentStatusFilter !== 'All') params.status = paymentStatusFilter;
+      if (paymentDateFilter) params.date = paymentDateFilter;
+      const response = await paymentService.getAdmin(params);
+      setPayments(response.data || []);
+    } catch (error: any) {
+      showToast('error', error?.response?.data?.message || 'Failed to load payments');
+    } finally {
+      setPaymentsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadStudents();
   }, []);
@@ -208,6 +245,43 @@ const FeesManagement = () => {
   useEffect(() => {
     loadFees();
   }, [query]);
+
+  useEffect(() => {
+    loadPayments();
+  }, [paymentStatusFilter, paymentDateFilter]);
+
+  const toAbsoluteSlipUrl = (slipUrl: string) => {
+    if (!slipUrl) return '#';
+    if (slipUrl.startsWith('http')) return slipUrl;
+    return `${apiOrigin}${slipUrl}`;
+  };
+
+  const updatePaymentStatus = async (paymentId: string, status: 'Approved' | 'Rejected') => {
+    setPaymentActionId(paymentId);
+    try {
+      await paymentService.updateStatus(paymentId, status);
+      showToast('success', `Payment ${status.toLowerCase()} successfully`);
+      await Promise.all([loadPayments(), loadFees()]);
+    } catch (error: any) {
+      showToast('error', error?.response?.data?.message || `Failed to ${status.toLowerCase()} payment`);
+    } finally {
+      setPaymentActionId(null);
+    }
+  };
+
+  const deletePayment = async (paymentId: string) => {
+    if (!window.confirm('Delete this payment submission? This action cannot be undone.')) return;
+    setPaymentActionId(paymentId);
+    try {
+      await paymentService.delete(paymentId);
+      showToast('success', 'Payment deleted successfully');
+      await loadPayments();
+    } catch (error: any) {
+      showToast('error', error?.response?.data?.message || 'Failed to delete payment');
+    } finally {
+      setPaymentActionId(null);
+    }
+  };
 
   const selectStudent = (student: Student) => {
     const room = student.room || student.roomNumber || 'Not Assigned';
@@ -660,6 +734,118 @@ const FeesManagement = () => {
                 </div>
               </div>
             </>
+          )}
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+          <div className="px-5 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <h2 className="text-lg font-semibold text-gray-800">Payment Submissions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full md:w-auto">
+              <select
+                value={paymentStatusFilter}
+                onChange={(e) => setPaymentStatusFilter(e.target.value as typeof paymentStatusFilter)}
+                className="px-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-purple-200"
+              >
+                <option value="All">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              <input
+                type="date"
+                value={paymentDateFilter}
+                onChange={(e) => setPaymentDateFilter(e.target.value)}
+                className="px-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-purple-200"
+              />
+            </div>
+          </div>
+
+          {paymentsLoading ? (
+            <div className="p-10 text-center text-gray-500">
+              <FaSpinner className="animate-spin mx-auto mb-3 text-purple-600" />
+              Loading payment submissions...
+            </div>
+          ) : payments.length === 0 ? (
+            <div className="p-10 text-center text-gray-500">No payment submissions found for selected filters.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 text-gray-600 text-sm">
+                  <tr>
+                    <th className="p-4 font-semibold">Student Name</th>
+                    <th className="p-4 font-semibold">Bank</th>
+                    <th className="p-4 font-semibold">Amount</th>
+                    <th className="p-4 font-semibold">Date</th>
+                    <th className="p-4 font-semibold">Slip Preview</th>
+                    <th className="p-4 font-semibold">Status</th>
+                    <th className="p-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {payments.map((payment) => (
+                    <tr key={payment._id} className="hover:bg-purple-50/40 transition">
+                      <td className="p-4">
+                        <p className="font-medium text-gray-800">{payment.studentName}</p>
+                        <p className="text-xs text-gray-500">{payment.transactionId}</p>
+                      </td>
+                      <td className="p-4 text-gray-700">{payment.bankName}</td>
+                      <td className="p-4 font-semibold text-gray-800">{formatLKR(payment.amount)}</td>
+                      <td className="p-4 text-gray-700">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                      <td className="p-4">
+                        <a
+                          href={toAbsoluteSlipUrl(payment.slipUrl)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-indigo-700 hover:text-indigo-900 underline"
+                        >
+                          <FaEye />
+                          View / Download
+                        </a>
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            payment.status === 'Approved'
+                              ? 'bg-green-100 text-green-700 border border-green-200'
+                              : payment.status === 'Rejected'
+                                ? 'bg-red-100 text-red-700 border border-red-200'
+                                : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                          }`}
+                        >
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => updatePaymentStatus(payment._id, 'Approved')}
+                            disabled={payment.status !== 'Pending' || paymentActionId === payment._id}
+                            className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => updatePaymentStatus(payment._id, 'Rejected')}
+                            disabled={payment.status !== 'Pending' || paymentActionId === payment._id}
+                            className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            onClick={() => deletePayment(payment._id)}
+                            disabled={paymentActionId === payment._id}
+                            className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition disabled:opacity-50"
+                            title="Delete payment"
+                          >
+                            {paymentActionId === payment._id ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
