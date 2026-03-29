@@ -78,29 +78,6 @@ const About = () => {
     { icon: <FaHeart className="w-6 h-6" />, value: '98%', label: 'Satisfaction' },
   ];
 
-  const hostelImages = [
-    {
-      src: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600',
-      alt: 'Modern hostel lobby',
-      caption: 'Welcoming Reception Area',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1522771739485-4b4b999b6d2?w=600',
-      alt: 'Study area',
-      caption: 'Spacious Study Rooms',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',
-      alt: 'Hostel exterior',
-      caption: 'Beautiful Campus View',
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600',
-      alt: 'Common area',
-      caption: 'Comfortable Common Areas',
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -148,8 +125,7 @@ const About = () => {
       {/* Introduction */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="animate-fade-in">
+          <div className="max-w-4xl mx-auto animate-fade-in">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                 Your Home Away <span className="text-purple-600">From Home</span>
               </h2>
@@ -176,28 +152,6 @@ const About = () => {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              {hostelImages.map((img, i) => (
-                <div
-                  key={i}
-                  className={`relative overflow-hidden rounded-2xl shadow-lg group border border-purple-500/10 ${
-                    i === 0 ? 'row-span-2' : ''
-                  }`}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.alt}
-                    className={`w-full object-cover transition-transform duration-500 group-hover:scale-110 ${
-                      i === 0 ? 'h-full' : 'h-48'
-                    }`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                    <span className="text-white text-sm font-medium p-4">{img.caption}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
