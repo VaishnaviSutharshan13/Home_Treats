@@ -81,7 +81,21 @@ const statusBadgeStyles: Record<FeeStatus, string> = {
   Overdue: 'bg-red-100 text-red-700 border border-red-200',
 };
 
+const getTodayDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const isPastDate = (dateValue: string, todayDate: string) => {
+  if (!dateValue) return false;
+  return dateValue < todayDate;
+};
+
 const FeesManagement = () => {
+  const todayDate = getTodayDateString();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fees, setFees] = useState<Fee[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -125,7 +139,7 @@ const FeesManagement = () => {
     room: '',
     feeType: 'Monthly',
     amount: 4500,
-    dueDate: '',
+    dueDate: todayDate,
     notes: '',
   });
 
@@ -136,6 +150,8 @@ const FeesManagement = () => {
     dueDate: '',
     notes: '',
   });
+  const [addDueDateError, setAddDueDateError] = useState('');
+  const [editDueDateError, setEditDueDateError] = useState('');
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -188,7 +204,8 @@ const FeesManagement = () => {
     addForm.studentId.trim() &&
     addForm.feeType.trim() &&
     addForm.amount > 0 &&
-    addForm.dueDate.trim();
+    addForm.dueDate.trim() &&
+    !isPastDate(addForm.dueDate, todayDate);
 
   const loadStudents = async () => {
     const studentRes = await studentService.getAll();
@@ -302,14 +319,21 @@ const FeesManagement = () => {
       room: '',
       feeType: 'Monthly',
       amount: 4500,
-      dueDate: '',
+      dueDate: todayDate,
       notes: '',
     });
+    setAddDueDateError('');
     setStudentSearch('');
   };
 
   const handleAddFee = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isPastDate(addForm.dueDate, todayDate)) {
+      setAddDueDateError('Past dates are not allowed');
+      showToast('error', 'Past dates are not allowed');
+      return;
+    }
+
     if (!isFormValid) {
       showToast('error', 'Please fill all required fields and enter an amount above 0');
       return;
@@ -350,6 +374,7 @@ const FeesManagement = () => {
 
   const openEditModal = (fee: Fee) => {
     setEditingFee(fee);
+    setEditDueDateError('');
     setEditForm({
       feeType: fee.feeType,
       amount: fee.amount,
@@ -361,6 +386,12 @@ const FeesManagement = () => {
   const handleEditFee = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingFee) return;
+    if (isPastDate(editForm.dueDate, todayDate)) {
+      setEditDueDateError('Past dates are not allowed');
+      showToast('error', 'Past dates are not allowed');
+      return;
+    }
+
     if (!editForm.feeType || !editForm.dueDate || editForm.amount <= 0) {
       showToast('error', 'Please fill valid edit fields (amount must be above 0)');
       return;
@@ -544,9 +575,21 @@ const FeesManagement = () => {
               <input
                 type="date"
                 value={addForm.dueDate}
-                onChange={(e) => setAddForm((prev) => ({ ...prev, dueDate: e.target.value }))}
-                className="w-full pl-10 pr-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-purple-200"
+                min={todayDate}
+                onChange={(e) => {
+                  const nextDueDate = e.target.value;
+                  setAddForm((prev) => ({ ...prev, dueDate: nextDueDate }));
+                  setAddDueDateError(isPastDate(nextDueDate, todayDate) ? 'Past dates are not allowed' : '');
+                }}
+                className={`w-full pl-10 pr-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 ${
+                  addDueDateError ? 'border-red-500 focus:ring-red-200' : 'focus:ring-purple-200'
+                }`}
               />
+              {addDueDateError ? (
+                <p className="mt-1 text-sm text-red-600">{addDueDateError}</p>
+              ) : (
+                <p className="mt-1 text-sm text-gray-500">Please select a valid due date (today or future)</p>
+              )}
             </div>
 
             <div className="md:col-span-2">
@@ -894,9 +937,17 @@ const FeesManagement = () => {
                 <input
                   type="date"
                   value={editForm.dueDate}
-                  onChange={(e) => setEditForm((prev) => ({ ...prev, dueDate: e.target.value }))}
-                  className="w-full px-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 focus:ring-purple-200"
+                  min={todayDate}
+                  onChange={(e) => {
+                    const nextDueDate = e.target.value;
+                    setEditForm((prev) => ({ ...prev, dueDate: nextDueDate }));
+                    setEditDueDateError(isPastDate(nextDueDate, todayDate) ? 'Past dates are not allowed' : '');
+                  }}
+                  className={`w-full px-3 py-2.5 border rounded-xl bg-gray-50 focus:bg-white outline-none focus:ring-2 ${
+                    editDueDateError ? 'border-red-500 focus:ring-red-200' : 'focus:ring-purple-200'
+                  }`}
                 />
+                {editDueDateError && <p className="mt-1 text-sm text-red-600">{editDueDateError}</p>}
               </div>
 
               <div>
