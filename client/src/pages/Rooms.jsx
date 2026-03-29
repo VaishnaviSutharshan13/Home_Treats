@@ -1,7 +1,18 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoomCard from "../components/RoomCard";
-import { FaFilter, FaChevronDown, FaRedo, FaWifi, FaBook, FaTshirt, FaShieldAlt, FaTint, FaUtensils } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaBook,
+  FaChevronDown,
+  FaFilter,
+  FaRedo,
+  FaShieldAlt,
+  FaTshirt,
+  FaTint,
+  FaUtensils,
+  FaWifi,
+} from "react-icons/fa";
 import { MdSort } from "react-icons/md";
 
 const floorNames = ["1st Floor", "2nd Floor", "3rd Floor", "4th Floor"];
@@ -12,7 +23,7 @@ const sortOptions = ["Price: Low to High", "Price: High to Low", "Rating"];
 const floorsData = [
   {
     id: "1st-floor",
-    image: "/images/rooms/room1.jpg",
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
     title: "1st Floor",
     price: 12000,
     priceMax: 20000,
@@ -26,7 +37,7 @@ const floorsData = [
   },
   {
     id: "2nd-floor",
-    image: "/images/rooms/room2.jpg",
+    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
     title: "2nd Floor",
     price: 14000,
     priceMax: 22000,
@@ -40,7 +51,7 @@ const floorsData = [
   },
   {
     id: "3rd-floor",
-    image: "/images/rooms/room3.jpg",
+    image: "https://images.unsplash.com/photo-1616594039964-3fda1f0b9b95?auto=format&fit=crop&w=1200&q=80",
     title: "3rd Floor",
     price: 15000,
     priceMax: 24000,
@@ -54,7 +65,7 @@ const floorsData = [
   },
   {
     id: "4th-floor",
-    image: "/images/rooms/room2.jpg",
+    image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80",
     title: "4th Floor",
     price: 16000,
     priceMax: 25000,
@@ -78,23 +89,36 @@ const Rooms = () => {
   });
   const [floors] = useState(floorsData);
 
-  const filteredFloors = floors.filter((floor) => {
-    const matchType = !filters.floorName || floor.title === filters.floorName;
-    const matchPrice = !filters.priceRange ||
-      (filters.priceRange === "Below 15,000" && floor.price < 15000) ||
-      (filters.priceRange === "15,000 - 20,000" && floor.price >= 15000 && floor.price <= 20000) ||
-      (filters.priceRange === "20,000 - 25,000" && floor.price > 20000 && floor.price <= 25000) ||
-      (filters.priceRange === "Above 25,000" && floor.price > 25000);
-    const matchAvailability = !filters.availability || floor.availability === filters.availability;
-    return matchType && matchPrice && matchAvailability;
-  });
+  const sortedFloors = useMemo(() => {
+    const filteredFloors = floors.filter((floor) => {
+      const matchType = !filters.floorName || floor.title === filters.floorName;
+      const matchPrice =
+        !filters.priceRange ||
+        (filters.priceRange === "Below 15,000" && floor.price < 15000) ||
+        (filters.priceRange === "15,000 - 20,000" && floor.price >= 15000 && floor.price <= 20000) ||
+        (filters.priceRange === "20,000 - 25,000" && floor.price > 20000 && floor.price <= 25000) ||
+        (filters.priceRange === "Above 25,000" && floor.price > 25000);
+      const matchAvailability = !filters.availability || floor.availability === filters.availability;
+      return matchType && matchPrice && matchAvailability;
+    });
 
-  const sortedFloors = [...filteredFloors].sort((a, b) => {
-    if (filters.sortBy === "Price: Low to High") return a.price - b.price;
-    if (filters.sortBy === "Price: High to Low") return b.price - a.price;
-    if (filters.sortBy === "Rating") return b.rating - a.rating;
-    return 0;
-  });
+    return [...filteredFloors].sort((a, b) => {
+      if (filters.sortBy === "Price: Low to High") return a.price - b.price;
+      if (filters.sortBy === "Price: High to Low") return b.price - a.price;
+      if (filters.sortBy === "Rating") return b.rating - a.rating;
+      return 0;
+    });
+  }, [filters, floors]);
+
+  const stats = useMemo(
+    () => ({
+      total: floors.length,
+      available: floors.filter((f) => f.availability === "Available").length,
+      limited: floors.filter((f) => f.availability === "Limited").length,
+      full: floors.filter((f) => f.availability === "Full").length,
+    }),
+    [floors],
+  );
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -105,124 +129,145 @@ const Rooms = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
-      <section className="w-full bg-gradient-to-br from-purple-800 via-purple-600 to-purple-500 relative flex flex-col items-center justify-center text-center py-28 sm:py-24">
-        {/* Optional overlay pattern or blur */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
-        <div className="relative z-10 max-w-2xl mx-auto px-4">
-          {/* Breadcrumb */}
-          <div className="text-sm text-white/70 mb-4 tracking-wide">Home &gt; Floors</div>
-          {/* Glassmorphism container */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-10 shadow-lg flex flex-col items-center animate-fadeIn">
-            {/* Small label */}
-            <div className="uppercase text-xs tracking-widest text-white/80 font-semibold mb-2">HOME TREATS</div>
-            {/* Heading */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide text-white drop-shadow-lg mb-2">
-              Our Floors
-            </h1>
-            {/* Divider */}
-            <div className="w-12 h-1 bg-white/30 rounded-full mb-4"></div>
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg md:text-xl text-white/80 font-medium mt-4">
-              Browse hostel floors and room availability at Home Treats
+    <div className="min-h-screen bg-gray-50 pb-12">
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-800 via-purple-700 to-purple-500 py-16 sm:py-20">
+        <div className="pointer-events-none absolute -left-24 top-8 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-fuchsia-300/20 blur-3xl" />
+
+        <div className="relative z-10 mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-[1.3fr_1fr] md:items-center">
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-white/70">Home Treats Residence</p>
+            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">Choose Your Ideal Floor</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
+              Compare pricing, room availability, and amenities in one place, then move to floor details with a single click.
             </p>
+            <button
+              type="button"
+              onClick={() => document.getElementById("rooms-grid")?.scrollIntoView({ behavior: "smooth" })}
+              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-purple-700 shadow-lg shadow-purple-950/20 transition hover:bg-purple-50"
+            >
+              Explore Floors
+              <FaArrowRight className="text-xs" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 rounded-2xl border border-white/25 bg-white/10 p-4 backdrop-blur-md">
+            <div className="rounded-xl bg-white/95 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-purple-500">Total Floors</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{stats.total}</p>
+            </div>
+            <div className="rounded-xl bg-white/95 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-purple-500">Available</p>
+              <p className="mt-1 text-2xl font-bold text-emerald-600">{stats.available}</p>
+            </div>
+            <div className="rounded-xl bg-white/95 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-purple-500">Limited</p>
+              <p className="mt-1 text-2xl font-bold text-amber-500">{stats.limited}</p>
+            </div>
+            <div className="rounded-xl bg-white/95 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-purple-500">Full</p>
+              <p className="mt-1 text-2xl font-bold text-rose-500">{stats.full}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <section className="max-w-5xl mx-auto mt-8 px-4">
-        <div className="bg-purple-50 rounded-2xl shadow flex flex-col md:flex-row items-center gap-4 p-6 md:gap-6 animate-fadeIn">
-          {/* Floor */}
-          <div className="flex items-center w-full md:w-auto relative group">
-            <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+      <section className="mx-auto -mt-8 max-w-6xl px-4">
+        <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-xl shadow-purple-900/10">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold text-purple-700">Filter Floors</h2>
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 transition hover:bg-purple-100"
+            >
+              <FaRedo className="text-[11px]" />
+              Reset Filters
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="relative">
+              <FaFilter className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <select
               name="floorName"
               value={filters.floorName}
               onChange={handleFilterChange}
-              className="pl-10 pr-8 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 px-4 py-2 w-full md:w-40 text-gray-700 transition-all duration-200 hover:border-purple-400"
+                className="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-white pl-10 pr-8 text-sm text-gray-700 transition-all duration-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Floor</option>
+                <option value="">All Floors</option>
               {floorNames.map((type) => (
-                <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type}>{type}</option>
               ))}
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
-          {/* Price Range */}
-          <div className="flex items-center w-full md:w-auto relative group">
-            <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+
+            <div className="relative">
+              <FaFilter className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <select
               name="priceRange"
               value={filters.priceRange}
               onChange={handleFilterChange}
-              className="pl-10 pr-8 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 px-4 py-2 w-full md:w-44 text-gray-700 transition-all duration-200 hover:border-purple-400"
+                className="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-white pl-10 pr-8 text-sm text-gray-700 transition-all duration-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Price Range</option>
+                <option value="">Any Price Range</option>
               {priceRanges.map((range) => (
-                <option key={range} value={range}>{range}</option>
+                  <option key={range} value={range}>{range}</option>
               ))}
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
-          {/* Availability */}
-          <div className="flex items-center w-full md:w-auto relative group">
-            <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+
+            <div className="relative">
+              <FaFilter className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <select
               name="availability"
               value={filters.availability}
               onChange={handleFilterChange}
-              className="pl-10 pr-8 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 px-4 py-2 w-full md:w-36 text-gray-700 transition-all duration-200 hover:border-purple-400"
+                className="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-white pl-10 pr-8 text-sm text-gray-700 transition-all duration-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Availability</option>
+                <option value="">Any Availability</option>
               {availabilities.map((avail) => (
-                <option key={avail} value={avail}>{avail}</option>
+                  <option key={avail} value={avail}>{avail}</option>
               ))}
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
-          {/* Sort By */}
-          <div className="flex items-center w-full md:w-auto relative group">
-            <MdSort className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
+
+            <div className="relative">
+              <MdSort className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <select
               name="sortBy"
               value={filters.sortBy}
               onChange={handleFilterChange}
-              className="pl-10 pr-8 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 px-4 py-2 w-full md:w-36 text-gray-700 transition-all duration-200 hover:border-purple-400"
+                className="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-white pl-10 pr-8 text-sm text-gray-700 transition-all duration-200 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-300"
             >
-              <option value="">Sort By</option>
+                <option value="">Sort Results</option>
               {sortOptions.map((sort) => (
-                <option key={sort} value={sort}>{sort}</option>
+                  <option key={sort} value={sort}>{sort}</option>
               ))}
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            </div>
           </div>
-          {/* Reset Button */}
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 border-2 border-purple-400 text-purple-600 font-semibold px-4 py-2 rounded-lg bg-white hover:bg-purple-50 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300"
-          >
-            <FaRedo /> Reset Filters
-          </button>
         </div>
       </section>
 
-      {/* Results Info */}
-      <div className="max-w-5xl mx-auto mt-8 px-4">
-        <p className="text-gray-700 font-medium mb-4">
-          Showing {sortedFloors.length} floors
-        </p>
-      </div>
+      <section id="rooms-grid" className="mx-auto mt-8 max-w-6xl px-4">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-gray-700">Showing {sortedFloors.length} floors</p>
+          <div className="inline-flex rounded-full border border-purple-200 bg-white p-1 text-xs font-medium text-purple-700">
+            <span className="rounded-full bg-purple-100 px-3 py-1">Professional Floor Listing</span>
+          </div>
+        </div>
 
-      {/* Floor Cards Grid */}
-      <section className="max-w-5xl mx-auto px-4">
         {sortedFloors.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-purple-100 bg-white py-20">
             <span className="text-5xl text-purple-300 mb-4">😕</span>
-            <p className="text-xl text-gray-500 font-semibold">No floors found</p>
+            <p className="text-xl font-semibold text-gray-500">No floors found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 animate-fadeIn">
+          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
             {sortedFloors.map((floor) => (
               <RoomCard
                 key={floor.id}
@@ -233,17 +278,21 @@ const Rooms = () => {
             ))}
           </div>
         )}
-
       </section>
-      {/* Hostel Facilities Section */}
-      <section className="max-w-5xl mx-auto mt-16 px-4 bg-gradient-to-br from-purple-50 via-white to-purple-100 rounded-2xl py-8 animate-fadeIn">
-        <h2 className="text-2xl font-bold text-purple-700 mb-6 text-center flex items-center justify-center gap-2">Hostel Facilities</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+      <section className="mx-auto mt-16 max-w-6xl px-4">
+        <div className="rounded-3xl border border-purple-100 bg-gradient-to-br from-purple-50 via-white to-purple-100 p-8 shadow-sm">
+          <h2 className="text-center text-2xl font-bold text-purple-700">Hostel Facilities</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-gray-600">
+            Every floor is supported by modern student-focused facilities for comfort, safety, and convenience.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaWifi className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaWifi className="h-6 w-6" />
                 </span>
               ),
               title: "High-Speed WiFi",
@@ -251,8 +300,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaBook className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaBook className="h-6 w-6" />
                 </span>
               ),
               title: "Study Area",
@@ -260,8 +309,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaTshirt className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaTshirt className="h-6 w-6" />
                 </span>
               ),
               title: "Laundry Service",
@@ -269,8 +318,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaShieldAlt className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaShieldAlt className="h-6 w-6" />
                 </span>
               ),
               title: "CCTV Security",
@@ -278,8 +327,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaTint className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaTint className="h-6 w-6" />
                 </span>
               ),
               title: "Water Supply",
@@ -287,8 +336,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaTint className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaTint className="h-6 w-6" />
                 </span>
               ),
               title: "24/7 Water Supply",
@@ -296,8 +345,8 @@ const Rooms = () => {
             },
             {
               icon: (
-                <span className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all duration-300">
-                  <FaUtensils className="w-7 h-7 text-purple-700" />
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow">
+                  <FaUtensils className="h-6 w-6" />
                 </span>
               ),
               title: "Common Kitchen",
@@ -306,21 +355,21 @@ const Rooms = () => {
           ].map((facility, idx) => (
             <div
               key={facility.title}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition-all p-6 flex flex-col items-center text-center group animate-fadeIn"
+              className="group rounded-2xl border border-purple-100 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               {facility.icon}
               <h3 className="mt-4 text-lg font-semibold text-purple-700">{facility.title}</h3>
               <p className="mt-2 text-gray-600 text-sm">{facility.desc}</p>
             </div>
           ))}
+          </div>
         </div>
       </section>
 
-      {/* Hostel Rules Section */}
-      <section className="max-w-3xl mx-auto mt-16 px-4">
-        <h2 className="text-2xl font-bold text-purple-700 mb-6 text-center">Important: Hostel Rules & Regulations</h2>
-        <div className="bg-purple-50 rounded-2xl shadow p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="mx-auto mt-16 grid max-w-6xl gap-6 px-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-purple-100 bg-white p-7 shadow-sm">
+          <h2 className="text-xl font-bold text-purple-700">Hostel Rules & Regulations</h2>
+          <div className="mt-5 space-y-3">
             {[
               "Valid student ID required",
               "Maintain cleanliness",
@@ -328,60 +377,48 @@ const Rooms = () => {
               "Visitors allowed only in common areas",
               "Respect hostel property",
             ].map((rule) => (
-              <div key={rule} className="flex items-start gap-3 py-1">
+              <div key={rule} className="flex items-start gap-3 rounded-lg bg-purple-50 px-3 py-2">
                 <span className="mt-1 text-green-500">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-gray-700 font-medium">{rule}</span>
+                <span className="text-sm font-medium text-gray-700">{rule}</span>
               </div>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* How Booking Works Section */}
-      <section className="max-w-4xl mx-auto mt-16 px-4">
-        <h2 className="text-2xl font-bold text-purple-700 mb-8 text-center">How Booking Works</h2>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
+        <div className="rounded-2xl border border-purple-100 bg-white p-7 shadow-sm">
+          <h2 className="text-xl font-bold text-purple-700">How Booking Works</h2>
+          <div className="mt-5 space-y-3">
           {[
             {
               title: "Choose a floor",
-              icon: (
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-              ),
+              detail: "Filter by availability and budget to shortlist options.",
             },
             {
               title: "Click View Details",
-              icon: (
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M16 3v4" /><path d="M8 3v4" /></svg>
-              ),
+              detail: "Inspect room setup, amenities, and monthly price range.",
             },
             {
               title: "Select your room",
-              icon: (
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 2v4" /><path d="M16 2v4" /></svg>
-              ),
+              detail: "Submit the booking request for your preferred room.",
             },
             {
               title: "Wait for admin approval",
-              icon: (
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
-              ),
+              detail: "Receive confirmation once your request is approved.",
             },
-          ].map((step, idx, arr) => (
-            <React.Fragment key={step.title}>
-              <div className="flex flex-col items-center text-center relative">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-600 text-white font-bold text-xl mb-2 shadow">
+          ].map((step, idx) => (
+            <div key={step.title} className="flex items-start gap-3 rounded-lg bg-purple-50 px-3 py-2">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-600 text-sm font-bold text-white">
                   {idx + 1}
-                </div>
-                <div className="mb-2">{step.icon}</div>
-                <div className="text-purple-700 font-semibold">{step.title}</div>
+              </span>
+              <div>
+                <p className="font-semibold text-purple-700">{step.title}</p>
+                <p className="text-sm text-gray-600">{step.detail}</p>
               </div>
-              {idx < arr.length - 1 && (
-                <div className="hidden md:block flex-1 h-1 bg-purple-200 mx-2 rounded"></div>
-              )}
-            </React.Fragment>
+            </div>
           ))}
+          </div>
         </div>
       </section>
     </div>
