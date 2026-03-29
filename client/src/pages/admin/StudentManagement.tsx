@@ -18,7 +18,6 @@ import {
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar';
-import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
 import { roomService, studentService } from '../../services';
 
 type StudentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
@@ -87,6 +86,49 @@ const sanitizePhone = (value: string) => value.replace(/\s+/g, '').replace(/\D/g
 
 const isEmailFormatValid = (value: string) => /^\S+@\S+\.\S+$/.test(value);
 
+const VALID_FLOORS = ['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'] as const;
+
+const deriveFloorFromRoomNumber = (roomNumber: string) => {
+  const normalized = (roomNumber || '').trim().toUpperCase();
+  if (!normalized) return '';
+
+  // Handles patterns like 201, A-201, D301, ROOM-401 by extracting first 3-digit segment.
+  const threeDigitMatch = normalized.match(/(\d{3})/);
+  const numericValue = threeDigitMatch ? Number(threeDigitMatch[1]) : Number.NaN;
+
+  if (numericValue >= 101 && numericValue <= 199) return '1st Floor';
+  if (numericValue >= 201 && numericValue <= 299) return '2nd Floor';
+  if (numericValue >= 301 && numericValue <= 399) return '3rd Floor';
+  if (numericValue >= 401 && numericValue <= 499) return '4th Floor';
+
+  return '';
+};
+
+const normalizeFloorValue = (floor: string) => {
+  const cleaned = (floor || '').trim();
+  if (!cleaned) return '';
+  if ((VALID_FLOORS as readonly string[]).includes(cleaned)) return cleaned;
+
+  const digitMatch = cleaned.match(/[1-4]/);
+  if (!digitMatch) return '';
+
+  if (digitMatch[0] === '1') return '1st Floor';
+  if (digitMatch[0] === '2') return '2nd Floor';
+  if (digitMatch[0] === '3') return '3rd Floor';
+  return '4th Floor';
+};
+
+const resolveStudentFloor = (roomNumber: string, floor: string) => {
+  const derived = deriveFloorFromRoomNumber(roomNumber);
+  if (derived) return derived;
+
+  const normalized = normalizeFloorValue(floor);
+  if (normalized) return normalized;
+
+  // Keep floor display valid and consistent even for legacy rows with missing room assignments.
+  return '1st Floor';
+};
+
 const allowEditControlKeys = (key: string) => (
   key === 'Backspace'
   || key === 'Delete'
@@ -136,7 +178,11 @@ const StudentManagement = () => {
       });
 
       if (res.success) {
-        setStudents(res.data || []);
+        const normalizedStudents = (res.data || []).map((student: StudentRow) => ({
+          ...student,
+          floor: resolveStudentFloor(student.roomNumber, student.floor),
+        }));
+        setStudents(normalizedStudents);
       } else {
         setError(res.message || 'Failed to load students');
       }
@@ -387,12 +433,7 @@ const StudentManagement = () => {
               <p className="text-sm text-gray-500">Approval queue, student records, and registration lifecycle.</p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <AdminNotificationComposer
-                source="Student Management"
-                defaultType="student"
-                buttonLabel="Send Update"
-              />
+            <div className="flex items-center justify-end">
               <button onClick={openAdd} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700">
                 <FaPlus /> Add Student
               </button>
