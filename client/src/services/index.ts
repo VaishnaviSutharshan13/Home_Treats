@@ -406,6 +406,36 @@ export const bookingService = {
   },
 };
 
+// ─── Payment Services ───────────────────────────────────────
+export const paymentService = {
+  create: async (formData: FormData) => {
+    const response = await api.post('/payments', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  getStudent: async () => {
+    const response = await api.get('/payments/student');
+    return response.data;
+  },
+
+  getAdmin: async (params?: { status?: 'Pending' | 'Approved' | 'Rejected'; date?: string }) => {
+    const response = await api.get('/payments/admin', { params });
+    return response.data;
+  },
+
+  updateStatus: async (id: string, status: 'Approved' | 'Rejected') => {
+    const response = await api.put(`/payments/${id}`, { status });
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/payments/${id}`);
+    return response.data;
+  },
+};
+
 // ─── Admin Log Services ──────────────────────────────────────
 export const adminLogService = {
   getLogs: async (params?: {
