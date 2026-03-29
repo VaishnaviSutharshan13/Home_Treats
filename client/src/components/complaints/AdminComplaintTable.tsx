@@ -1,4 +1,4 @@
-import { FaEye, FaSpinner, FaTrash } from 'react-icons/fa';
+import { FaBan, FaEye, FaSpinner } from 'react-icons/fa';
 import type { ComplaintItem } from './ComplaintCard';
 
 interface AdminComplaintTableProps {
@@ -6,7 +6,7 @@ interface AdminComplaintTableProps {
   loadingId?: string | null;
   onView: (complaint: ComplaintItem) => void;
   onStatusChange: (complaint: ComplaintItem, status: string) => void;
-  onDelete: (id: string) => void;
+  onReject: (complaint: ComplaintItem) => void;
 }
 
 const statusClasses: Record<string, string> = {
@@ -22,12 +22,12 @@ const priorityClasses: Record<string, string> = {
   Low: 'bg-violet-100 text-violet-700',
 };
 
-const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, onDelete }: AdminComplaintTableProps) => {
+const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, onReject }: AdminComplaintTableProps) => {
   if (!complaints.length) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center shadow-sm">
         <h3 className="text-base font-semibold text-gray-800">No complaints found</h3>
-        <p className="mt-2 text-sm text-gray-500">Try adjusting filters to find pending or in-progress complaints.</p>
+        <p className="mt-2 text-sm text-gray-500">Try adjusting filters to find complaints.</p>
       </div>
     );
   }
@@ -69,10 +69,13 @@ const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, on
                     <select
                       value={complaint.status}
                       onChange={(e) => onStatusChange(complaint, e.target.value)}
+                      disabled={complaint.status === 'Rejected'}
                       className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-700 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-100"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="Rejected">Rejected</option>
                     </select>
                   </div>
                 </td>
@@ -86,12 +89,12 @@ const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, on
                       <FaEye /> View
                     </button>
                     <button
-                      onClick={() => onDelete(complaint._id)}
-                      disabled={loadingId === complaint._id}
+                      onClick={() => onReject(complaint)}
+                      disabled={loadingId === complaint._id || complaint.status === 'Rejected'}
                       className="inline-flex h-9 items-center gap-1 rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
                     >
-                      {loadingId === complaint._id ? <FaSpinner className="animate-spin" /> : <FaTrash />}
-                      Delete
+                      {loadingId === complaint._id ? <FaSpinner className="animate-spin" /> : <FaBan />}
+                      Reject
                     </button>
                   </div>
                 </td>

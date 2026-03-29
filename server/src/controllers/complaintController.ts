@@ -8,7 +8,7 @@ import User from '../models/User';
 const ALLOWED_CATEGORIES = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'];
 const ALLOWED_PRIORITIES = ['High', 'Medium', 'Low'];
 const ALLOWED_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected'];
-const ADMIN_ALLOWED_STATUSES = ['Pending', 'In Progress'];
+const ADMIN_ALLOWED_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected'];
 
 const isOwnerComplaint = async (complaint: any, userId: string) => {
   if (String(complaint.createdBy || '') === String(userId)) return true;
@@ -48,7 +48,10 @@ const sanitizeUpdatePayload = (body: any) => {
 
 const isValidStatusTransition = (currentStatus: string, nextStatus: string) => {
   if (currentStatus === nextStatus) return true;
-  return ADMIN_ALLOWED_STATUSES.includes(currentStatus) && ADMIN_ALLOWED_STATUSES.includes(nextStatus);
+  if (!ADMIN_ALLOWED_STATUSES.includes(currentStatus) || !ADMIN_ALLOWED_STATUSES.includes(nextStatus)) return false;
+  if (currentStatus === 'Pending') return nextStatus === 'In Progress' || nextStatus === 'Rejected';
+  if (currentStatus === 'In Progress') return nextStatus === 'Resolved' || nextStatus === 'Rejected';
+  return false;
 };
 
 // GET all complaints
@@ -245,7 +248,7 @@ export const updateComplaint = async (req: AuthRequest, res: Response) => {
       complaint.resolvedDate = undefined;
     } else {
       if (updatePayload.status && !ADMIN_ALLOWED_STATUSES.includes(updatePayload.status)) {
-        return res.status(400).json({ success: false, message: 'Admin can only set status to Pending or In Progress' });
+        return res.status(400).json({ success: false, message: 'Invalid status for admin update' });
       }
 
       if (updatePayload.status && !isValidStatusTransition(complaint.status, updatePayload.status)) {
@@ -259,9 +262,25 @@ export const updateComplaint = async (req: AuthRequest, res: Response) => {
         return res.status(400).json({ success: false, message: 'Assigned to is required when moving complaint to In Progress' });
       }
 
+      if (updatePayload.status === 'Rejected' && !String(updatePayload.rejectionReason || complaint.rejectionReason || '').trim()) {
+        return res.status(400).json({ success: false, message: 'Rejection reason is required when rejecting complaint' });
+      }
+
       Object.entries(updatePayload).forEach(([key, value]) => {
         (complaint as any)[key] = value;
       });
+
+      if (updatePayload.status === 'Resolved' || updatePayload.status === 'Rejected') {
+        complaint.resolvedDate = new Date();
+      }
+
+      if (updatePayload.status === 'Resolved') {
+        complaint.rejectionReason = '';
+      }
+
+      if (updatePayload.status === 'Rejected') {
+        complaint.resolutionNotes = '';
+      }
 
       if (updatePayload.status === 'Pending') {
         complaint.rejectionReason = '';
@@ -370,9 +389,6 @@ export const resolveComplaint = async (req: AuthRequest, res: Response) => {
       complaint.status = 'Resolved';
       complaint.rejectionReason = '';
       complaint.resolutionNotes = String(req.body.resolutionNotes || '').trim();
-      if (!complaint.resolutionNotes) {
-        return res.status(400).json({ success: false, message: 'Resolution notes are required when resolving complaint' });
-      }
     }
     complaint.resolvedDate = new Date();
 

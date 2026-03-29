@@ -17,6 +17,7 @@ import { complaintService } from '../../services';
 interface AdminComplaintMeta {
   status: string;
   assignedTo: string;
+  rejectionReason: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -48,7 +49,7 @@ const ComplaintManagement = () => {
   const [detailMeta, setDetailMeta] = useState<AdminComplaintMeta | null>(null);
   const [detailTouched, setDetailTouched] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmRejectComplaint, setConfirmRejectComplaint] = useState<ComplaintItem | null>(null);
 
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -81,9 +82,6 @@ const ComplaintManagement = () => {
 
   const filteredComplaints = useMemo(() => {
     return complaints.filter((complaint) => {
-      const statusAllowed = complaint.status === 'Pending' || complaint.status === 'In Progress';
-      if (!statusAllowed) return false;
-
       const matchesSearch =
         complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         complaint.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,8 +96,10 @@ const ComplaintManagement = () => {
   }, [complaints, searchTerm, filterCategory, filterStatus, filterPriority]);
 
   const isValidStatusTransition = (currentStatus: string, nextStatus: string) => {
-    const allowedStatuses = ['Pending', 'In Progress'];
-    return allowedStatuses.includes(currentStatus) && allowedStatuses.includes(nextStatus);
+    if (currentStatus === nextStatus) return true;
+    if (currentStatus === 'Pending') return nextStatus === 'In Progress' || nextStatus === 'Rejected';
+    if (currentStatus === 'In Progress') return nextStatus === 'Resolved' || nextStatus === 'Rejected';
+    return false;
   };
 
   const getDetailErrors = () => {
@@ -107,7 +107,7 @@ const ComplaintManagement = () => {
     if (!selectedComplaint || !detailMeta) return errors;
 
     if (!isValidStatusTransition(selectedComplaint.status, detailMeta.status)) {
-      errors.status = 'Status must be Pending or In Progress';
+      errors.status = `Invalid transition from ${selectedComplaint.status} to ${detailMeta.status}`;
     }
 
     if (detailMeta.status === 'In Progress' && detailMeta.assignedTo.trim().length < 2) {
@@ -122,6 +122,7 @@ const ComplaintManagement = () => {
     setDetailMeta({
       status: complaint.status,
       assignedTo: complaint.assignedTo || '',
+      rejectionReason: complaint.rejectionReason || '',
     });
     setDetailTouched(false);
   };
@@ -131,17 +132,40 @@ const ComplaintManagement = () => {
     setDetailTouched(true);
     const metaErrors = getDetailErrors();
     if (Object.keys(metaErrors).length) {
-      const firstError = metaErrors.status || metaErrors.assignedTo || 'Please fix highlighted fields before updating status';
-      showToast(firstError, 'error');
+      const detailError =
+        metaErrors.status ||
+        metaErrors.assignedTo ||
+        'Please fix highlighted fields before updating status';
+      showToast(detailError, 'error');
       return;
+    }
+
+    const resolvedNotes = detailMeta.status === 'Resolved' ? String(selectedComplaint.resolutionNotes || '').trim() : '';
+    const rejectedReason =
+      detailMeta.status === 'Rejected'
+        ? (detailMeta.rejectionReason.trim() || selectedComplaint.rejectionReason?.trim() || 'Rejected by admin')
+        : '';
+
+    const payload: Record<string, string> = {
+      status: detailMeta.status,
+    };
+
+    const assignedTo = detailMeta.assignedTo.trim();
+    if (assignedTo) {
+      payload.assignedTo = assignedTo;
+    }
+
+    if (detailMeta.status === 'Resolved' && resolvedNotes) {
+      payload.resolutionNotes = resolvedNotes;
+    }
+
+    if (detailMeta.status === 'Rejected' && rejectedReason) {
+      payload.rejectionReason = rejectedReason;
     }
 
     try {
       setUpdating(true);
-      await complaintService.update(selectedComplaint._id, {
-        status: detailMeta.status,
-        assignedTo: detailMeta.assignedTo.trim(),
-      });
+      await complaintService.update(selectedComplaint._id, payload);
       showToast(`Status updated to ${detailMeta.status}`, 'success');
       setSelectedComplaint(null);
       setDetailMeta(null);
@@ -157,13 +181,12 @@ const ComplaintManagement = () => {
   const handleStatusChange = async (complaint: ComplaintItem, status: string) => {
     if (status === complaint.status) return;
 
-    if (!['Pending', 'In Progress'].includes(status)) {
-      showToast('Only Pending and In Progress statuses are allowed', 'error');
-      return;
-    }
+    const requiresDetails =
+      (status === 'In Progress' && !String(complaint.assignedTo || '').trim()) ||
+      (status === 'Rejected' && !String(complaint.rejectionReason || '').trim());
 
-    if (status === 'In Progress' && !String(complaint.assignedTo || '').trim()) {
-      showToast('Open details and assign staff before setting In Progress', 'error');
+    if (requiresDetails) {
+      showToast('Open details and provide required assignment/reason for this status', 'error');
       openDetails(complaint);
       return;
     }
@@ -180,14 +203,21 @@ const ComplaintManagement = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleReject = async (complaint: ComplaintItem) => {
+    if (complaint.status === 'Rejected') {
+      showToast('Complaint is already rejected', 'error');
+      return;
+    }
+
     try {
-      setActionLoadingId(id);
-      await complaintService.delete(id);
-      showToast('Complaint deleted', 'success');
+      setActionLoadingId(complaint._id);
+      await complaintService.resolve(complaint._id, {
+        rejectionReason: complaint.rejectionReason?.trim() || 'Rejected by admin',
+      });
+      showToast('Complaint rejected', 'success');
       await fetchComplaints();
     } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Unable to delete complaint', 'error');
+      showToast(err?.response?.data?.message || 'Unable to reject complaint', 'error');
     } finally {
       setActionLoadingId(null);
     }
@@ -228,7 +258,7 @@ const ComplaintManagement = () => {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Complaint Management</h1>
-                <p className="text-sm text-gray-500">Admins can view all complaints, update status to Pending/In Progress, and delete when needed</p>
+                <p className="text-sm text-gray-500">Admins can view all complaints and update complaint status</p>
               </div>
             </div>
           </div>
@@ -299,6 +329,8 @@ const ComplaintManagement = () => {
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Rejected">Rejected</option>
               </select>
 
               <select
@@ -344,7 +376,7 @@ const ComplaintManagement = () => {
               loadingId={actionLoadingId}
               onView={openDetails}
               onStatusChange={handleStatusChange}
-              onDelete={setConfirmDeleteId}
+              onReject={setConfirmRejectComplaint}
             />
           )}
         </main>
@@ -423,6 +455,7 @@ const ComplaintManagement = () => {
                 <select
                   value={detailMeta.status}
                   onChange={(e) => setDetailMeta({ ...detailMeta, status: e.target.value })}
+                  disabled={selectedComplaint.status === 'Rejected'}
                   className={`h-12 w-full rounded-xl border bg-white px-4 text-sm text-gray-900 outline-none transition focus:ring-2 ${
                     detailMetaErrors.status
                       ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
@@ -431,6 +464,8 @@ const ComplaintManagement = () => {
                 >
                   <option value="Pending">Pending</option>
                   <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
                 </select>
                 {detailMetaErrors.status && <p className="mt-1 text-xs font-medium text-red-600">{detailMetaErrors.status}</p>}
               </div>
@@ -463,7 +498,7 @@ const ComplaintManagement = () => {
               </button>
               <button
                 onClick={updateDetailStatus}
-                disabled={updating || !isDetailValid}
+                disabled={updating || !isDetailValid || selectedComplaint.status === 'Rejected'}
                 className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white transition hover:from-purple-700 hover:to-pink-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {updating ? (
@@ -499,27 +534,27 @@ const ComplaintManagement = () => {
         </div>
       )}
 
-      {confirmDeleteId && (
+      {confirmRejectComplaint && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900">Delete Complaint</h3>
-            <p className="mt-2 text-sm text-gray-600">Are you sure you want to permanently delete this complaint?</p>
+            <h3 className="text-lg font-bold text-gray-900">Reject Complaint</h3>
+            <p className="mt-2 text-sm text-gray-600">Are you sure you want to reject this complaint?</p>
             <div className="mt-5 flex justify-end gap-3">
               <button
-                onClick={() => setConfirmDeleteId(null)}
+                onClick={() => setConfirmRejectComplaint(null)}
                 className="h-11 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={async () => {
-                  const id = confirmDeleteId;
-                  setConfirmDeleteId(null);
-                  if (id) await handleDelete(id);
+                  const complaint = confirmRejectComplaint;
+                  setConfirmRejectComplaint(null);
+                  if (complaint) await handleReject(complaint);
                 }}
                 className="h-11 rounded-xl bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700"
               >
-                Delete
+                Reject
               </button>
             </div>
           </div>

@@ -52,10 +52,9 @@ const validateComplaintUpdate = [
     .isIn(['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'])
     .withMessage('Invalid category'),
   body('priority').optional().isIn(['Low', 'Medium', 'High']).withMessage('Invalid priority'),
-  body('status').optional().isIn(['Pending', 'In Progress']).withMessage('Status must be Pending or In Progress'),
-  body('assignedTo').optional().trim().isLength({ min: 2 }).withMessage('Assigned to must be at least 2 characters'),
-  body('resolutionNotes').optional().trim().isLength({ min: 5 }).withMessage('Resolution notes must be at least 5 characters'),
-  body('rejectionReason').optional().trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
+  body('status').optional().isIn(['Pending', 'In Progress', 'Resolved', 'Rejected']).withMessage('Invalid status'),
+  body('assignedTo').optional({ checkFalsy: true }).trim().isLength({ min: 2 }).withMessage('Assigned to must be at least 2 characters'),
+  body('rejectionReason').optional({ checkFalsy: true }).trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
 ];
 
 const validateAssign = [
@@ -64,8 +63,7 @@ const validateAssign = [
 ];
 
 const validateResolve: any[] = [
-  body('resolutionNotes').optional().trim().isLength({ min: 5 }).withMessage('Resolution notes must be at least 5 characters'),
-  body('rejectionReason').optional().trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
+  body('rejectionReason').optional({ checkFalsy: true }).trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
 ];
 
 const validateComment = [
