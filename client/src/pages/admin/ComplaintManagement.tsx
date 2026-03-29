@@ -5,58 +5,19 @@ import {
   FaChevronLeft,
   FaExclamationTriangle,
   FaFilter,
-  FaPlus,
   FaSearch,
   FaSpinner,
   FaTimes,
 } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
-import ComplaintForm from '../../components/complaints/ComplaintForm';
-import type { ComplaintFormValues } from '../../components/complaints/ComplaintForm';
 import AdminComplaintTable from '../../components/complaints/AdminComplaintTable';
 import type { ComplaintItem } from '../../components/complaints/ComplaintCard';
 import { complaintService } from '../../services';
 
-const blankForm: ComplaintFormValues = {
-  title: '',
-  description: '',
-  category: 'Maintenance',
-  priority: 'Medium',
-  student: '',
-  room: '',
-};
-
 interface AdminComplaintMeta {
   status: string;
   assignedTo: string;
-  resolutionNotes: string;
-  rejectionReason: string;
 }
-
-const validateComplaintForm = (
-  values: ComplaintFormValues,
-  includeStudentRoom: boolean
-): Partial<Record<keyof ComplaintFormValues, string>> => {
-  const errors: Partial<Record<keyof ComplaintFormValues, string>> = {};
-  const title = values.title.trim();
-  const description = values.description.trim();
-
-  if (!title) errors.title = 'Title is required';
-  else if (title.length < 5) errors.title = 'Title must be at least 5 characters';
-
-  if (!description) errors.description = 'Description is required';
-  else if (description.length < 20) errors.description = 'Description must be at least 20 characters';
-
-  if (!values.category.trim()) errors.category = 'Category is required';
-  if (!['Low', 'Medium', 'High'].includes(values.priority)) errors.priority = 'Invalid priority';
-
-  if (includeStudentRoom) {
-    if (!String(values.student || '').trim()) errors.student = 'Student is required';
-    if (!String(values.room || '').trim()) errors.room = 'Room is required';
-  }
-
-  return errors;
-};
 
 const statusColors: Record<string, string> = {
   Pending: 'bg-yellow-100 text-yellow-800',
@@ -82,11 +43,6 @@ const ComplaintManagement = () => {
   const [filterCategory, setFilterCategory] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
-
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [createFormValues, setCreateFormValues] = useState<ComplaintFormValues>(blankForm);
-  const [createFormTouched, setCreateFormTouched] = useState(false);
-  const [creating, setCreating] = useState(false);
 
   const [selectedComplaint, setSelectedComplaint] = useState<ComplaintItem | null>(null);
   const [detailMeta, setDetailMeta] = useState<AdminComplaintMeta | null>(null);
@@ -123,19 +79,11 @@ const ComplaintManagement = () => {
     fetchComplaints();
   }, []);
 
-  useEffect(() => {
-    if (!createModalOpen) return;
-
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [createModalOpen]);
-
   const filteredComplaints = useMemo(() => {
     return complaints.filter((complaint) => {
+      const statusAllowed = complaint.status === 'Pending' || complaint.status === 'In Progress';
+      if (!statusAllowed) return false;
+
       const matchesSearch =
         complaint.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         complaint.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -149,18 +97,9 @@ const ComplaintManagement = () => {
     });
   }, [complaints, searchTerm, filterCategory, filterStatus, filterPriority]);
 
-  const stats = {
-    pending: complaints.filter((item) => item.status === 'Pending').length,
-    inProgress: complaints.filter((item) => item.status === 'In Progress').length,
-    resolved: complaints.filter((item) => item.status === 'Resolved').length,
-    rejected: complaints.filter((item) => item.status === 'Rejected').length,
-  };
-
   const isValidStatusTransition = (currentStatus: string, nextStatus: string) => {
-    if (currentStatus === nextStatus) return true;
-    if (currentStatus === 'Pending') return nextStatus === 'In Progress';
-    if (currentStatus === 'In Progress') return nextStatus === 'Resolved' || nextStatus === 'Rejected';
-    return false;
+    const allowedStatuses = ['Pending', 'In Progress'];
+    return allowedStatuses.includes(currentStatus) && allowedStatuses.includes(nextStatus);
   };
 
   const getDetailErrors = () => {
@@ -168,63 +107,14 @@ const ComplaintManagement = () => {
     if (!selectedComplaint || !detailMeta) return errors;
 
     if (!isValidStatusTransition(selectedComplaint.status, detailMeta.status)) {
-      errors.status = `Invalid transition from ${selectedComplaint.status} to ${detailMeta.status}`;
+      errors.status = 'Status must be Pending or In Progress';
     }
 
     if (detailMeta.status === 'In Progress' && detailMeta.assignedTo.trim().length < 2) {
       errors.assignedTo = 'Assigned to is required for In Progress';
     }
 
-    if (detailMeta.status === 'Resolved' && detailMeta.resolutionNotes.trim().length < 5) {
-      errors.resolutionNotes = 'Resolution notes must be at least 5 characters';
-    }
-
-    if (detailMeta.status === 'Rejected' && detailMeta.rejectionReason.trim().length < 5) {
-      errors.rejectionReason = 'Rejection reason must be at least 5 characters';
-    }
-
     return errors;
-  };
-
-  const submitCreateComplaint = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setCreateFormTouched(true);
-
-    const createErrors = validateComplaintForm(createFormValues, true);
-    if (Object.keys(createErrors).length) {
-      const firstError =
-        createErrors.description ||
-        createErrors.title ||
-        createErrors.category ||
-        createErrors.priority ||
-        createErrors.student ||
-        createErrors.room ||
-        'Please fix highlighted fields before submitting';
-      showToast(firstError, 'error');
-      return;
-    }
-
-    const payload = {
-      ...createFormValues,
-      title: createFormValues.title.trim(),
-      description: createFormValues.description.trim(),
-      student: createFormValues.student?.trim(),
-      room: createFormValues.room?.trim(),
-    };
-
-    try {
-      setCreating(true);
-      await complaintService.create(payload);
-      showToast('Complaint created successfully', 'success');
-      setCreateModalOpen(false);
-      setCreateFormValues(blankForm);
-      setCreateFormTouched(false);
-      await fetchComplaints();
-    } catch (err: any) {
-      showToast(err?.response?.data?.message || 'Unable to create complaint', 'error');
-    } finally {
-      setCreating(false);
-    }
   };
 
   const openDetails = (complaint: ComplaintItem) => {
@@ -232,8 +122,6 @@ const ComplaintManagement = () => {
     setDetailMeta({
       status: complaint.status,
       assignedTo: complaint.assignedTo || '',
-      resolutionNotes: complaint.resolutionNotes || '',
-      rejectionReason: complaint.rejectionReason || '',
     });
     setDetailTouched(false);
   };
@@ -243,12 +131,7 @@ const ComplaintManagement = () => {
     setDetailTouched(true);
     const metaErrors = getDetailErrors();
     if (Object.keys(metaErrors).length) {
-      const firstError =
-        metaErrors.status ||
-        metaErrors.assignedTo ||
-        metaErrors.resolutionNotes ||
-        metaErrors.rejectionReason ||
-        'Please fix highlighted fields before updating status';
+      const firstError = metaErrors.status || metaErrors.assignedTo || 'Please fix highlighted fields before updating status';
       showToast(firstError, 'error');
       return;
     }
@@ -258,8 +141,6 @@ const ComplaintManagement = () => {
       await complaintService.update(selectedComplaint._id, {
         status: detailMeta.status,
         assignedTo: detailMeta.assignedTo.trim(),
-        resolutionNotes: detailMeta.resolutionNotes.trim(),
-        rejectionReason: detailMeta.rejectionReason.trim(),
       });
       showToast(`Status updated to ${detailMeta.status}`, 'success');
       setSelectedComplaint(null);
@@ -276,13 +157,13 @@ const ComplaintManagement = () => {
   const handleStatusChange = async (complaint: ComplaintItem, status: string) => {
     if (status === complaint.status) return;
 
-    const requiresDetails =
-      (status === 'In Progress' && !String(complaint.assignedTo || '').trim()) ||
-      (status === 'Resolved' && !String(complaint.resolutionNotes || '').trim()) ||
-      (status === 'Rejected' && !String(complaint.rejectionReason || '').trim());
+    if (!['Pending', 'In Progress'].includes(status)) {
+      showToast('Only Pending and In Progress statuses are allowed', 'error');
+      return;
+    }
 
-    if (requiresDetails) {
-      showToast('Open details and provide required assignment/notes for this status', 'error');
+    if (status === 'In Progress' && !String(complaint.assignedTo || '').trim()) {
+      showToast('Open details and assign staff before setting In Progress', 'error');
       openDetails(complaint);
       return;
     }
@@ -312,11 +193,15 @@ const ComplaintManagement = () => {
     }
   };
 
-  const createFormErrors = createFormTouched ? validateComplaintForm(createFormValues, true) : {};
-  const isCreateFormValid = Object.keys(validateComplaintForm(createFormValues, true)).length === 0;
-
   const detailMetaErrors = detailTouched ? getDetailErrors() : {};
   const isDetailValid = Object.keys(getDetailErrors()).length === 0;
+
+  const stats = {
+    pending: complaints.filter((item) => item.status === 'Pending').length,
+    inProgress: complaints.filter((item) => item.status === 'In Progress').length,
+    resolved: complaints.filter((item) => item.status === 'Resolved').length,
+    rejected: complaints.filter((item) => item.status === 'Rejected').length,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -343,14 +228,8 @@ const ComplaintManagement = () => {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Complaint Management</h1>
-                <p className="text-sm text-gray-500">Manage all student complaints with full lifecycle tracking</p>
+                <p className="text-sm text-gray-500">Admins can view all complaints, update status to Pending/In Progress, and delete when needed</p>
               </div>
-              <button
-                onClick={() => setCreateModalOpen(true)}
-                className="inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:from-purple-700 hover:to-pink-600"
-              >
-                <FaPlus /> New Complaint
-              </button>
             </div>
           </div>
         </header>
@@ -420,8 +299,6 @@ const ComplaintManagement = () => {
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Rejected">Rejected</option>
               </select>
 
               <select
@@ -472,51 +349,6 @@ const ComplaintManagement = () => {
           )}
         </main>
       </div>
-
-      {createModalOpen && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 px-4"
-          onClick={() => {
-            setCreateModalOpen(false);
-            setCreateFormValues(blankForm);
-            setCreateFormTouched(false);
-          }}
-        >
-          <div
-            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-6 shadow-lg sm:p-8"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              onClick={() => {
-                setCreateModalOpen(false);
-                setCreateFormValues(blankForm);
-                setCreateFormTouched(false);
-              }}
-              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-              aria-label="Close complaint form"
-            >
-              <FaTimes className="h-4 w-4" />
-            </button>
-
-            <h2 className="mb-6 pr-12 text-xl font-bold text-gray-900">Create Complaint</h2>
-            <ComplaintForm
-              values={createFormValues}
-              onChange={setCreateFormValues}
-              onSubmit={submitCreateComplaint}
-              errors={createFormErrors}
-              submitDisabled={!isCreateFormValid}
-              onCancel={() => {
-                setCreateModalOpen(false);
-                setCreateFormValues(blankForm);
-                setCreateFormTouched(false);
-              }}
-              loading={creating}
-              submitLabel="Create Complaint"
-              includeStudentRoom
-            />
-          </div>
-        </div>
-      )}
 
       {selectedComplaint && detailMeta && (
         <div
@@ -599,8 +431,6 @@ const ComplaintManagement = () => {
                 >
                   <option value="Pending">Pending</option>
                   <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
-                  <option value="Rejected">Rejected</option>
                 </select>
                 {detailMetaErrors.status && <p className="mt-1 text-xs font-medium text-red-600">{detailMetaErrors.status}</p>}
               </div>
@@ -617,42 +447,6 @@ const ComplaintManagement = () => {
                   placeholder="Staff name or team"
                 />
                 {detailMetaErrors.assignedTo && <p className="mt-1 text-xs font-medium text-red-600">{detailMetaErrors.assignedTo}</p>}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-gray-700">Resolution Notes</label>
-                <textarea
-                  value={detailMeta.resolutionNotes}
-                  onChange={(e) => setDetailMeta({ ...detailMeta, resolutionNotes: e.target.value })}
-                  rows={3}
-                  className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:ring-2 ${
-                    detailMetaErrors.resolutionNotes
-                      ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
-                      : 'border-gray-200 focus:border-purple-400 focus:ring-purple-100'
-                  }`}
-                  placeholder="Add notes when resolving a complaint"
-                />
-                {detailMetaErrors.resolutionNotes && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{detailMetaErrors.resolutionNotes}</p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-semibold text-gray-700">Rejection Reason</label>
-                <textarea
-                  value={detailMeta.rejectionReason}
-                  onChange={(e) => setDetailMeta({ ...detailMeta, rejectionReason: e.target.value })}
-                  rows={3}
-                  className={`w-full rounded-xl border bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:ring-2 ${
-                    detailMetaErrors.rejectionReason
-                      ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
-                      : 'border-gray-200 focus:border-purple-400 focus:ring-purple-100'
-                  }`}
-                  placeholder="Add reason when rejecting a complaint"
-                />
-                {detailMetaErrors.rejectionReason && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{detailMetaErrors.rejectionReason}</p>
-                )}
               </div>
             </div>
 

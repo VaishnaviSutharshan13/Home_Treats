@@ -27,7 +27,7 @@ const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, on
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center shadow-sm">
         <h3 className="text-base font-semibold text-gray-800">No complaints found</h3>
-        <p className="mt-2 text-sm text-gray-500">Try adjusting filters or create a complaint from the top action bar.</p>
+        <p className="mt-2 text-sm text-gray-500">Try adjusting filters to find pending or in-progress complaints.</p>
       </div>
     );
   }
@@ -73,8 +73,6 @@ const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, on
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Rejected">Rejected</option>
                     </select>
                   </div>
                 </td>

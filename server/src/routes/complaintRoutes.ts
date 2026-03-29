@@ -12,7 +12,7 @@ import {
   resolveComplaint,
   addComment,
 } from '../controllers/complaintController';
-import { authMiddleware, adminOnly, approvedStudentOrAdmin } from '../middleware/auth';
+import { authMiddleware, adminOnly, approvedStudentOnly, approvedStudentOrAdmin } from '../middleware/auth';
 import { validateRequest } from '../middleware/validateRequest';
 
 const router = Router();
@@ -52,7 +52,7 @@ const validateComplaintUpdate = [
     .isIn(['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'])
     .withMessage('Invalid category'),
   body('priority').optional().isIn(['Low', 'Medium', 'High']).withMessage('Invalid priority'),
-  body('status').optional().isIn(['Pending', 'In Progress', 'Resolved', 'Rejected']).withMessage('Invalid status'),
+  body('status').optional().isIn(['Pending', 'In Progress']).withMessage('Status must be Pending or In Progress'),
   body('assignedTo').optional().trim().isLength({ min: 2 }).withMessage('Assigned to must be at least 2 characters'),
   body('resolutionNotes').optional().trim().isLength({ min: 5 }).withMessage('Resolution notes must be at least 5 characters'),
   body('rejectionReason').optional().trim().isLength({ min: 5 }).withMessage('Rejection reason must be at least 5 characters'),
@@ -78,7 +78,7 @@ router.get('/', authMiddleware, adminOnly, getAllComplaints);
 router.get('/user', authMiddleware, approvedStudentOrAdmin, getCurrentUserComplaints);
 router.get('/student/:studentId', authMiddleware, approvedStudentOrAdmin, getComplaintsByStudent);
 router.get('/:id', authMiddleware, getComplaintById);
-router.post('/', authMiddleware, approvedStudentOrAdmin, validateComplaint, validateRequest, createComplaint);
+router.post('/', authMiddleware, approvedStudentOnly, validateComplaint, validateRequest, createComplaint);
 router.put('/:id', authMiddleware, approvedStudentOrAdmin, validateComplaintUpdate, validateRequest, updateComplaint);
 router.delete('/:id', authMiddleware, approvedStudentOrAdmin, deleteComplaint);
 router.put('/:id/assign', authMiddleware, adminOnly, validateAssign, validateRequest, assignComplaint);

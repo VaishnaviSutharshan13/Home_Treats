@@ -8,6 +8,7 @@ import User from '../models/User';
 const ALLOWED_CATEGORIES = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'];
 const ALLOWED_PRIORITIES = ['High', 'Medium', 'Low'];
 const ALLOWED_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected'];
+const ADMIN_ALLOWED_STATUSES = ['Pending', 'In Progress'];
 
 const isOwnerComplaint = async (complaint: any, userId: string) => {
   if (String(complaint.createdBy || '') === String(userId)) return true;
@@ -47,9 +48,7 @@ const sanitizeUpdatePayload = (body: any) => {
 
 const isValidStatusTransition = (currentStatus: string, nextStatus: string) => {
   if (currentStatus === nextStatus) return true;
-  if (currentStatus === 'Pending') return nextStatus === 'In Progress';
-  if (currentStatus === 'In Progress') return nextStatus === 'Resolved' || nextStatus === 'Rejected';
-  return false;
+  return ADMIN_ALLOWED_STATUSES.includes(currentStatus) && ADMIN_ALLOWED_STATUSES.includes(nextStatus);
 };
 
 // GET all complaints
@@ -153,6 +152,10 @@ export const createComplaint = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
+    if (req.user.role === 'admin') {
+      return res.status(403).json({ success: false, message: 'Admins cannot create complaints' });
+    }
+
     const payload = sanitizeCreatePayload(req.body);
     if (!payload.title || !payload.description) {
       return res.status(400).json({ success: false, message: 'Title and description are required' });
@@ -241,6 +244,10 @@ export const updateComplaint = async (req: AuthRequest, res: Response) => {
       complaint.estimatedResolution = undefined;
       complaint.resolvedDate = undefined;
     } else {
+      if (updatePayload.status && !ADMIN_ALLOWED_STATUSES.includes(updatePayload.status)) {
+        return res.status(400).json({ success: false, message: 'Admin can only set status to Pending or In Progress' });
+      }
+
       if (updatePayload.status && !isValidStatusTransition(complaint.status, updatePayload.status)) {
         return res.status(400).json({
           success: false,
@@ -252,28 +259,14 @@ export const updateComplaint = async (req: AuthRequest, res: Response) => {
         return res.status(400).json({ success: false, message: 'Assigned to is required when moving complaint to In Progress' });
       }
 
-      if (updatePayload.status === 'Resolved' && !String(updatePayload.resolutionNotes || complaint.resolutionNotes || '').trim()) {
-        return res.status(400).json({ success: false, message: 'Resolution notes are required when resolving complaint' });
-      }
-
-      if (updatePayload.status === 'Rejected' && !String(updatePayload.rejectionReason || complaint.rejectionReason || '').trim()) {
-        return res.status(400).json({ success: false, message: 'Rejection reason is required when rejecting complaint' });
-      }
-
       Object.entries(updatePayload).forEach(([key, value]) => {
         (complaint as any)[key] = value;
       });
 
-      if (updatePayload.status === 'Resolved' || updatePayload.status === 'Rejected') {
-        complaint.resolvedDate = new Date();
-      }
-
-      if (updatePayload.status === 'Resolved') {
+      if (updatePayload.status === 'Pending') {
         complaint.rejectionReason = '';
-      }
-
-      if (updatePayload.status === 'Rejected') {
         complaint.resolutionNotes = '';
+        complaint.resolvedDate = undefined;
       }
 
       await logAdminAction(req.user.email, String(req.user.id), 'Updated complaint', 'complaint', String(req.params.id), complaint.title);
