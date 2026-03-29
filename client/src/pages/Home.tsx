@@ -145,6 +145,9 @@ const testimonials = [
   },
 ];
 
+// Can be overridden via Vite env (e.g., VITE_HOSTEL_LOCATION in .env)
+const location = import.meta.env.VITE_HOSTEL_LOCATION || 'Jaffna, Sri Lanka';
+
 /* ──────────────────────────────────────────────────
    COMPONENT
 ────────────────────────────────────────────────── */
@@ -183,7 +186,7 @@ const Home = () => {
           {/* Tag badge */}
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/40 text-white text-sm font-medium px-5 py-2.5 rounded-full mb-8 shadow-lg">
             <FaBuilding className="w-4 h-4 text-purple-200" />
-            Student Hostel Building — Colombo, Sri Lanka
+            Student Hostel Building — {location}
           </div>
 
           {/* Main Title */}
