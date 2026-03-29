@@ -341,11 +341,6 @@ const Home = () => {
               <div className="absolute -top-4 -right-4 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-4 shadow-xl shadow-purple-500/30">
                 <FaShieldAlt className="w-8 h-8 text-white" />
               </div>
-              {/* Floating badge bottom-left */}
-              <div className="absolute -bottom-4 -left-4 bg-white border border-purple-500/20 rounded-2xl px-5 py-3 shadow-xl">
-                <div className="text-3xl font-extrabold text-purple-600 leading-none">8+</div>
-                <div className="text-xs text-gray-500 font-medium mt-0.5">Years of Trust</div>
-              </div>
             </div>
           </div>
         </div>
