@@ -35,44 +35,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
     {
       title: 'Dashboard',
       icon: <FaTachometerAlt className="w-5 h-5" />,
-      href: '/admin/dashboard',
-      badge: null
+      href: '/admin/dashboard'
     },
     {
       title: 'Students',
       icon: <FaUsers className="w-5 h-5" />,
-      href: '/admin/student-management',
-      badge: null
+      href: '/admin/student-management'
+    },
+    {
+      title: 'Approvals',
+      icon: <FaCheck className="w-5 h-5" />,
+      href: '/admin/student-approvals'
     },
     {
       title: 'Rooms',
       icon: <FaBed className="w-5 h-5" />,
-      href: '/admin/room-management',
-      badge: null
+      href: '/admin/room-management'
     },
     {
       title: 'Fees',
       icon: <FaDollarSign className="w-5 h-5" />,
-      href: '/admin/fees-management',
-      badge: null
+      href: '/admin/fees-management'
     },
     {
       title: 'Complaints',
       icon: <FaExclamationTriangle className="w-5 h-5" />,
-      href: '/admin/complaint-management',
-      badge: null
+      href: '/admin/complaint-management'
     },
     {
       title: 'Activity Log',
       icon: <FaHistory className="w-5 h-5" />,
-      href: '/admin/activity-log',
-      badge: null
+      href: '/admin/activity-log'
     },
     {
       title: 'Profile',
       icon: <FaUser className="w-5 h-5" />,
-      href: '/admin/profile',
-      badge: null
+      href: '/admin/profile'
     }
   ];
 
@@ -80,32 +78,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
     {
       title: 'Home',
       icon: <FaHome className="w-5 h-5" />,
-      href: '/student/dashboard',
-      badge: null
+      href: '/student/dashboard'
     },
     {
       title: 'My Room',
       icon: <FaBed className="w-5 h-5" />,
-      href: '/student/my-room',
-      badge: null
+      href: '/student/my-room'
     },
     {
       title: 'Book Room',
       icon: <FaBed className="w-5 h-5" />,
-      href: '/student/book-room',
-      badge: null
+      href: '/student/book-room'
     },
     {
       title: 'Payments',
       icon: <FaFileInvoiceDollar className="w-5 h-5" />,
-      href: '/student/my-fees',
-      badge: null
+      href: '/student/my-fees'
     },
     {
       title: 'Complaints',
       icon: <FaComments className="w-5 h-5" />,
-      href: '/student/my-complaints',
-      badge: { count: 2, color: 'warning' }
+      href: '/student/my-complaints'
     },
     {
       title: 'Profile',
@@ -127,15 +120,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
   const handleLogout = () => {
     logout();
     navigate('/');
-  };
-
-  const getBadgeColor = (color: string) => {
-    switch (color) {
-      case 'error': return 'bg-error-500';
-      case 'warning': return 'bg-warning-500';
-      case 'success': return 'bg-success-500';
-      default: return 'bg-primary-500';
-    }
   };
 
   return (
@@ -186,30 +170,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
                 to={item.href}
                 onClick={() => { if (window.innerWidth < 1024) onToggle(); }}
                 className={`
-                  group flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                  group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                   ${isActiveLink(item.href)
                     ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm shadow-purple-100'
                     : 'text-gray-600 hover:bg-[#f5f3ff] hover:text-purple-700'
                   }
                 `}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`
-                    w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200
-                    ${isActiveLink(item.href)
-                      ? 'bg-purple-100 text-purple-600'
-                      : 'bg-gray-100 text-gray-500 group-hover:bg-purple-50 group-hover:text-purple-600'
-                    }
-                  `}>
-                    {item.icon}
-                  </div>
-                  <span>{item.title}</span>
+                <div className={`
+                  w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200
+                  ${isActiveLink(item.href)
+                    ? 'bg-purple-100 text-purple-600'
+                    : 'bg-gray-100 text-gray-500 group-hover:bg-purple-50 group-hover:text-purple-600'
+                  }
+                `}>
+                  {item.icon}
                 </div>
-                {item.badge && (
-                  <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${getBadgeColor(item.badge.color)} text-white`}>
-                    {item.badge.count}
-                  </span>
-                )}
+                <span>{item.title}</span>
               </Link>
             </div>
           ))}
