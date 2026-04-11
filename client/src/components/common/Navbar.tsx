@@ -3,19 +3,15 @@ import {
   FaBars,
   FaBed,
   FaHome,
-  FaMoon,
   FaSignInAlt,
   FaSignOutAlt,
-  FaSun,
   FaTachometerAlt,
   FaTimes,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
 
 const Navbar = () => {
-  const { toggle, resolved } = useTheme();
   const { isAuthenticated, isAdmin, isStudent, user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,7 +81,7 @@ const Navbar = () => {
           </div>
           <div className="leading-tight">
             <span className="text-lg font-bold tracking-tight text-foreground">
-              Gowsi Treats
+              Home Treats
             </span>
             <p className="text-[0.65rem] font-medium uppercase tracking-wider text-muted-foreground">
               Student stays
@@ -120,22 +116,6 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
-          <button
-            type="button"
-            onClick={toggle}
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label={
-              resolved === "dark"
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
-          >
-            {resolved === "dark" ? (
-              <FaSun className="h-4 w-4" />
-            ) : (
-              <FaMoon className="h-4 w-4" />
-            )}
-          </button>
           <Link
             to="/contact"
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30 transition hover:bg-primary-hover"
@@ -223,20 +203,6 @@ const Navbar = () => {
               </Link>
             )}
             <div className="mt-2 flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  toggle();
-                  setMobileOpen(false);
-                }}
-                className="flex flex-1 items-center justify-center rounded-xl border border-border py-3 text-sm font-medium text-muted-foreground"
-              >
-                {resolved === "dark" ? (
-                  <FaSun className="h-4 w-4" />
-                ) : (
-                  <FaMoon className="h-4 w-4" />
-                )}
-              </button>
               <Link
                 to="/contact"
                 className="flex-[2] rounded-xl bg-primary py-3 text-center text-sm font-semibold text-primary-foreground"

@@ -87,14 +87,14 @@ const Booking = () => {
 
   if (!bookingData) {
     return (
-      <div className="min-h-screen bg-white pt-20 pb-16">
+      <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-surface-active/50 rounded-2xl border border-primary/20 p-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">No Booking Details Found</h1>
-            <p className="text-gray-600 mb-6">Please select a room from the Rooms page and continue the booking process.</p>
+            <h1 className="text-2xl font-bold text-foreground mb-3">No Booking Details Found</h1>
+            <p className="text-muted-foreground mb-6">Please select a room from the Rooms page and continue the booking process.</p>
             <Link
               to="/rooms"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl font-semibold transition-all"
             >
               <FaArrowLeft className="w-4 h-4" />
               Back to Rooms
@@ -106,13 +106,13 @@ const Booking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-20 pb-16">
+    <div className="min-h-screen bg-background pt-20 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
             Booking <span className="text-primary">Confirmation</span>
           </h1>
-          <p className="text-gray-600">Review your details before confirming your room booking.</p>
+          <p className="text-muted-foreground">Review your details before confirming your room booking.</p>
         </div>
 
         {successMessage && (
@@ -123,7 +123,7 @@ const Booking = () => {
         )}
 
         {errorMessage && (
-          <div className="mb-6 flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
+          <div className="mb-6 flex items-center gap-3 bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl">
             <FaTimes className="w-5 h-5" />
             <span className="font-medium">{errorMessage}</span>
           </div>
@@ -131,28 +131,28 @@ const Booking = () => {
 
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Student Information</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Student Information</h2>
             <div className="space-y-3 text-sm">
-              <p><span className="font-semibold text-primary">Full Name:</span> <span className="text-gray-700">{bookingData.fullName}</span></p>
-              <p><span className="font-semibold text-primary">Email:</span> <span className="text-gray-700">{bookingData.email}</span></p>
-              <p><span className="font-semibold text-primary">Phone Number:</span> <span className="text-gray-700">{bookingData.phone}</span></p>
+              <p><span className="font-semibold text-primary">Full Name:</span> <span className="text-foreground/90">{bookingData.fullName}</span></p>
+              <p><span className="font-semibold text-primary">Email:</span> <span className="text-foreground/90">{bookingData.email}</span></p>
+              <p><span className="font-semibold text-primary">Phone Number:</span> <span className="text-foreground/90">{bookingData.phone}</span></p>
             </div>
           </div>
 
           <div className="bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Room Information</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Room Information</h2>
             <div className="space-y-3 text-sm">
-              <p><span className="font-semibold text-primary">Selected Floor:</span> <span className="text-gray-700">{bookingData.selectedFloor}</span></p>
-              <p><span className="font-semibold text-primary">Room Capacity:</span> <span className="text-gray-700">Based on assigned room</span></p>
-              <p><span className="font-semibold text-primary">Number of Beds:</span> <span className="text-gray-700">Based on assigned room</span></p>
-              <p><span className="font-semibold text-primary">Monthly Rent:</span> <span className="text-gray-700">Based on assigned room</span></p>
+              <p><span className="font-semibold text-primary">Selected Floor:</span> <span className="text-foreground/90">{bookingData.selectedFloor}</span></p>
+              <p><span className="font-semibold text-primary">Room Capacity:</span> <span className="text-foreground/90">Based on assigned room</span></p>
+              <p><span className="font-semibold text-primary">Number of Beds:</span> <span className="text-foreground/90">Based on assigned room</span></p>
+              <p><span className="font-semibold text-primary">Monthly Rent:</span> <span className="text-foreground/90">Based on assigned room</span></p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 bg-white border border-primary/20 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Hostel Information</h2>
-          <div className="space-y-3 text-sm text-gray-700">
+        <div className="mt-6 bg-card border border-primary/20 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-foreground mb-4">Hostel Information</h2>
+          <div className="space-y-3 text-sm text-foreground/90">
             <p><span className="font-semibold text-primary">Hostel Name:</span> Home_Treats Student Hostel</p>
             <div className="flex items-center gap-2">
               <FaMapMarkerAlt className="w-4 h-4 text-primary" />
@@ -170,8 +170,8 @@ const Booking = () => {
         </div>
 
         <div className="mt-6 bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Booking Confirmation</h2>
-          <div className="space-y-2 text-sm text-gray-700 mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-4">Booking Confirmation</h2>
+          <div className="space-y-2 text-sm text-foreground/90 mb-6">
             <p><span className="font-semibold text-primary">Selected Room:</span> {bookingData.selectedFloor}</p>
             <p><span className="font-semibold text-primary">Monthly Price:</span> Based on assigned room</p>
             <p><span className="font-semibold text-primary">Student:</span> {bookingData.fullName}</p>
@@ -182,7 +182,7 @@ const Booking = () => {
               type="button"
               onClick={handleConfirm}
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition-all disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl font-semibold transition-all disabled:opacity-60"
             >
               <FaCheckCircle className="w-4 h-4" />
               {submitting ? 'Confirming...' : 'Confirm Booking'}
@@ -190,7 +190,7 @@ const Booking = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-primary/30 text-primary rounded-xl font-semibold hover:bg-surface-active transition-all"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-card border border-primary/30 text-primary rounded-xl font-semibold hover:bg-surface-active transition-all"
             >
               <FaTimes className="w-4 h-4" />
               Cancel

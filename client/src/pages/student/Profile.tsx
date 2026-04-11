@@ -168,11 +168,11 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       {toast && (
-        <div className="fixed top-5 right-5 bg-primary text-white px-4 py-2 rounded">
+        <div className="fixed top-5 right-5 px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
           {toast.message}
         </div>
       )}
@@ -190,7 +190,7 @@ const Profile = () => {
         {activeTab === 'profile' && profile && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Card */}
-            <div className="bg-white p-6 rounded-xl text-center">
+            <div className="bg-card p-6 rounded-xl text-center">
               <div className="w-24 h-24 bg-primary rounded-full mx-auto flex items-center justify-center text-white text-2xl">
                 {getInitials(profile.name)}
               </div>
@@ -199,31 +199,31 @@ const Profile = () => {
               <p className="text-sm mt-2">{profile.studentId}</p>
               <p className="text-sm">Room: {profile.room}</p>
 
-              <button onClick={handleEdit} className="mt-4 bg-primary text-white px-4 py-2 rounded">
+              <button onClick={handleEdit} className="mt-4 px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
                 Edit
               </button>
             </div>
 
             {/* Right Card */}
-            <div className="lg:col-span-2 bg-white p-6 rounded-xl">
+            <div className="lg:col-span-2 bg-card p-6 rounded-xl">
               <h2 className="font-bold mb-4">Details</h2>
 
               <input
                 value={isEditing ? editData.name : profile.name}
                 disabled={!isEditing}
                 onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                className="border p-2 w-full mb-3"
+                className="w-full mb-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               />
 
               <input
                 value={isEditing ? editData.phone : profile.phone}
                 disabled={!isEditing}
                 onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                className="border p-2 w-full mb-3"
+                className="w-full mb-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               />
 
               {isEditing && (
-                <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded">
+                <button onClick={handleSave} className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
                   Save
                 </button>
               )}
@@ -233,7 +233,7 @@ const Profile = () => {
 
         {/* PASSWORD TAB */}
         {activeTab === 'password' && (
-          <form onSubmit={handlePasswordChange} className="bg-white p-6 rounded-xl max-w-md">
+          <form onSubmit={handlePasswordChange} className="bg-card p-6 rounded-xl max-w-md">
             <input
               type="password"
               placeholder="New Password"
@@ -241,7 +241,7 @@ const Profile = () => {
               onChange={(e) =>
                 setPasswordData({ ...passwordData, newPassword: e.target.value })
               }
-              className="border p-2 w-full mb-3"
+              className="w-full mb-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             />
 
             <input
@@ -251,10 +251,10 @@ const Profile = () => {
               onChange={(e) =>
                 setPasswordData({ ...passwordData, confirmPassword: e.target.value })
               }
-              className="border p-2 w-full mb-3"
+              className="w-full mb-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             />
 
-            <button className="bg-primary text-white px-4 py-2 rounded">
+            <button className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
               Change Password
             </button>
           </form>

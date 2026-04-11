@@ -519,7 +519,7 @@ const Home = () => {
               </span>
               <span className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-sm">
                 <FaEnvelope className="h-4 w-4" />
-                info@gowsitreats.lk
+                info@HomeTreats.lk
               </span>
               <span className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-sm">
                 <FaMapMarkerAlt className="h-4 w-4" />

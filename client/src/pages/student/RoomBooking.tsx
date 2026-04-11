@@ -90,7 +90,7 @@ const RoomBooking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -98,9 +98,9 @@ const RoomBooking = () => {
       />
 
       <div className="lg:ml-64">
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Room Booking</h1>
-          <p className="text-gray-500 text-sm mt-1">View room availability and confirm your booking.</p>
+        <div className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full">
+          <h1 className="text-2xl font-bold text-foreground">Room Booking</h1>
+          <p className="text-muted-foreground text-sm mt-1">View room availability and confirm your booking.</p>
         </div>
 
         <div className="p-6 space-y-6">
@@ -111,7 +111,7 @@ const RoomBooking = () => {
           )}
 
           {errorMessage && (
-            <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 font-medium">
+            <div className="bg-error/10 border border-error/20 text-error rounded-xl px-4 py-3 font-medium">
               {errorMessage}
             </div>
           )}
@@ -127,15 +127,15 @@ const RoomBooking = () => {
                 const isFull = availableBeds <= 0 || room.status === 'Occupied';
 
                 return (
-                  <div key={room._id} className="bg-white rounded-2xl border border-primary/15 shadow-sm p-5">
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Room {room.roomNumber}</h3>
-                    <div className="space-y-1 text-sm text-gray-700 mb-4">
+                  <div key={room._id} className="bg-card rounded-2xl border border-primary/15 shadow-sm p-5">
+                    <h3 className="text-lg font-bold text-foreground mb-3">Room {room.roomNumber}</h3>
+                    <div className="space-y-1 text-sm text-foreground/90 mb-4">
                       <p><span className="font-semibold text-primary">Floor:</span> {room.floor}</p>
                       <p><span className="font-semibold text-primary">Total Beds:</span> {room.capacity}</p>
                       <p><span className="font-semibold text-primary">Available Beds:</span> {availableBeds}</p>
                       <p>
                         <span className="font-semibold text-primary">Status:</span>{' '}
-                        <span className={isFull ? 'text-red-500 font-semibold' : 'text-primary font-semibold'}>
+                        <span className={isFull ? 'text-error font-semibold' : 'text-primary font-semibold'}>
                           {isFull ? 'Full' : 'Available'}
                         </span>
                       </p>
@@ -145,7 +145,7 @@ const RoomBooking = () => {
                       <button
                         type="button"
                         onClick={() => handleBookNow(room)}
-                        className="w-full py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition"
+                        className="w-full py-2.5 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl font-semibold transition"
                       >
                         Book Now
                       </button>
@@ -153,7 +153,7 @@ const RoomBooking = () => {
                       <button
                         type="button"
                         disabled
-                        className="w-full py-2.5 bg-gray-200 text-gray-500 rounded-xl font-semibold cursor-not-allowed"
+                        className="w-full py-2.5 bg-gray-200 text-muted-foreground rounded-xl font-semibold cursor-not-allowed"
                       >
                         Full
                       </button>
@@ -165,9 +165,9 @@ const RoomBooking = () => {
           )}
 
           {selectedRoom && (
-            <div className="bg-white rounded-2xl border border-primary/20 shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Booking Confirmation</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6">
+            <div className="bg-card rounded-2xl border border-primary/20 shadow-sm p-6">
+              <h2 className="text-xl font-bold text-foreground mb-4">Booking Confirmation</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-foreground/90 mb-6">
                 <p><span className="font-semibold text-primary">Student Name:</span> {user?.name}</p>
                 <p><span className="font-semibold text-primary">Email:</span> {user?.email}</p>
                 <p><span className="font-semibold text-primary">Selected Room Number:</span> {selectedRoom.roomNumber}</p>
@@ -181,7 +181,7 @@ const RoomBooking = () => {
                   type="button"
                   onClick={handleConfirmBooking}
                   disabled={confirming}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl font-semibold transition disabled:opacity-60"
                 >
                   <FaCheckCircle className="w-4 h-4" />
                   {confirming ? 'Confirming...' : 'Confirm Booking'}
@@ -189,7 +189,7 @@ const RoomBooking = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedRoom(null)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-card border border-border text-foreground/90 rounded-xl font-semibold hover:bg-muted/70 transition"
                 >
                   <FaTimes className="w-4 h-4" />
                   Cancel
