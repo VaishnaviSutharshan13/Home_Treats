@@ -6,7 +6,6 @@
  * Room listings have been moved exclusively to the Rooms Page.
  */
 
-import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FaWifi,
@@ -27,8 +26,9 @@ import {
   FaHome,
   FaQuoteLeft,
 } from 'react-icons/fa';
-import { settingsService } from '../services';
-import heroBg from '../assets/hero_bg.png';
+
+const HERO_ROOM_IMAGE = '/images/hostel-room.jpg';
+const HOSTEL_LOCATION = import.meta.env.VITE_HOSTEL_LOCATION || 'Jaffna, Sri Lanka';
 
 /* ──────────────────────────────────────────────────
    DATA
@@ -152,32 +152,6 @@ const testimonials = [
    COMPONENT
 ────────────────────────────────────────────────── */
 const Home = () => {
-  const [heroImage, setHeroImage] = useState('');
-  const apiRoot = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
-
-  useEffect(() => {
-    const loadHeroImage = async () => {
-      try {
-        const res = await settingsService.getHeroImage();
-        if (res?.success) {
-          setHeroImage(String(res.heroImage || ''));
-        }
-      } catch {
-        setHeroImage('');
-      }
-    };
-
-    loadHeroImage();
-  }, []);
-
-  const resolvedHeroImage = useMemo(() => {
-    if (!heroImage) return heroBg;
-    if (heroImage.startsWith('http://') || heroImage.startsWith('https://')) {
-      return heroImage;
-    }
-    return `${apiRoot}${heroImage}`;
-  }, [heroImage, apiRoot]);
-
   return (
     <div className="min-h-screen bg-white font-sans">
 
@@ -186,14 +160,22 @@ const Home = () => {
           Soft purple gradient overlay — bright and welcoming
       ══════════════════════════════════════════════ */}
       <section
-        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(124,58,237,0.25)), url(${resolvedHeroImage})`,
+          backgroundImage: `url(${HERO_ROOM_IMAGE})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }}
       >
+
+        {/* Soft purple overlay for readability + subtle blur depth */}
+        <div
+          className="absolute inset-0 backdrop-blur-[1px]"
+          style={{
+            background: 'linear-gradient(160deg, rgba(124, 58, 237, 0.6) 0%, rgba(124, 58, 237, 0.45) 100%)',
+          }}
+        />
 
         {/* Content */}
         <div className="relative z-10 text-center px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
@@ -201,7 +183,7 @@ const Home = () => {
           {/* Tag badge */}
           <div className="inline-flex items-center gap-2 bg-white/30 backdrop-blur-sm border border-white/40 text-white text-sm font-semibold px-6 py-2.5 rounded-full mb-10 shadow-xl">
             <FaBuilding className="w-4 h-4 text-purple-200" />
-            Student Hostel Building — Colombo, Sri Lanka
+            Student Hostel Building — {HOSTEL_LOCATION}
           </div>
 
           {/* Main Title */}
@@ -358,11 +340,6 @@ const Home = () => {
               {/* Floating badge top-right */}
               <div className="absolute -top-4 -right-4 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-4 shadow-xl shadow-purple-500/30">
                 <FaShieldAlt className="w-8 h-8 text-white" />
-              </div>
-              {/* Floating badge bottom-left */}
-              <div className="absolute -bottom-16 left-2 sm:-bottom-16 sm:left-3 md:-bottom-20 md:left-4 bg-white border border-purple-500/20 rounded-2xl px-5 py-3 shadow-xl z-20">
-                <div className="text-3xl font-extrabold text-purple-600 leading-none">8+</div>
-                <div className="text-xs text-gray-500 font-medium mt-0.5">Years of Trust</div>
               </div>
             </div>
           </div>
