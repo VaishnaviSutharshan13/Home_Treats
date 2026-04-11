@@ -52,7 +52,8 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user?.id).select('-password');
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      // 401 (not 404) so clients don’t confuse this with “route not found”, and auth interceptors can refresh session.
+      return res.status(401).json({ success: false, message: 'User not found. Please sign in again.' });
     }
 
     const data = await buildProfileResponse(user);
@@ -69,7 +70,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     const user = await User.findById(req.user?.id);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(401).json({ success: false, message: 'User not found. Please sign in again.' });
     }
 
     if (fullName || name) user.name = String(fullName || name).trim();
@@ -92,7 +93,7 @@ export const updateProfileImage = async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user?.id);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(401).json({ success: false, message: 'User not found. Please sign in again.' });
     }
 
     if (!req.file) {

@@ -4,12 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 // Pages
 import Home from './pages/Home';
 import About from './pages/About';
-import Rooms from './pages/Rooms';
-import Floors from './pages/Floors';
-import RoomSelectionPage from './pages/RoomSelectionPage';
-import RoomDetailsPage from './pages/RoomDetailsPage';
-import BookingForm from './pages/BookingForm';
 import ContactUs from './pages/ContactUs';
+import BookingForm from './pages/BookingForm';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -50,12 +46,6 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/floors" element={<Floors />} />
-          <Route path="/floor/:floorId" element={<RoomDetailsPage />} />
-          <Route path="/floor/:floorId/rooms" element={<RoomSelectionPage />} />
-          <Route path="/room-selection" element={<Navigate to="/floors" replace />} />
-          <Route path="/room/:id" element={<Navigate to="/floors" replace />} />
           <Route path="/contact" element={<ContactUs />} />
           
           {/* Auth Routes */}

@@ -79,11 +79,26 @@ export const login = async (req: Request, res: Response) => {
         | "Inactive"
         | undefined;
 
-      // Convert Student status to User status
+      // Map Student hostel row → User account state (do not demote approved accounts
+      // when the Student record is still Inactive, which is the default before approval).
       if (studentStatus === "Active") {
         userStatusToSync = "Approved";
       } else if (studentStatus === "Inactive") {
-        userStatusToSync = "Inactive";
+        if (user.approvalStatus === "Rejected" || user.status === "Rejected") {
+          userStatusToSync = "Rejected";
+        } else if (
+          user.approvalStatus === "Pending" ||
+          user.status === "Pending"
+        ) {
+          userStatusToSync = "Pending";
+        } else if (
+          user.approvalStatus === "Approved" ||
+          user.status === "Approved"
+        ) {
+          userStatusToSync = "Approved";
+        } else {
+          userStatusToSync = "Inactive";
+        }
       } else {
         userStatusToSync = user.status;
       }
@@ -115,7 +130,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: String(user._id), email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -136,6 +151,8 @@ export const login = async (req: Request, res: Response) => {
       userData.gender = user.gender;
       userData.address = user.address;
       userData.status = user.status;
+      userData.approvalStatus =
+        user.approvalStatus || user.status || "Pending";
     }
 
     res.json({
@@ -297,6 +314,7 @@ export const verifyToken = async (req: Request, res: Response) => {
         gender: user.gender,
         address: user.address,
         status: user.status,
+        approvalStatus: user.approvalStatus || user.status,
       },
     });
   } catch (error: any) {

@@ -115,7 +115,7 @@ const About = () => {
                   {stat.icon}
                 </div>
                 <div className="text-4xl font-extrabold text-primary leading-none">{stat.value}</div>
-                <div className="text-sm text-gray-600 mt-2 font-medium">{stat.label}</div>
+                <div className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -129,12 +129,12 @@ const About = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                 Your Home Away <span className="text-primary">From Home</span>
               </h2>
-              <p className="text-lg text-gray-500 mb-6 leading-relaxed">
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 Home_Treats is a premier student accommodation provider located in the heart of Sri Lanka.
                 Since our establishment, we have been dedicated to offering safe, modern, and affordable
                 living spaces that support students throughout their academic journey.
               </p>
-              <p className="text-lg text-gray-500 mb-8 leading-relaxed">
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 Our hostel combines the warmth of home with world-class amenities, creating an environment
                 where students can focus on their studies while enjoying a vibrant community life. We believe
                 that comfortable living leads to better academic performance.
@@ -148,7 +148,7 @@ const About = () => {
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <FaCheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-gray-600">{item}</span>
+                    <span className="text-muted-foreground">{item}</span>
                   </div>
                 ))}
               </div>
@@ -160,7 +160,7 @@ const About = () => {
       <section className="py-20 bg-surface-active/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-600 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-muted-foreground mb-4">
               Our <span className="text-primary font-bold">Mission & Vision</span>
             </h2>
           </div>
@@ -175,7 +175,7 @@ const About = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-white">Our Mission</h3>
               </div>
-              <p className="text-gray-500 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 To provide comfortable, safe, and affordable student accommodation that nurtures
                 academic excellence and personal growth. We strive to create a supportive community
                 where every resident feels at home, with access to modern amenities and a positive
@@ -193,7 +193,7 @@ const About = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-white">Our Vision</h3>
               </div>
-              <p className="text-gray-500 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 To become Sri Lanka's most trusted and innovative student accommodation provider,
                 setting the benchmark for quality hostel living. We envision a future where every student
                 has access to premium living spaces that inspire success, foster meaningful connections,
@@ -211,7 +211,7 @@ const About = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Premium <span className="text-primary">Facilities</span>
             </h2>
-            <p className="text-lg text-gray-500 max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Everything you need for a comfortable and productive stay at Home_Treats
             </p>
           </div>
@@ -227,8 +227,8 @@ const About = () => {
                 >
                   {facility.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{facility.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{facility.description}</p>
+                <h3 className="text-xl font-bold text-foreground mb-3">{facility.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{facility.description}</p>
               </div>
             ))}
           </div>
@@ -247,7 +247,7 @@ const About = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/rooms"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-semibold transition-all duration-300 hover:bg-gray-100 hover:scale-105 shadow-lg"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-semibold transition-all duration-300 hover:bg-muted hover:scale-105 shadow-lg"
             >
               Explore Rooms
               <FaArrowRight className="w-4 h-4" />

@@ -204,11 +204,11 @@ const RoomManagement = () => {
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Available': return 'bg-green-100 text-green-700 border border-green-200';
-      case 'Limited': return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
-      case 'Occupied': return 'bg-red-100 text-red-700 border border-red-200';
-      case 'Maintenance': return 'bg-orange-100 text-orange-700 border border-orange-200';
-      default: return 'bg-gray-100 text-gray-700 border border-gray-200';
+      case 'Available': return 'bg-primary/20 border border-primary/20 text-primary border border-primary/30';
+      case 'Limited': return 'bg-warning/20 border border-warning/30 text-warning border border-warning/30';
+      case 'Occupied': return 'bg-error/20 border border-error/30 text-error border border-error/30';
+      case 'Maintenance': return 'bg-warning/20 border border-warning/30 text-warning border border-orange-200';
+      default: return 'bg-muted text-foreground/90 border border-border';
     }
   };
 
@@ -373,7 +373,7 @@ const RoomManagement = () => {
   // RENDER
   // ═══════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
       <div className="lg:ml-64">
       {/* ── Toast Notifications ─────────────────────────── */}
@@ -381,8 +381,8 @@ const RoomManagement = () => {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`px-5 py-3 rounded-xl shadow-lg text-gray-900 text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              t.type === 'success' ? 'bg-primary' : 'bg-red-600'
+            className={`px-5 py-3 rounded-xl shadow-lg text-foreground text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+              t.type === 'success' ? 'bg-primary' : 'bg-error/10 border border-error/200'
             }`}
           >
             {t.type === 'success' ? <FaCheck /> : <FaTimes />}
@@ -392,7 +392,7 @@ const RoomManagement = () => {
       </div>
 
       {/* ── Header ──────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
         <div className="w-full px-6 sm:px-8 lg:px-10 py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
@@ -401,22 +401,22 @@ const RoomManagement = () => {
                 title="Open sidebar"
                 aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+                className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted transition"
               >
                 <FaBars className="w-5 h-5" />
               </button>
               <div className="flex flex-col">
                 <Link
                   to="/admin/dashboard"
-                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-primary text-xs mb-1 transition-colors duration-200 group"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary text-xs mb-1 transition-colors duration-200 group"
                 >
                   <FaChevronLeft className="w-2.5 h-2.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
                   <span>Dashboard</span>
-                  <span className="text-gray-600 mx-0.5">/</span>
-                  <span className="text-gray-500">Room Management</span>
+                  <span className="text-muted-foreground mx-0.5">/</span>
+                  <span className="text-muted-foreground">Room Management</span>
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">Room Management</h1>
-                <p className="text-sm text-gray-500">Manage hostel rooms, allocations & availability</p>
+                <h1 className="text-2xl font-bold text-foreground">Room Management</h1>
+                <p className="text-sm text-muted-foreground">Manage hostel rooms, allocations & availability</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -427,7 +427,7 @@ const RoomManagement = () => {
               />
               <button
                 onClick={handleAddRoom}
-                className="bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
+                className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 px-5 py-2.5 rounded-xl hover:bg-primary transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
               >
                 <FaPlus className="mr-2" />
                 Add New Room
@@ -442,18 +442,18 @@ const RoomManagement = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
             { label: 'Total Rooms', count: rooms.length, icon: <FaBed className="text-xl" />, color: 'bg-primary/10 text-primary' },
-            { label: 'Total Beds', count: totalBeds, icon: <FaLayerGroup className="text-xl" />, color: 'bg-blue-50 text-blue-600' },
-            { label: 'Occupied Beds', count: occupiedBeds, icon: <FaUsers className="text-xl" />, color: 'bg-red-50 text-red-600' },
-            { label: 'Available Beds', count: availableBeds, icon: <FaCheck className="text-xl" />, color: 'bg-green-50 text-green-600' },
-            { label: 'Maintenance', count: rooms.filter((r) => r.status === 'Maintenance').length, icon: <FaWrench className="text-xl" />, color: 'bg-orange-50 text-orange-600' },
+            { label: 'Total Beds', count: totalBeds, icon: <FaLayerGroup className="text-xl" />, color: 'bg-primary/10 text-primary' },
+            { label: 'Occupied Beds', count: occupiedBeds, icon: <FaUsers className="text-xl" />, color: 'bg-error/10 border border-error/20 text-error' },
+            { label: 'Available Beds', count: availableBeds, icon: <FaCheck className="text-xl" />, color: 'bg-primary/10 border border-primary/20 text-primary' },
+            { label: 'Maintenance', count: rooms.filter((r) => r.status === 'Maintenance').length, icon: <FaWrench className="text-xl" />, color: 'bg-warning/10 border border-warning/20 text-warning' },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+            <div key={stat.label} className="bg-card rounded-xl border border-border p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
               <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
                 {stat.icon}
               </div>
               <div>
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.count}</p>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{stat.label}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.count}</p>
               </div>
             </div>
           ))}
@@ -462,28 +462,28 @@ const RoomManagement = () => {
 
       {/* ── Search & Filter Bar ─────────────────────────── */}
       <div className="w-full px-6 sm:px-8 lg:px-10 pt-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <FaFilter className="text-primary w-4 h-4" />
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Filter Rooms</h3>
+            <h3 className="text-sm font-bold text-foreground/90 uppercase tracking-wide">Filter Rooms</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             {/* Search */}
             <div className="relative lg:col-span-2">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search name or room number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm"
+                className="w-full rounded-lg py-2 pl-10 pr-4 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               />
             </div>
             {/* Room Type */}
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
+              className="w-full rounded-lg px-3 py-2 appearance-none bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             >
               <option value="All">All Types</option>
               <option value="Single Room">Single Room</option>
@@ -494,7 +494,7 @@ const RoomManagement = () => {
             <select
               value={filterBlock}
               onChange={(e) => setFilterBlock(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
+              className="w-full rounded-lg px-3 py-2 appearance-none bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             >
               <option value="All">All Blocks</option>
               {['Block A', 'Block B', 'Block C', 'Block D'].map((b) => (
@@ -505,7 +505,7 @@ const RoomManagement = () => {
             <select
               value={filterFloor}
               onChange={(e) => setFilterFloor(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
+              className="w-full rounded-lg px-3 py-2 appearance-none bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             >
               <option value="All">All Floors</option>
               {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((f) => (
@@ -517,7 +517,7 @@ const RoomManagement = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
+                className="flex-1 rounded-lg px-3 py-2 appearance-none bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               >
                 <option value="All">All Status</option>
                 <option value="Available">Available</option>
@@ -527,7 +527,7 @@ const RoomManagement = () => {
               </select>
               <button
                 onClick={resetFilters}
-                className="flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-primary text-primary font-semibold rounded-lg bg-white hover:bg-surface-active transition-all text-sm shrink-0"
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-primary text-primary font-semibold rounded-lg bg-card hover:bg-surface-active transition-all text-sm shrink-0"
                 title="Reset all filters"
               >
                 <FaRedo className="w-3 h-3" />
@@ -542,23 +542,23 @@ const RoomManagement = () => {
         {loading && (
           <div className="flex flex-col items-center justify-center py-24">
             <FaSpinner className="w-10 h-10 text-primary animate-spin mb-4" />
-            <p className="text-gray-500 text-lg">Loading rooms...</p>
+            <p className="text-muted-foreground text-lg">Loading rooms...</p>
           </div>
         )}
 
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24">
-            <p className="text-red-600 text-lg mb-4">{error}</p>
-            <button onClick={fetchRooms} className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary transition-colors">
+            <p className="text-error text-lg mb-4">{error}</p>
+            <button onClick={fetchRooms} className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 px-6 py-2 rounded-lg hover:bg-primary transition-colors">
               Retry
             </button>
           </div>
         )}
 
         {!loading && !error && filteredRooms.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
             <FaBed className="w-16 h-16 mb-4 opacity-30" />
-            <p className="text-lg font-medium text-gray-500">
+            <p className="text-lg font-medium text-muted-foreground">
               {searchTerm || filterStatus !== 'All' ? 'No rooms match your search.' : 'No rooms yet.'}
             </p>
             {!searchTerm && filterStatus === 'All' && (
@@ -578,8 +578,8 @@ const RoomManagement = () => {
               <div
                 key={room._id}
                 onClick={() => setSelectedCardId(isSelected ? null : room._id)}
-                className={`bg-white rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${
-                  isSelected ? 'border-primary ring-2 ring-primary/25' : 'border-gray-100'
+                className={`bg-card rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${
+                  isSelected ? 'border-primary ring-2 ring-primary/25' : 'border-border'
                 }`}
               >
                 {/* Image */}
@@ -595,7 +595,7 @@ const RoomManagement = () => {
                   <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStatusStyle(room.status)}`}>
                     {room.status}
                   </span>
-                  <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-primary shadow-sm">
+                  <span className="absolute top-3 right-3 bg-card/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-primary shadow-sm">
                     {formatLKR(room.price)} / night
                   </span>
                 </div>
@@ -603,7 +603,7 @@ const RoomManagement = () => {
                 {/* Details */}
                 <div className="p-4">
                   {/* Room Number = Primary, Room Name = Subtitle */}
-                  <h3 className="text-lg font-bold text-gray-900 leading-tight mb-0.5">
+                  <h3 className="text-lg font-bold text-foreground leading-tight mb-0.5">
                     {room.roomNumber}
                   </h3>
                   <p className="text-sm text-primary font-medium line-clamp-1 mb-2">
@@ -611,19 +611,19 @@ const RoomManagement = () => {
                   </p>
 
                   {/* Location */}
-                  <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5">
-                    <FaMapMarkerAlt className="text-gray-400 shrink-0" />
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
+                    <FaMapMarkerAlt className="text-muted-foreground shrink-0" />
                     {room.block} &middot; {room.floor}
                   </p>
 
                   {/* Type + Occupancy row */}
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs font-medium">
-                      <FaBed className="text-gray-400 text-xs" />
+                    <span className="inline-flex items-center gap-1 bg-muted border border-border px-2 py-1 rounded-md text-foreground/90 text-xs font-medium">
+                      <FaBed className="text-muted-foreground text-xs" />
                       {room.type}
                     </span>
-                    <span className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 px-2 py-1 rounded-md text-gray-700 text-xs font-medium">
-                      <FaUsers className="text-gray-400 text-xs" />
+                    <span className="inline-flex items-center gap-1 bg-muted border border-border px-2 py-1 rounded-md text-foreground/90 text-xs font-medium">
+                      <FaUsers className="text-muted-foreground text-xs" />
                       {room.occupied}/{room.capacity} beds
                     </span>
                   </div>
@@ -638,7 +638,7 @@ const RoomManagement = () => {
                         </span>
                       ))}
                       {room.facilities.length > 3 && (
-                        <span className="px-2 py-0.5 rounded-md bg-gray-50 text-gray-500 text-xs font-medium border border-gray-200">
+                        <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-xs font-medium border border-border">
                           +{room.facilities.length - 3}
                         </span>
                       )}
@@ -646,13 +646,13 @@ const RoomManagement = () => {
                   )}
 
                   {/* Last Updated */}
-                  <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
                     <FaClock className="w-3 h-3" />
                     Updated {getTimeAgo(room.createdAt)}
                   </p>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                  <div className="flex items-center gap-2 pt-3 border-t border-border">
                     <button
                       onClick={(e) => { e.stopPropagation(); setViewingRoom(room); }}
                       className="flex items-center justify-center gap-1 text-xs font-medium text-primary bg-surface-active hover:bg-surface-active py-2 px-2.5 rounded-lg transition-colors border border-primary/15"
@@ -662,21 +662,21 @@ const RoomManagement = () => {
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleEditRoom(room); }}
-                      className="flex items-center justify-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 py-2 px-2.5 rounded-lg transition-colors border border-blue-100"
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-primary bg-primary/10 text-primary hover:bg-primary/20 text-primary py-2 px-2.5 rounded-lg transition-colors border border-info/20"
                       title="Edit Room"
                     >
                       <FaEdit className="text-xs" /> Edit
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); setDeleteTarget(room); }}
-                      className="flex items-center justify-center gap-1 text-xs font-medium text-red-500 bg-red-50 hover:bg-red-100 py-2 px-2.5 rounded-lg transition-colors border border-red-100"
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-error bg-error/10 border border-error/20 hover:bg-error/20 border border-error/30 py-2 px-2.5 rounded-lg transition-colors border border-error/20"
                       title="Delete Room"
                     >
                       <FaTrash className="text-xs" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); showToast(`Bookings for ${room.roomNumber} — coming soon`, 'success'); }}
-                      className="flex items-center justify-center gap-1 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 py-2 px-2.5 rounded-lg transition-colors border border-green-100"
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 border border-primary/20 py-2 px-2.5 rounded-lg transition-colors border border-primary/20"
                       title="View Bookings"
                     >
                       <FaClipboardList className="text-xs" />
@@ -715,14 +715,14 @@ const RoomManagement = () => {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-start justify-center min-h-screen px-4 py-8">
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
-            <div className="relative bg-gray-50 rounded-2xl w-full max-w-2xl">
+            <div className="relative bg-muted rounded-2xl w-full max-w-2xl">
               <form onSubmit={handleSubmit}>
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                  <h3 className="text-xl font-bold text-foreground">
                     {editingRoom ? 'Edit Room' : 'Add New Room'}
                   </h3>
-                  <button type="button" title="Close room modal" aria-label="Close room modal" onClick={closeModal} className="text-gray-500 hover:text-gray-600 transition-colors">
+                  <button type="button" title="Close room modal" aria-label="Close room modal" onClick={closeModal} className="text-muted-foreground hover:text-muted-foreground transition-colors">
                     <FaTimes className="w-5 h-5" />
                   </button>
                 </div>
@@ -731,21 +731,21 @@ const RoomManagement = () => {
                 <div className="px-6 py-5 max-h-[70vh] overflow-y-auto space-y-5">
                   {/* Image Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Room Image</label>
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">Room Image</label>
                     <div className="flex items-center gap-4">
                       <div
-                        className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-300 hover:border-primary flex items-center justify-center overflow-hidden cursor-pointer transition-colors relative group"
+                        className="w-28 h-28 rounded-xl border-2 border-dashed border-border hover:border-primary flex items-center justify-center overflow-hidden cursor-pointer transition-colors relative group"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {formData.imagePreview ? (
                           <>
                             <img src={formData.imagePreview} alt="Preview" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                              <FaCamera className="text-gray-900 text-lg" />
+                              <FaCamera className="text-foreground text-lg" />
                             </div>
                           </>
                         ) : (
-                          <div className="text-center text-gray-500">
+                          <div className="text-center text-muted-foreground">
                             <FaCamera className="mx-auto text-xl mb-1" />
                             <span className="text-xs">Upload</span>
                           </div>
@@ -757,9 +757,9 @@ const RoomManagement = () => {
                         title="Upload room image"
                         accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                         onChange={handleImageChange}
-                        className="hidden"
+                        className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted-foreground">
                         <p>Click to upload room image</p>
                         <p className="mt-1">JPEG, PNG, WebP — Max 5 MB</p>
                         {formData.image && (
@@ -771,38 +771,38 @@ const RoomManagement = () => {
 
                   {/* Room Name */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Room Name *</label>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Room Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Nallur Comfort Single"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                      className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                     />
                   </div>
 
                   {/* Room Number & Location */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Room Number *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Room Number *</label>
                       <input
                         type="text"
                         required
                         placeholder="e.g. A-101"
                         value={formData.roomNumber}
                         onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Location</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Location</label>
                       <input
                         type="text"
                         title="Room location"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
                     </div>
                   </div>
@@ -810,12 +810,12 @@ const RoomManagement = () => {
                   {/* Block & Floor */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Block *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Block *</label>
                       <select
                         title="Room block"
                         value={formData.block}
                         onChange={(e) => setFormData({ ...formData, block: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       >
                         {['Block A', 'Block B', 'Block C', 'Block D'].map((b) => (
                           <option key={b} value={b}>{b}</option>
@@ -823,12 +823,12 @@ const RoomManagement = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Floor *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Floor *</label>
                       <select
                         title="Room floor"
                         value={formData.floor}
                         onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       >
                         {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((f) => (
                           <option key={f} value={f}>{f}</option>
@@ -840,12 +840,12 @@ const RoomManagement = () => {
                   {/* Type & Capacity */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Room Type *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Room Type *</label>
                       <select
                         title="Room type"
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       >
                         <option value="Single Room">Single Room</option>
                         <option value="Double Room">Double Room</option>
@@ -853,7 +853,7 @@ const RoomManagement = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Beds (Capacity) *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Beds (Capacity) *</label>
                       <input
                         type="number"
                         title="Beds capacity"
@@ -862,7 +862,7 @@ const RoomManagement = () => {
                         required
                         value={formData.capacity}
                         onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                        className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
                     </div>
                   </div>
@@ -870,10 +870,10 @@ const RoomManagement = () => {
                   {/* Price & Status */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Price (LKR) *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Price (LKR) *</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 text-sm font-medium">LKR</span>
+                          <span className="text-muted-foreground text-sm font-medium">LKR</span>
                         </div>
                         <input
                           type="number"
@@ -883,18 +883,18 @@ const RoomManagement = () => {
                           required
                           value={formData.price}
                           onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 pl-12 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                          className="w-full rounded-lg py-2 pl-12 pr-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                         />
                       </div>
                     </div>
                     {editingRoom && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Availability</label>
+                        <label className="block text-sm font-medium text-muted-foreground mb-1">Availability</label>
                         <select
                           title="Room availability"
                           value={formData.status}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                          className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                         >
                           <option value="Available">Available</option>
                           <option value="Limited">Limited</option>
@@ -907,19 +907,19 @@ const RoomManagement = () => {
 
                   {/* Description */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Description</label>
                     <textarea
                       rows={3}
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
+                      className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       placeholder="Brief description of the room..."
                     />
                   </div>
 
                   {/* Facilities */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Facilities</label>
+                    <label className="block text-sm font-medium text-muted-foreground mb-2">Facilities</label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {ALL_FACILITIES.map((facility) => (
                         <label
@@ -927,14 +927,14 @@ const RoomManagement = () => {
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
                             formData.facilities.includes(facility)
                               ? 'border-primary bg-primary/10 text-primary'
-                              : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                              : 'border-border text-muted-foreground hover:border-border'
                           }`}
                         >
                           <input
                             type="checkbox"
                             checked={formData.facilities.includes(facility)}
                             onChange={() => toggleFacility(facility)}
-                            className="hidden"
+                            className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                           />
                           <span className="text-base">{FACILITY_ICONS[facility]}</span>
                           <span className="font-medium">{facility}</span>
@@ -945,18 +945,18 @@ const RoomManagement = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-900 rounded-b-2xl">
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-gray-900 rounded-b-2xl">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-5 py-2.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 text-sm font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
+                    className="px-5 py-2.5 border border-border rounded-xl bg-muted text-foreground text-sm font-medium text-foreground/90 hover:bg-muted/50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                    className="px-6 py-2.5 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl text-sm font-medium hover:bg-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
                   >
                     {submitting ? (
                       <>
@@ -982,26 +982,26 @@ const RoomManagement = () => {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
-          <div className="relative bg-gray-50 rounded-2xl max-w-sm w-full p-6">
+          <div className="relative bg-muted rounded-2xl max-w-sm w-full p-6">
             <div className="text-center">
-              <div className="w-14 h-14 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <FaTrash className="text-red-600 text-xl" />
+              <div className="w-14 h-14 mx-auto rounded-full bg-error/20 border border-error/30 flex items-center justify-center mb-4">
+                <FaTrash className="text-error text-xl" />
               </div>
               <h3 className="text-lg font-bold text-gray-100 mb-2">Delete Room</h3>
-              <p className="text-sm text-gray-500 mb-1">Are you sure you want to delete</p>
-              <p className="text-sm font-semibold text-gray-700 mb-5">
+              <p className="text-sm text-muted-foreground mb-1">Are you sure you want to delete</p>
+              <p className="text-sm font-semibold text-foreground/90 mb-5">
                 {deleteTarget.name || deleteTarget.roomNumber}?
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteTarget(null)}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 text-sm font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border border-border rounded-xl bg-muted text-foreground text-sm font-medium text-foreground/90 hover:bg-muted/50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteRoom}
-                  className="flex-1 px-4 py-2.5 bg-red-600 text-gray-900 rounded-xl text-sm font-medium hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-error/10 border border-error/200 text-foreground rounded-xl text-sm font-medium hover:bg-error/10 border border-error/200 transition-colors"
                 >
                   Delete
                 </button>
@@ -1017,28 +1017,28 @@ const RoomManagement = () => {
       {showAllocateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAllocateModal(false)} />
-          <div className="relative bg-gray-50 rounded-2xl max-w-sm w-full p-6">
+          <div className="relative bg-muted rounded-2xl max-w-sm w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">Allocate Student</h3>
-              <button type="button" title="Close allocate modal" aria-label="Close allocate modal" onClick={() => setShowAllocateModal(false)} className="text-gray-500 hover:text-gray-600">
+              <h3 className="text-lg font-bold text-foreground">Allocate Student</h3>
+              <button type="button" title="Close allocate modal" aria-label="Close allocate modal" onClick={() => setShowAllocateModal(false)} className="text-muted-foreground hover:text-muted-foreground">
                 <FaTimes />
               </button>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Student ID</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Student ID</label>
               <input
                 type="text"
                 value={studentIdInput}
                 onChange={(e) => setStudentIdInput(e.target.value)}
                 placeholder="Enter student ID..."
-                className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               />
             </div>
             <div className="mt-5 flex gap-3">
               <button
                 type="button"
                 onClick={() => setShowAllocateModal(false)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-900 text-sm font-medium text-gray-700 hover:bg-gray-100/50 transition-colors"
+                className="flex-1 px-4 py-2.5 border border-border rounded-xl bg-muted text-foreground text-sm font-medium text-foreground/90 hover:bg-muted/50 transition-colors"
               >
                 Cancel
               </button>
@@ -1046,7 +1046,7 @@ const RoomManagement = () => {
                 type="button"
                 onClick={handleAllocate}
                 disabled={allocating || !studentIdInput.trim()}
-                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-xl text-sm font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
                 {allocating ? (
                   <>
@@ -1067,48 +1067,48 @@ const RoomManagement = () => {
       {/* View Room Modal */}
       {viewingRoom && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-gray-50 rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-700">Room Details</h2>
-              <button onClick={() => setViewingRoom(null)} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+          <div className="bg-muted rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+              <h2 className="text-xl font-bold text-foreground/90">Room Details</h2>
+              <button onClick={() => setViewingRoom(null)} className="text-muted-foreground hover:text-foreground/90 text-2xl">&times;</button>
             </div>
             <div className="p-6 space-y-4">
               <div className="rounded-lg overflow-hidden h-48">
                 <img src={resolveImageUrl(viewingRoom.image)} alt={viewingRoom.name} className="w-full h-full object-cover" />
               </div>
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">{viewingRoom.name || viewingRoom.roomNumber}</h3>
+                <h3 className="text-lg font-semibold text-foreground">{viewingRoom.name || viewingRoom.roomNumber}</h3>
                 <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusStyle(viewingRoom.status)}`}>{viewingRoom.status}</span>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500 font-medium">Room Number</p>
+                  <p className="text-muted-foreground font-medium">Room Number</p>
                   <p className="text-gray-100">{viewingRoom.roomNumber}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 font-medium">Block / Floor</p>
+                  <p className="text-muted-foreground font-medium">Block / Floor</p>
                   <p className="text-gray-100">{viewingRoom.block} / {viewingRoom.floor}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 font-medium">Type</p>
+                  <p className="text-muted-foreground font-medium">Type</p>
                   <p className="text-gray-100">{viewingRoom.type}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 font-medium">Price</p>
+                  <p className="text-muted-foreground font-medium">Price</p>
                   <p className="text-gray-100 font-semibold">{formatLKR(viewingRoom.price)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 font-medium">Capacity</p>
+                  <p className="text-muted-foreground font-medium">Capacity</p>
                   <p className="text-gray-100">{viewingRoom.occupied} / {viewingRoom.capacity}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 font-medium">Location</p>
+                  <p className="text-muted-foreground font-medium">Location</p>
                   <p className="text-gray-100">{viewingRoom.location || 'Jaffna, Sri Lanka'}</p>
                 </div>
               </div>
               {viewingRoom.facilities.length > 0 && (
                 <div>
-                  <p className="text-gray-500 font-medium text-sm mb-2">Facilities</p>
+                  <p className="text-muted-foreground font-medium text-sm mb-2">Facilities</p>
                   <div className="flex flex-wrap gap-2">
                     {viewingRoom.facilities.map((f) => (
                       <span key={f} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full border border-primary/20">
@@ -1120,13 +1120,13 @@ const RoomManagement = () => {
               )}
               {viewingRoom.description && (
                 <div>
-                  <p className="text-gray-500 font-medium text-sm mb-1">Description</p>
-                  <p className="text-gray-700 text-sm">{viewingRoom.description}</p>
+                  <p className="text-muted-foreground font-medium text-sm mb-1">Description</p>
+                  <p className="text-foreground/90 text-sm">{viewingRoom.description}</p>
                 </div>
               )}
               <div className="flex justify-end space-x-3 pt-4 border-t">
-                <button onClick={() => setViewingRoom(null)} className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 text-gray-700 hover:bg-primary/5">Close</button>
-                <button onClick={() => { handleEditRoom(viewingRoom); setViewingRoom(null); }} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary flex items-center">
+                <button onClick={() => setViewingRoom(null)} className="px-4 py-2 border border-border rounded-lg bg-muted text-foreground text-foreground/90 hover:bg-primary/5">Close</button>
+                <button onClick={() => { handleEditRoom(viewingRoom); setViewingRoom(null); }} className="px-4 py-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 rounded-lg hover:bg-primary flex items-center">
                   <FaEdit className="mr-2" /> Edit Room
                 </button>
               </div>

@@ -186,7 +186,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex pt-16">
+    <div className="min-h-[calc(100vh-4rem)] flex">
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center bg-[url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200')]" />
         <div className="absolute inset-0 bg-gradient-to-br from-sidebar/90 to-primary-hover/75" />

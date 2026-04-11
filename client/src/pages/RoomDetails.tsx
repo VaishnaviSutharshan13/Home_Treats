@@ -91,7 +91,7 @@ const RoomDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
-          <p className="text-red-600 text-lg mb-4">{error || 'Room not found'}</p>
+          <p className="text-error text-lg mb-4">{error || 'Room not found'}</p>
           <button
             onClick={() => navigate('/rooms')}
             className="btn btn-primary"
@@ -141,7 +141,7 @@ const RoomDetails = () => {
                 className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   isAvailable
                     ? 'bg-primary/90 text-white'
-                    : 'bg-red-500/90 text-white'
+                    : 'bg-error/10 border border-error/200/90 text-white'
                 }`}
               >
                 {isAvailable ? 'Available' : room.status}
@@ -238,7 +238,7 @@ const RoomDetails = () => {
                   <span className="text-neutral-500">Status</span>
                   <span
                     className={`flex items-center gap-1.5 font-medium ${
-                      isAvailable ? 'text-primary' : 'text-red-600'
+                      isAvailable ? 'text-primary' : 'text-error'
                     }`}
                   >
                     {isAvailable ? (
@@ -257,7 +257,7 @@ const RoomDetails = () => {
                 <div className="flex justify-between py-3">
                   <span className="text-neutral-500">Location</span>
                   <span className="font-medium text-neutral-900 flex items-center gap-1.5">
-                    <FaMapMarkerAlt className="w-3.5 h-3.5 text-red-500" />
+                    <FaMapMarkerAlt className="w-3.5 h-3.5 text-error" />
                     {room.location || 'Jaffna, Sri Lanka'}
                   </span>
                 </div>

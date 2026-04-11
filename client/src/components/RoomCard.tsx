@@ -34,7 +34,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onViewDetails }) => {
           <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
             room.available 
               ? 'bg-primary/90 text-white' 
-              : 'bg-red-500/90 text-white'
+              : 'bg-error/10 border border-error/200/90 text-white'
           }`}>
             {room.available ? 'Available' : 'Occupied'}
           </span>
@@ -59,24 +59,24 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onViewDetails }) => {
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-1">{room.name}</h3>
-            <p className="text-sm text-gray-600">{room.type} Room</p>
+            <h3 className="text-xl font-bold text-foreground mb-1">{room.name}</h3>
+            <p className="text-sm text-muted-foreground">{room.type} Room</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-blue-600">${room.price}</div>
-            <div className="text-xs text-gray-500">per month</div>
+            <div className="text-2xl font-bold text-primary">${room.price}</div>
+            <div className="text-xs text-muted-foreground">per month</div>
           </div>
         </div>
         
         {/* Features */}
         <div className="flex flex-wrap gap-2 mb-4">
           {room.features.slice(0, 3).map((feature, index) => (
-            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs">
+            <span key={index} className="px-2 py-1 bg-muted text-muted-foreground rounded-lg text-xs">
               {feature}
             </span>
           ))}
           {room.features.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs">
+            <span className="px-2 py-1 bg-muted text-muted-foreground rounded-lg text-xs">
               +{room.features.length - 3} more
             </span>
           )}

@@ -23,7 +23,7 @@ const Footer = () => {
   };
 
   const location = useLocation();
-  if (['/login', '/register', '/forgot-password','/student/dashboard'].includes(location.pathname)) {
+  if (location.pathname !== '/') {
     return null;
   }
 

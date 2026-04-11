@@ -3,7 +3,7 @@ import { FaHome } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   return (
-    <header className="flex items-center justify-between p-4 bg-blue-600 text-white">
+    <header className="flex items-center justify-between p-4 bg-primary/10 text-primary0 text-white">
       <div className="flex items-center space-x-2">
         <FaHome className="text-2xl" />
         <h1 className="text-xl font-semibold">HostelMng</h1>

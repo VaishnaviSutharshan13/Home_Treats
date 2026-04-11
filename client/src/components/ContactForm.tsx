@@ -49,17 +49,17 @@ const ContactForm: React.FC = () => {
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FaEnvelope className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-primary/20 text-primary rounded-xl flex items-center justify-center">
+                <FaEnvelope className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Email Us</h3>
-                <p className="text-gray-600">Get in touch via email</p>
+                <h3 className="font-semibold text-foreground">Email Us</h3>
+                <p className="text-muted-foreground">Get in touch via email</p>
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-gray-700">admin@studenthub.edu</p>
-              <p className="text-gray-700">support@studenthub.edu</p>
+              <p className="text-foreground/90">admin@studenthub.edu</p>
+              <p className="text-foreground/90">support@studenthub.edu</p>
             </div>
           </div>
           
@@ -69,13 +69,13 @@ const ContactForm: React.FC = () => {
                 <FaPhone className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Call Us</h3>
-                <p className="text-gray-600">Mon-Fri: 9AM-6PM</p>
+                <h3 className="font-semibold text-foreground">Call Us</h3>
+                <p className="text-muted-foreground">Mon-Fri: 9AM-6PM</p>
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-gray-700">+1 (555) 123-4567</p>
-              <p className="text-gray-700">+1 (555) 123-4568</p>
+              <p className="text-foreground/90">+1 (555) 123-4567</p>
+              <p className="text-foreground/90">+1 (555) 123-4568</p>
             </div>
           </div>
           
@@ -85,14 +85,14 @@ const ContactForm: React.FC = () => {
                 <FaMapMarkerAlt className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Visit Us</h3>
-                <p className="text-gray-600">Our location</p>
+                <h3 className="font-semibold text-foreground">Visit Us</h3>
+                <p className="text-muted-foreground">Our location</p>
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-gray-700">University Campus</p>
-              <p className="text-gray-700">Building A, Hostel Office</p>
-              <p className="text-gray-700">123 Campus Drive</p>
+              <p className="text-foreground/90">University Campus</p>
+              <p className="text-foreground/90">Building A, Hostel Office</p>
+              <p className="text-foreground/90">123 Campus Drive</p>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const ContactForm: React.FC = () => {
         {/* Contact Form */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Send us a Message</h2>
             
             {submitStatus === 'success' && (
               <div className="mb-6 p-4 bg-surface-active border border-primary/25 rounded-xl">
@@ -109,19 +109,19 @@ const ContactForm: React.FC = () => {
             )}
             
             {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-red-700 font-medium">Something went wrong. Please try again.</p>
+              <div className="mb-6 p-4 bg-error/10 border border-error/20 border border-red-200 rounded-xl">
+                <p className="text-error font-medium">Something went wrong. Please try again.</p>
               </div>
             )}
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Name <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-foreground/90 mb-2">
+                    Your Name <span className="text-error">*</span>
                   </label>
                   <div className="relative">
-                    <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <FaUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <input
                       type="text"
                       name="name"
@@ -135,11 +135,11 @@ const ContactForm: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-foreground/90 mb-2">
+                    Email Address <span className="text-error">*</span>
                   </label>
                   <div className="relative">
-                    <FaEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <FaEnvelope className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <input
                       type="email"
                       name="email"
@@ -154,11 +154,11 @@ const ContactForm: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground/90 mb-2">
                   Phone Number
                 </label>
                 <div className="relative">
-                  <FaPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <FaPhone className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <input
                     type="tel"
                     name="phone"
@@ -171,8 +171,8 @@ const ContactForm: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-foreground/90 mb-2">
+                  Subject <span className="text-error">*</span>
                 </label>
                 <select
                   name="subject"
@@ -191,8 +191,8 @@ const ContactForm: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Message <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium text-foreground/90 mb-2">
+                  Message <span className="text-error">*</span>
                 </label>
                 <textarea
                   name="message"

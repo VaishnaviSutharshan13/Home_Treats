@@ -56,40 +56,40 @@ const StudentApprovalManagement = () => {
   };
 
   const badgeClass = (status: StudentApproval['status']) => {
-    if (status === 'Pending') return 'bg-yellow-100 text-yellow-700';
-    if (status === 'Approved') return 'bg-green-100 text-green-700';
-    return 'bg-red-100 text-red-700';
+    if (status === 'Pending') return 'bg-warning/20 border border-warning/30 text-warning';
+    if (status === 'Approved') return 'bg-primary/20 border border-primary/20 text-primary';
+    return 'bg-error/20 border border-error/30 text-error';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
 
       <div className="lg:ml-64">
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-1 rounded hover:bg-gray-100">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+              <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-1 rounded hover:bg-muted">
                 <FaBars className="w-4 h-4" />
               </button>
               <Link to="/admin/dashboard" className="hover:text-primary">Dashboard</Link>
               <span>/</span>
-              <span className="text-gray-700">Student Approval Management</span>
+              <span className="text-foreground/90">Student Approval Management</span>
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">Student Approval Management</h1>
+            <h1 className="text-xl font-semibold text-foreground">Student Approval Management</h1>
           </div>
         </div>
 
         <div className="p-6">
           {message && <div className="mb-4 text-sm bg-surface-active border border-primary/25 text-primary rounded-lg px-3 py-2">{message}</div>}
 
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
             {loading ? (
-              <div className="p-6 text-gray-600">Loading student approvals...</div>
+              <div className="p-6 text-muted-foreground">Loading student approvals...</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-surface-active text-gray-700 text-xs uppercase">
+                  <thead className="bg-surface-active text-foreground/90 text-xs uppercase border-b border-border">
                     <tr>
                       <th className="text-left px-4 py-3">Student Name</th>
                       <th className="text-left px-4 py-3">Student ID</th>
@@ -101,15 +101,15 @@ const StudentApprovalManagement = () => {
                       <th className="text-left px-4 py-3">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-border">
                     {students.map((student) => (
                       <tr key={student._id} className="text-sm">
-                        <td className="px-4 py-3 text-gray-900">{student.name}</td>
-                        <td className="px-4 py-3 text-gray-700">{student.studentId}</td>
-                        <td className="px-4 py-3 text-gray-700">{student.email}</td>
-                        <td className="px-4 py-3 text-gray-700">{student.course}</td>
-                        <td className="px-4 py-3 text-gray-700">{student.year}</td>
-                        <td className="px-4 py-3 text-gray-700">{new Date(student.createdAt).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-foreground">{student.name}</td>
+                        <td className="px-4 py-3 text-foreground/90">{student.studentId}</td>
+                        <td className="px-4 py-3 text-foreground/90">{student.email}</td>
+                        <td className="px-4 py-3 text-foreground/90">{student.course}</td>
+                        <td className="px-4 py-3 text-foreground/90">{student.year}</td>
+                        <td className="px-4 py-3 text-foreground/90">{new Date(student.createdAt).toLocaleDateString()}</td>
                         <td className="px-4 py-3">
                           <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass(student.status)}`}>
                             {student.status}
@@ -119,14 +119,14 @@ const StudentApprovalManagement = () => {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleApprove(student._id)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-primary/10 border border-primary/200 text-white hover:bg-primary/10 border border-primary/200"
                               disabled={student.status === 'Approved'}
                             >
                               <FaCheck className="w-3 h-3" /> Approve
                             </button>
                             <button
                               onClick={() => handleReject(student._id)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-red-600 text-white hover:bg-red-700"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-error/10 border border-error/200 text-white hover:bg-error/10 border border-error/200"
                               disabled={student.status === 'Rejected'}
                             >
                               <FaTimes className="w-3 h-3" /> Reject
@@ -151,10 +151,10 @@ const StudentApprovalManagement = () => {
 
       {viewing && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-xl border border-primary/15 shadow-2xl">
-            <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Student Details</h2>
-              <button onClick={() => setViewing(null)} className="text-gray-500 hover:text-gray-800">✕</button>
+          <div className="w-full max-w-lg bg-card rounded-xl border border-primary/15 shadow-2xl">
+            <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">Student Details</h2>
+              <button onClick={() => setViewing(null)} className="text-muted-foreground hover:text-foreground/90">✕</button>
             </div>
             <div className="p-5 grid grid-cols-2 gap-3 text-sm">
               <Detail label="Name" value={viewing.name} />
@@ -166,8 +166,8 @@ const StudentApprovalManagement = () => {
               <Detail label="Year" value={viewing.year} />
               <Detail label="Status" value={viewing.status} />
               <div className="col-span-2">
-                <p className="text-xs text-gray-500 mb-1">Address</p>
-                <p className="text-gray-800">{viewing.address || '-'}</p>
+                <p className="text-xs text-muted-foreground mb-1">Address</p>
+                <p className="text-foreground/90">{viewing.address || '-'}</p>
               </div>
             </div>
           </div>
@@ -179,8 +179,8 @@ const StudentApprovalManagement = () => {
 
 const Detail = ({ label, value }: { label: string; value: string }) => (
   <div>
-    <p className="text-xs text-gray-500 mb-1">{label}</p>
-    <p className="text-gray-800">{value}</p>
+    <p className="text-xs text-muted-foreground mb-1">{label}</p>
+    <p className="text-foreground/90">{value}</p>
   </div>
 );
 

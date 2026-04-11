@@ -33,33 +33,33 @@ interface ComplaintCardProps {
 }
 
 const badgeByStatus: Record<string, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  'In Progress': 'bg-blue-100 text-blue-800',
-  Resolved: 'bg-green-100 text-green-800',
-  Rejected: 'bg-red-100 text-red-700',
+  Pending: 'bg-warning/20 border border-warning/30 text-warning',
+  'In Progress': 'bg-primary/20 text-primary text-primary',
+  Resolved: 'bg-primary/20 border border-primary/20 text-primary',
+  Rejected: 'bg-error/20 border border-error/30 text-error',
 };
 
 const badgeByPriority: Record<string, string> = {
-  High: 'bg-red-100 text-red-700',
-  Medium: 'bg-orange-100 text-orange-700',
+  High: 'bg-error/20 border border-error/30 text-error',
+  Medium: 'bg-warning/20 border border-warning/30 text-warning',
   Low: 'bg-secondary/15 text-primary',
 };
 
 const canStudentEdit = (complaintStatus: string) => complaintStatus === 'Pending';
 
 const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete }: ComplaintCardProps) => {
-  const statusClass = badgeByStatus[complaint.status] || 'bg-gray-100 text-gray-700';
-  const priorityClass = badgeByPriority[complaint.priority] || 'bg-gray-100 text-gray-700';
+  const statusClass = badgeByStatus[complaint.status] || 'bg-muted text-foreground/90';
+  const priorityClass = badgeByPriority[complaint.priority] || 'bg-muted text-foreground/90';
 
   return (
     <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-gray-900">
+          <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-foreground">
             <FaExclamationTriangle className="text-amber-500" />
             <span className="truncate">{complaint.title}</span>
           </h3>
-          <p className="text-sm leading-relaxed text-gray-600">{complaint.description}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{complaint.description}</p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${priorityClass}`}>{complaint.priority}</span>
@@ -69,25 +69,25 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
 
       <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4 text-sm">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Category</p>
-          <p className="mt-1 text-gray-800">{complaint.category}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Category</p>
+          <p className="mt-1 text-foreground/90">{complaint.category}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Submitted</p>
-          <p className="mt-1 text-gray-800">{new Date(complaint.createdAt).toLocaleDateString()}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Submitted</p>
+          <p className="mt-1 text-foreground/90">{new Date(complaint.createdAt).toLocaleDateString()}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Assigned To</p>
-          <p className="mt-1 text-gray-800">{complaint.assignedTo || 'Not assigned'}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Assigned To</p>
+          <p className="mt-1 text-foreground/90">{complaint.assignedTo || 'Not assigned'}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">ETA</p>
-          <p className="mt-1 text-gray-800">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">ETA</p>
+          <p className="mt-1 text-foreground/90">
             {complaint.estimatedResolution ? new Date(complaint.estimatedResolution).toLocaleDateString() : '-'}
           </p>
         </div>
         {complaint.rejectionReason && (
-          <div className="col-span-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">{complaint.rejectionReason}</div>
+          <div className="col-span-2 rounded-xl bg-error/10 border border-error/20 p-3 text-sm text-error">{complaint.rejectionReason}</div>
         )}
       </div>
 
@@ -104,16 +104,16 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
           <div className="mt-3 space-y-2">
             {complaint.comments && complaint.comments.length > 0 ? (
               complaint.comments.map((comment, index) => (
-                <div key={`${complaint._id}-${index}`} className="rounded-xl bg-gray-50 p-3">
-                  <div className="mb-1 flex items-center justify-between text-xs text-gray-500">
-                    <span className="font-semibold text-gray-700">{comment.author}</span>
+                <div key={`${complaint._id}-${index}`} className="rounded-xl bg-muted p-3">
+                  <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground/90">{comment.author}</span>
                     <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-sm text-gray-700">{comment.text}</p>
+                  <p className="text-sm text-foreground/90">{comment.text}</p>
                 </div>
               ))
             ) : (
-              <div className="rounded-xl bg-gray-50 p-3 text-sm text-gray-500">No comments yet.</div>
+              <div className="rounded-xl bg-muted p-3 text-sm text-muted-foreground">No comments yet.</div>
             )}
           </div>
         )}
@@ -125,7 +125,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
             <button
               onClick={() => onEdit(complaint)}
               disabled={!canStudentEdit(complaint.status)}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaEdit className="text-xs" />
               Edit
@@ -135,13 +135,13 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
             <button
               onClick={() => onDelete(complaint._id)}
               disabled={!canStudentEdit(complaint.status)}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-200 px-4 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-200 px-4 text-sm font-semibold text-error transition hover:bg-error/10 border border-error/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaTrash className="text-xs" />
               Delete
             </button>
           )}
-          <span className="ml-auto inline-flex items-center gap-1 text-xs text-gray-400">
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
             <FaClock />
             Last update {new Date(complaint.createdAt).toLocaleDateString()}
           </span>

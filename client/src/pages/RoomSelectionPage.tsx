@@ -42,20 +42,20 @@ interface SelectionRoom {
 
 const statusConfig = {
   Available: {
-    bg: 'bg-green-50',
-    text: 'text-green-700',
+    bg: 'bg-primary/10 border border-primary/20',
+    text: 'text-primary',
     border: 'border-green-200',
     icon: <FaCheckCircle className="w-3.5 h-3.5" />,
   },
   Limited: {
-    bg: 'bg-yellow-50',
-    text: 'text-yellow-700',
+    bg: 'bg-warning/10 border border-warning/20',
+    text: 'text-warning',
     border: 'border-yellow-200',
     icon: <FaExclamationCircle className="w-3.5 h-3.5" />,
   },
   'Not Available': {
-    bg: 'bg-red-50',
-    text: 'text-red-600',
+    bg: 'bg-error/10 border border-error/20',
+    text: 'text-error',
     border: 'border-red-200',
     icon: <FaTimesCircle className="w-3.5 h-3.5" />,
   },
@@ -183,7 +183,7 @@ const RoomSelectionPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -195,7 +195,7 @@ const RoomSelectionPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28">
+    <div className="min-h-screen bg-muted pb-28">
       <section className="w-full bg-gradient-to-br from-primary via-primary-hover to-secondary relative py-16 sm:py-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-6xl mx-auto px-4">
@@ -220,16 +220,16 @@ const RoomSelectionPage: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-4">
             <FaFilter className="text-primary w-4 h-4" />
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Filter Rooms</h3>
+            <h3 className="text-sm font-bold text-foreground/90 uppercase tracking-wide">Filter Rooms</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative lg:col-span-1">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input type="text" name="search" placeholder="Search room ID..." value={filters.search} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-gray-700 transition-all outline-none" />
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <input type="text" name="search" placeholder="Search room ID..." value={filters.search} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none" />
             </div>
             <div className="relative">
               <FaBuilding className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="building" value={filters.building} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-gray-700 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="building" value={filters.building} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
                 <option value="">All Buildings</option>
                 {buildings.map((b) => (
                   <option key={b} value={b}>{b}</option>
@@ -238,7 +238,7 @@ const RoomSelectionPage: React.FC = () => {
             </div>
             <div className="relative">
               <FaLayerGroup className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="floor" value={filters.floor} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-gray-700 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="floor" value={filters.floor} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
                 <option value="">All Floors</option>
                 {floors.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -247,7 +247,7 @@ const RoomSelectionPage: React.FC = () => {
             </div>
             <div className="relative">
               <FaCheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="availability" value={filters.availability} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-gray-700 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="availability" value={filters.availability} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
                 <option value="">All Status</option>
                 {statuses.map((s) => (
                   <option key={s} value={s}>{s}</option>
@@ -262,7 +262,7 @@ const RoomSelectionPage: React.FC = () => {
       </section>
 
       <div className="max-w-6xl mx-auto mt-6 px-4">
-        <p className="text-gray-600 text-sm font-medium">
+        <p className="text-muted-foreground text-sm font-medium">
           Showing <span className="text-primary font-bold">{filteredRooms.length}</span> rooms
           {filters.building || filters.floor || filters.availability || filters.search ? ' (filtered)' : ''}
         </p>
@@ -272,7 +272,7 @@ const RoomSelectionPage: React.FC = () => {
         {filteredRooms.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <span className="text-5xl text-info mb-4">🔍</span>
-            <p className="text-xl text-gray-500 font-semibold">No rooms match your filters</p>
+            <p className="text-xl text-muted-foreground font-semibold">No rooms match your filters</p>
             <button onClick={handleReset} className="mt-4 text-primary font-medium hover:underline text-sm">Clear all filters</button>
           </div>
         ) : (
@@ -299,21 +299,21 @@ const RoomSelectionPage: React.FC = () => {
                   )}
 
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${isUnavailable ? 'bg-gray-100' : 'bg-surface-active'}`}>
-                      <MdMeetingRoom className={`w-6 h-6 ${isUnavailable ? 'text-gray-400' : 'text-primary'}`} />
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${isUnavailable ? 'bg-muted' : 'bg-surface-active'}`}>
+                      <MdMeetingRoom className={`w-6 h-6 ${isUnavailable ? 'text-muted-foreground' : 'text-primary'}`} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">{room.roomNumber}</h3>
-                      <p className="text-xs text-gray-400 font-medium">{room.floor}</p>
+                      <h3 className="text-lg font-bold text-foreground">{room.roomNumber}</h3>
+                      <p className="text-xs text-muted-foreground font-medium">{room.floor}</p>
                     </div>
                   </div>
 
                   <div className="space-y-2.5 mb-4">
-                    <div className="flex items-center gap-2.5 text-sm"><FaBuilding className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-gray-600">{room.building}</span></div>
-                    <div className="flex items-center gap-2.5 text-sm"><FaLayerGroup className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-gray-600">{room.floor}</span></div>
-                    <div className="flex items-center gap-2.5 text-sm"><FaDoorOpen className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-gray-600">Room {room.roomNumber}</span></div>
-                    <div className="flex items-center gap-2.5 text-sm"><FaBed className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-gray-600">{room.occupiedBeds}/{room.totalBeds} occupied</span></div>
-                    <div className="flex items-center gap-2.5 text-sm"><FaMoneyBillWave className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-gray-600">Rs. {room.price.toLocaleString()}/month</span></div>
+                    <div className="flex items-center gap-2.5 text-sm"><FaBuilding className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-muted-foreground">{room.building}</span></div>
+                    <div className="flex items-center gap-2.5 text-sm"><FaLayerGroup className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-muted-foreground">{room.floor}</span></div>
+                    <div className="flex items-center gap-2.5 text-sm"><FaDoorOpen className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-muted-foreground">Room {room.roomNumber}</span></div>
+                    <div className="flex items-center gap-2.5 text-sm"><FaBed className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-muted-foreground">{room.occupiedBeds}/{room.totalBeds} occupied</span></div>
+                    <div className="flex items-center gap-2.5 text-sm"><FaMoneyBillWave className="w-3.5 h-3.5 text-primary shrink-0" /><span className="text-muted-foreground">Rs. {room.price.toLocaleString()}/month</span></div>
                   </div>
 
                   <div className={`flex items-center justify-between rounded-xl px-3 py-2 ${sc.bg} ${sc.border} border`}>
@@ -329,7 +329,7 @@ const RoomSelectionPage: React.FC = () => {
                     disabled={isUnavailable}
                     className={`
                       w-full mt-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300
-                      ${isUnavailable ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : isSelected ? 'bg-primary text-white shadow-md hover:bg-primary-hover' : 'bg-surface-active text-primary hover:bg-surface-active border border-primary/25'}
+                      ${isUnavailable ? 'bg-muted text-muted-foreground cursor-not-allowed' : isSelected ? 'bg-primary text-white shadow-md hover:bg-primary-hover' : 'bg-surface-active text-primary hover:bg-surface-active border border-primary/25'}
                     `}
                   >
                     {isUnavailable ? 'Not Available' : isSelected ? '✓ Selected' : 'Select Room'}
@@ -347,13 +347,13 @@ const RoomSelectionPage: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-surface-active rounded-xl flex items-center justify-center shrink-0"><MdMeetingRoom className="w-5 h-5 text-primary" /></div>
               <div>
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Selected Room</p>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Selected Room</p>
                 {selectedRoom && (
-                  <p className="text-gray-900 font-bold text-sm sm:text-base">
+                  <p className="text-foreground font-bold text-sm sm:text-base">
                     Room {selectedRoom.roomNumber}
-                    <span className="text-gray-400 font-normal mx-2">|</span>
+                    <span className="text-muted-foreground font-normal mx-2">|</span>
                     {selectedRoom.floor}
-                    <span className="text-gray-400 font-normal mx-2">|</span>
+                    <span className="text-muted-foreground font-normal mx-2">|</span>
                     Rs. {selectedRoom.price.toLocaleString()}/month
                   </p>
                 )}
@@ -361,7 +361,7 @@ const RoomSelectionPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <button onClick={() => setSelectedRoom(null)} className="px-4 py-2.5 border border-gray-300 text-gray-600 rounded-xl font-medium text-sm hover:bg-gray-50 transition-all">Cancel</button>
+              <button onClick={() => setSelectedRoom(null)} className="px-4 py-2.5 border border-gray-300 text-muted-foreground rounded-xl font-medium text-sm hover:bg-muted transition-all">Cancel</button>
               <button onClick={handleContinueBooking} className="px-8 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300">
                 Continue Booking →
               </button>

@@ -38,6 +38,8 @@ const validateStudentUpdate = [
 // Routes — List, approval queue, and CRUD require admin
 router.get('/', authMiddleware, adminOnly, getAllStudents);
 router.get('/pending', authMiddleware, adminOnly, getPendingStudents);
+// Alias used by admin UI — must be registered before /:id or "approvals" is treated as an ObjectId
+router.get('/approvals', authMiddleware, adminOnly, getPendingStudents);
 router.get('/search/:query', authMiddleware, adminOnly, searchStudents);
 router.put('/:id/approve', authMiddleware, adminOnly, approveStudent);
 router.put('/:id/reject', authMiddleware, adminOnly, rejectStudent);

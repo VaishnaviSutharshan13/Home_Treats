@@ -136,17 +136,17 @@ const NotificationBell = () => {
       case 'student': return 'bg-surface-active text-primary';
       case 'complaint': return 'bg-amber-100 text-amber-600';
       case 'room':
-      case 'booking': return 'bg-indigo-100 text-primary';
+      case 'booking': return 'bg-primary/20 text-primary';
       case 'fee':
       case 'payment': return 'bg-emerald-100 text-emerald-600';
-      default: return 'bg-gray-100 text-gray-600';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getPriorityPill = (priority: Notification['priority']) => {
-    if (priority === 'urgent') return 'bg-red-100 text-red-700';
-    if (priority === 'important') return 'bg-yellow-100 text-yellow-700';
-    if (priority === 'success') return 'bg-green-100 text-green-700';
+    if (priority === 'urgent') return 'bg-error/20 border border-error/30 text-error';
+    if (priority === 'important') return 'bg-warning/20 border border-warning/30 text-warning';
+    if (priority === 'success') return 'bg-primary/20 border border-primary/20 text-primary';
     return 'bg-surface-active text-primary';
   };
 
@@ -164,12 +164,12 @@ const NotificationBell = () => {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        className="relative p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground/90 transition-colors"
         aria-label="Notifications"
       >
         <FaBell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full ring-2 ring-white animate-pulse">
+          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-error/10 border border-error/200 rounded-full ring-2 ring-white animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -177,18 +177,18 @@ const NotificationBell = () => {
 
       {/* Dropdown Panel */}
       <div
-        className={`absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden transition-all duration-200 origin-top-right ${
+        className={`absolute right-0 top-full mt-2 w-80 sm:w-96 bg-card rounded-2xl shadow-2xl border border-border z-50 overflow-hidden transition-all duration-200 origin-top-right ${
           isOpen
             ? 'opacity-100 scale-100 translate-y-0'
             : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface-active">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+            <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 rounded-full">
+              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-error/20 border border-error/30 text-error rounded-full">
                 {unreadCount} new
               </span>
             )}
@@ -197,7 +197,7 @@ const NotificationBell = () => {
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
-              className="text-xs border border-gray-200 rounded-md px-2 py-1 bg-white text-gray-600"
+              className="text-xs border border-border rounded-md px-2 py-1 bg-muted/30 text-foreground outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none cursor-pointer"
               title="Filter notifications"
             >
               <option value="all">All</option>
@@ -211,7 +211,7 @@ const NotificationBell = () => {
               <button
                 onClick={markAllAsRead}
                 disabled={loading}
-                className="p-1.5 text-xs text-blue-600 hover:bg-blue-50 rounded-lg transition disabled:opacity-50"
+                className="p-1.5 text-xs text-primary hover:bg-primary/10 text-primary rounded-lg transition disabled:opacity-50"
                 title="Mark all as read"
               >
                 <FaCheck className="w-3 h-3" />
@@ -221,7 +221,7 @@ const NotificationBell = () => {
               <button
                 onClick={clearAll}
                 disabled={loading}
-                className="p-1.5 text-xs text-red-500 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                className="p-1.5 text-xs text-error hover:bg-error/10 border border-error/20 rounded-lg transition disabled:opacity-50"
                 title="Clear all"
               >
                 <FaTrash className="w-3 h-3" />
@@ -231,7 +231,7 @@ const NotificationBell = () => {
               onClick={() => setIsOpen(false)}
               title="Close notifications"
               aria-label="Close notifications"
-              className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition"
+              className="p-1.5 text-muted-foreground hover:bg-muted rounded-lg transition"
             >
               <FaTimes className="w-3 h-3" />
             </button>
@@ -239,9 +239,9 @@ const NotificationBell = () => {
         </div>
 
         {/* Notification List */}
-        <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+        <div className="max-h-80 overflow-y-auto divide-y divide-border">
           {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
               <FaBell className="w-8 h-8 mb-2 opacity-40" />
               <p className="text-sm">No notifications yet</p>
             </div>
@@ -252,8 +252,8 @@ const NotificationBell = () => {
                 onClick={() => !notif.isRead && markAsRead(notif._id)}
                 className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors ${
                   notif.isRead
-                    ? 'bg-white hover:bg-gray-50'
-                    : 'bg-blue-50/50 hover:bg-blue-50'
+                    ? 'bg-card hover:bg-muted'
+                    : 'bg-primary/10 hover:bg-primary/20'
                 }`}
               >
                 {/* Icon */}
@@ -264,26 +264,26 @@ const NotificationBell = () => {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className={`text-sm leading-snug ${notif.isRead ? 'text-gray-700' : 'text-gray-900 font-semibold'}`}>
+                    <p className={`text-sm leading-snug ${notif.isRead ? 'text-foreground/90' : 'text-foreground font-semibold'}`}>
                       {notif.title}
                     </p>
                     <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-semibold ${getPriorityPill(notif.priority)}`}>
                       {notif.priority}
                     </span>
                   </div>
-                  <p className={`text-xs leading-snug ${notif.isRead ? 'text-gray-500' : 'text-gray-700'}`}>
+                  <p className={`text-xs leading-snug ${notif.isRead ? 'text-muted-foreground' : 'text-foreground/90'}`}>
                     {notif.message}
                   </p>
                   <div className="flex items-center justify-between mt-1.5">
                     <span className="text-[11px] text-primary font-medium">{notif.source}</span>
-                    <p className="text-[11px] text-gray-400">{timeAgo(notif.createdAt)}</p>
+                    <p className="text-[11px] text-muted-foreground">{timeAgo(notif.createdAt)}</p>
                   </div>
                 </div>
 
                 {/* Unread indicator */}
                 <div className="flex-shrink-0 mt-1.5 flex items-center gap-2">
                   {!notif.isRead && (
-                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    <div className="w-2 h-2 rounded-full bg-primary" />
                   )}
                   <button
                     type="button"
@@ -293,7 +293,7 @@ const NotificationBell = () => {
                       e.stopPropagation();
                       hideNotification(notif._id);
                     }}
-                    className="text-gray-400 hover:text-red-500"
+                    className="text-muted-foreground hover:text-error"
                   >
                     <FaTimes className="w-3 h-3" />
                   </button>
@@ -305,8 +305,8 @@ const NotificationBell = () => {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50">
-            <p className="text-xs text-center text-gray-400">
+          <div className="px-4 py-2.5 border-t border-border bg-surface-active">
+            <p className="text-xs text-center text-muted-foreground">
               Showing latest {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
             </p>
           </div>
