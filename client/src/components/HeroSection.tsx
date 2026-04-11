@@ -40,7 +40,7 @@ const HeroSection = () => {
           {/* Main Title */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Find Your Perfect
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+            <span className="block bg-gradient-to-r from-info to-secondary bg-clip-text text-transparent">
               Student Home
             </span>
           </h1>
@@ -123,11 +123,11 @@ const HeroSection = () => {
                 <div className="text-sm text-gray-600">Rooms Available</div>
               </div>
               <div className="text-center p-3 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-purple-600">2000+</div>
+                <div className="text-2xl font-bold text-primary">2000+</div>
                 <div className="text-sm text-gray-600">Happy Students</div>
               </div>
               <div className="text-center p-3 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-purple-600">50+</div>
+                <div className="text-2xl font-bold text-primary">50+</div>
                 <div className="text-sm text-gray-600">Facilities</div>
               </div>
               <div className="text-center p-3 bg-gray-50 rounded-xl">

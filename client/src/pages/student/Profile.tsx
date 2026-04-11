@@ -172,7 +172,7 @@ const Profile = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       {toast && (
-        <div className="fixed top-5 right-5 bg-purple-600 text-white px-4 py-2 rounded">
+        <div className="fixed top-5 right-5 bg-primary text-white px-4 py-2 rounded">
           {toast.message}
         </div>
       )}
@@ -191,7 +191,7 @@ const Profile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Card */}
             <div className="bg-white p-6 rounded-xl text-center">
-              <div className="w-24 h-24 bg-purple-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl">
+              <div className="w-24 h-24 bg-primary rounded-full mx-auto flex items-center justify-center text-white text-2xl">
                 {getInitials(profile.name)}
               </div>
               <h2 className="mt-4 font-bold">{profile.name}</h2>
@@ -199,7 +199,7 @@ const Profile = () => {
               <p className="text-sm mt-2">{profile.studentId}</p>
               <p className="text-sm">Room: {profile.room}</p>
 
-              <button onClick={handleEdit} className="mt-4 bg-purple-600 text-white px-4 py-2 rounded">
+              <button onClick={handleEdit} className="mt-4 bg-primary text-white px-4 py-2 rounded">
                 Edit
               </button>
             </div>
@@ -254,7 +254,7 @@ const Profile = () => {
               className="border p-2 w-full mb-3"
             />
 
-            <button className="bg-purple-600 text-white px-4 py-2 rounded">
+            <button className="bg-primary text-white px-4 py-2 rounded">
               Change Password
             </button>
           </form>

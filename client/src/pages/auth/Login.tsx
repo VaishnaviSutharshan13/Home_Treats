@@ -119,21 +119,21 @@ const Login = () => {
             backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')"
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 to-purple-700/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-sidebar/95 to-primary-hover/70"></div>
         </div>
         
         {/* Overlay Content */}
         <div className="relative z-10 flex flex-col justify-center items-center h-full text-white p-12">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Welcome Back to <span className="text-purple-400">Home_Treats</span>
+              Welcome Back to <span className="text-primary">Home_Treats</span>
             </h1>
-            <p className="text-xl text-purple-100 mb-8 max-w-md">
+            <p className="text-xl text-sidebar-foreground/90 mb-8 max-w-md">
               Your comfortable and affordable student accommodation awaits
             </p>
             <Link 
               to="/" 
-              className="inline-flex items-center space-x-2 text-purple-300 hover:text-white transition-colors duration-300"
+              className="inline-flex items-center space-x-2 text-info hover:text-white transition-colors duration-300"
             >
               <FaHome className="w-5 h-5" />
               <span>Back to Home</span>
@@ -148,10 +148,10 @@ const Login = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
                 <FaHome className="w-5 h-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">
+              <span className="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
                 Home_Treats
               </span>
             </Link>
@@ -161,7 +161,7 @@ const Login = () => {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-200">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/15">
                 <FaHome className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -174,10 +174,10 @@ const Login = () => {
 
             {/* Redirect Info Message */}
             {location.state?.message && !loginError && (
-              <div className="mb-6 p-4 bg-purple-500/10 backdrop-blur border border-purple-500/20 rounded-xl">
+              <div className="mb-6 p-4 bg-primary/10 backdrop-blur border border-primary/20 rounded-xl">
                 <div className="flex items-center space-x-2">
-                  <FaInfoCircle className="w-5 h-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-purple-400 text-sm font-medium">{location.state.message}</span>
+                  <FaInfoCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-primary text-sm font-medium">{location.state.message}</span>
                 </div>
               </div>
             )}
@@ -208,10 +208,10 @@ const Login = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 ${
+                    className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
                       formErrors.email 
                         ? 'border-red-400 focus:ring-red-400 bg-red-50' 
-                        : 'border-gray-200 hover:border-purple-300'
+                        : 'border-gray-200 hover:border-primary/30'
                     }`}
                     placeholder="john@example.com"
                   />
@@ -235,10 +235,10 @@ const Login = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-12 py-3 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 ${
+                    className={`w-full pl-12 pr-12 py-3 bg-white border rounded-xl text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
                       formErrors.password 
                         ? 'border-red-400 focus:ring-red-400 bg-red-50' 
-                        : 'border-gray-200 hover:border-purple-300'
+                        : 'border-gray-200 hover:border-primary/30'
                     }`}
                     placeholder="Enter your password"
                   />
@@ -265,7 +265,7 @@ const Login = () => {
                   <input
                     id="remember"
                     type="checkbox"
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 bg-white"
+                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary bg-white"
                   />
                   <label htmlFor="remember" className="ml-2 text-sm text-gray-500">
                     Remember me
@@ -273,7 +273,7 @@ const Login = () => {
                 </div>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors duration-200"
+                  className="text-sm text-primary hover:text-primary-hover font-medium transition-colors duration-200"
                 >
                   Forgot password?
                 </Link>
@@ -283,7 +283,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
               >
                 {isLoading ? (
                   <>
@@ -305,7 +305,7 @@ const Login = () => {
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-medium text-purple-600 hover:text-purple-800 transition-colors duration-200"
+                  className="font-medium text-primary hover:text-primary-hover transition-colors duration-200"
                 >
                   Register
                 </Link>

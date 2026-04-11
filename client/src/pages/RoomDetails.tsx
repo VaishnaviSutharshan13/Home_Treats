@@ -140,7 +140,7 @@ const RoomDetails = () => {
               <span
                 className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   isAvailable
-                    ? 'bg-purple-500/90 text-white'
+                    ? 'bg-primary/90 text-white'
                     : 'bg-red-500/90 text-white'
                 }`}
               >
@@ -179,7 +179,7 @@ const RoomDetails = () => {
                 <div className="text-sm text-neutral-500">Total Beds</div>
               </div>
               <div className="card text-center">
-                <FaUsers className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                <FaUsers className="w-6 h-6 text-primary mx-auto mb-2" />
                 <div className="text-2xl font-bold text-neutral-900">{availableBeds}</div>
                 <div className="text-sm text-neutral-500">Available Beds</div>
               </div>
@@ -238,7 +238,7 @@ const RoomDetails = () => {
                   <span className="text-neutral-500">Status</span>
                   <span
                     className={`flex items-center gap-1.5 font-medium ${
-                      isAvailable ? 'text-purple-600' : 'text-red-600'
+                      isAvailable ? 'text-primary' : 'text-red-600'
                     }`}
                   >
                     {isAvailable ? (

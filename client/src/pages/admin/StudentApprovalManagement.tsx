@@ -72,7 +72,7 @@ const StudentApprovalManagement = () => {
               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-1 rounded hover:bg-gray-100">
                 <FaBars className="w-4 h-4" />
               </button>
-              <Link to="/admin/dashboard" className="hover:text-purple-700">Dashboard</Link>
+              <Link to="/admin/dashboard" className="hover:text-primary">Dashboard</Link>
               <span>/</span>
               <span className="text-gray-700">Student Approval Management</span>
             </div>
@@ -81,7 +81,7 @@ const StudentApprovalManagement = () => {
         </div>
 
         <div className="p-6">
-          {message && <div className="mb-4 text-sm bg-purple-50 border border-purple-200 text-purple-700 rounded-lg px-3 py-2">{message}</div>}
+          {message && <div className="mb-4 text-sm bg-surface-active border border-primary/25 text-primary rounded-lg px-3 py-2">{message}</div>}
 
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             {loading ? (
@@ -89,7 +89,7 @@ const StudentApprovalManagement = () => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-purple-50 text-gray-700 text-xs uppercase">
+                  <thead className="bg-surface-active text-gray-700 text-xs uppercase">
                     <tr>
                       <th className="text-left px-4 py-3">Student Name</th>
                       <th className="text-left px-4 py-3">Student ID</th>
@@ -133,7 +133,7 @@ const StudentApprovalManagement = () => {
                             </button>
                             <button
                               onClick={() => setViewing(student)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-purple-300 text-purple-700 hover:bg-purple-50"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-primary/30 text-primary hover:bg-surface-active"
                             >
                               <FaEye className="w-3 h-3" /> View
                             </button>
@@ -151,7 +151,7 @@ const StudentApprovalManagement = () => {
 
       {viewing && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-xl border border-purple-100 shadow-2xl">
+          <div className="w-full max-w-lg bg-white rounded-xl border border-primary/15 shadow-2xl">
             <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Student Details</h2>
               <button onClick={() => setViewing(null)} className="text-gray-500 hover:text-gray-800">✕</button>

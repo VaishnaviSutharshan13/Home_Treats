@@ -14,13 +14,25 @@ import {
   FaUser,
   FaWallet,
 } from 'react-icons/fa';
-  FaPlus, FaMagnifyingGlass, FaDollarSign, FaReceipt,
-  FaCircleCheck, FaCircleXmark, FaClock, FaSpinner, FaFileLines,
-  FaUserSlash, FaEye, FaTrash, FaMoneyBillWave, FaChartBar,
-  FaTriangleExclamation, FaDownload, FaXmark, FaChevronDown, FaChevronLeft,
-  FaArrowTrendUp, FaBars,
+import {
+  FaPlus,
+  FaMagnifyingGlass,
+  FaDollarSign,
+  FaReceipt,
+  FaCircleCheck,
+  FaCircleXmark,
+  FaClock,
+  FaFileLines,
+  FaUserSlash,
+  FaChartBar,
+  FaTriangleExclamation,
+  FaDownload,
+  FaXmark,
+  FaChevronDown,
+  FaChevronLeft,
+  FaArrowTrendUp,
+  FaBars,
 } from 'react-icons/fa6';
-import { feesService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
 import { feesService, paymentService, studentService } from '../../services';
 
@@ -70,21 +82,20 @@ const getInitials = (name: string) =>
   name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
 const statusBadge: Record<string, string> = {
-  Paid:    'bg-purple-500/15 text-purple-600 border border-purple-500/30 shadow-purple-500/10',
-  Pending: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 shadow-yellow-500/10',
+  Paid:    'bg-primary/15 text-primary border border-primary/30 shadow-primary/10',
+  Pending: 'bg-yellow-500/15 text-warning border border-warning/30 shadow-yellow-500/10',
   Overdue: 'bg-red-500/15 text-red-400 border border-red-500/30 shadow-red-500/10',
-  Partial: 'bg-purple-500/15 text-purple-600 border border-purple-500/30 shadow-emerald-500/10',
+  Partial: 'bg-primary/15 text-primary border border-primary/30 shadow-emerald-500/10',
 };
 
 const statusDot: Record<string, string> = {
-  Paid: 'bg-purple-400', Pending: 'bg-yellow-400', Overdue: 'bg-red-400', Partial: 'bg-purple-400',
+  Paid: 'bg-primary', Pending: 'bg-yellow-400', Overdue: 'bg-red-400', Partial: 'bg-primary',
 };
 
 /* ═══════════════════════════════════════════════════
    COMPONENT
 ═══════════════════════════════════════════════════ */
 const FeesManagement = () => {
-  const todayDate = getTodayDateString();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [fees, setFees] = useState<Fee[]>([]);
@@ -246,7 +257,7 @@ const FeesManagement = () => {
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-green-500 rounded-full animate-spin mx-auto mb-4" />
+        <div className="w-16 h-16 border-4 border-primary/20 border-t-green-500 rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-500 text-lg font-medium">Loading fees data…</p>
         <p className="text-gray-600 text-sm mt-1">Please wait</p>
       </div>
@@ -262,7 +273,7 @@ const FeesManagement = () => {
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Failed to Load Fees</h2>
         <p className="text-gray-500 mb-6">{error}</p>
-        <button onClick={fetchFees} className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105">
+        <button onClick={fetchFees} className="bg-primary hover:bg-primary text-white px-8 py-3 rounded-xl font-semibold transition-all hover:scale-105">
           Try Again
         </button>
       </div>
@@ -283,18 +294,18 @@ const FeesManagement = () => {
           <div
             key={t.id}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium text-gray-900 backdrop-blur-sm border transition-all
-              ${t.type === 'success' ? 'bg-purple-600/90 border-purple-500/50' : t.type === 'error' ? 'bg-red-600/90 border-red-500/50' : 'bg-white border-purple-500/30'}`}
+              ${t.type === 'success' ? 'bg-primary/90 border-primary/50' : t.type === 'error' ? 'bg-red-600/90 border-red-500/50' : 'bg-white border-primary/30'}`}
           >
             {t.type === 'success' && <FaCircleCheck className="shrink-0 text-gray-900" />}
             {t.type === 'error'   && <FaCircleXmark className="shrink-0 text-gray-900" />}
-            {t.type === 'info'    && <FaFileLines className="shrink-0 text-purple-600" />}
+            {t.type === 'info'    && <FaFileLines className="shrink-0 text-primary" />}
             <span>{t.message}</span>
           </div>
         ))}
       </div>
 
       {/* ── PAGE HEADER ────────────────────────── */}
-      <div className="bg-white border-b border-purple-500/10">
+      <div className="bg-white border-b border-primary/10">
         <div className="w-full px-6 sm:px-8 lg:px-10 py-6">
 
           {/* Breadcrumb */}
@@ -310,7 +321,7 @@ const FeesManagement = () => {
             </button>
           <Link
             to="/admin/dashboard"
-            className="inline-flex items-center gap-1.5 text-gray-500 hover:text-purple-600 text-sm mb-5 transition-colors duration-200 group"
+            className="inline-flex items-center gap-1.5 text-gray-500 hover:text-primary text-sm mb-5 transition-colors duration-200 group"
           >
             <FaChevronLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform duration-200" />
             <span>Dashboard</span>
@@ -323,8 +334,8 @@ const FeesManagement = () => {
             {/* Title block */}
             <div>
               <div className="flex items-center gap-3 mb-1.5">
-                <div className="w-9 h-9 bg-purple-500/15 border border-purple-500/25 rounded-xl flex items-center justify-center">
-                  <FaDollarSign className="w-5 h-5 text-purple-600" />
+                <div className="w-9 h-9 bg-primary/15 border border-primary/25 rounded-xl flex items-center justify-center">
+                  <FaDollarSign className="w-5 h-5 text-primary" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Fees Management</h1>
               </div>
@@ -347,14 +358,14 @@ const FeesManagement = () => {
               </button>
               <button
                 onClick={() => setShowReportPrompt(true)}
-                className="group inline-flex items-center gap-2 px-4 py-2.5 bg-[#f5f3ff] hover:bg-[#243147] border border-gray-200 hover:border-purple-500/30 text-gray-600 hover:text-gray-900 rounded-xl text-sm font-semibold transition-all duration-200"
+                className="group inline-flex items-center gap-2 px-4 py-2.5 bg-surface-active/50 hover:bg-[#243147] border border-gray-200 hover:border-primary/30 text-gray-600 hover:text-gray-900 rounded-xl text-sm font-semibold transition-all duration-200"
               >
-                <FaChartBar className="w-3.5 h-3.5 text-purple-600" />
+                <FaChartBar className="w-3.5 h-3.5 text-primary" />
                 Monthly Report
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="group inline-flex items-center gap-2 px-5 py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 shadow-lg shadow-purple-500/20"
+                className="group inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 shadow-lg shadow-primary/20"
               >
                 <FaPlus className="w-3.5 h-3.5 transition-transform group-hover:rotate-90 duration-200" />
                 Add Fee
@@ -369,19 +380,19 @@ const FeesManagement = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
 
           {/* Total Revenue */}
-          <div className="group relative bg-white border border-purple-500/15 rounded-2xl p-6 overflow-hidden hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 cursor-default">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
+          <div className="group relative bg-white border border-primary/15 rounded-2xl p-6 overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 cursor-default">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
             <div className="flex items-start justify-between mb-5">
-              <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:border-purple-500 transition-all duration-300">
-                <FaArrowTrendUp className="w-5 h-5 text-purple-600 group-hover:text-gray-900 transition-colors duration-300" />
+              <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
+                <FaArrowTrendUp className="w-5 h-5 text-primary group-hover:text-gray-900 transition-colors duration-300" />
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 bg-purple-500/10 text-purple-600 border border-purple-500/20 rounded-full">Revenue</span>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full">Revenue</span>
             </div>
             <p className="text-2xl font-extrabold text-gray-900 mb-1 tracking-tight">
               LKR {totalRevenue.toLocaleString()}
             </p>
             <p className="text-sm text-gray-500">Total collected payments</p>
-            <div className="mt-4 h-0.5 bg-gradient-to-r from-purple-500/50 to-transparent rounded-full" />
+            <div className="mt-4 h-0.5 bg-gradient-to-r from-primary/50 to-transparent rounded-full" />
           </div>
 
           {/* Pending Payments */}
@@ -389,9 +400,9 @@ const FeesManagement = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
             <div className="flex items-start justify-between mb-5">
               <div className="w-12 h-12 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-500 group-hover:border-yellow-500 transition-all duration-300">
-                <FaClock className="w-5 h-5 text-yellow-400 group-hover:text-gray-900 transition-colors duration-300" />
+                <FaClock className="w-5 h-5 text-warning group-hover:text-gray-900 transition-colors duration-300" />
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-full">Pending</span>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-yellow-500/10 text-warning border border-yellow-500/20 rounded-full">Pending</span>
             </div>
             <p className="text-2xl font-extrabold text-gray-900 mb-1 tracking-tight">
               LKR {pendingRevenue.toLocaleString()}
@@ -401,13 +412,13 @@ const FeesManagement = () => {
           </div>
 
           {/* Partial Payments */}
-          <div className="group relative bg-white border border-purple-500/15 rounded-2xl p-6 overflow-hidden hover:border-purple-500/40 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 cursor-default">
+          <div className="group relative bg-white border border-primary/15 rounded-2xl p-6 overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 cursor-default">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
             <div className="flex items-start justify-between mb-5">
-              <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:border-purple-500 transition-all duration-300">
-                <FaReceipt className="w-5 h-5 text-purple-600 group-hover:text-gray-900 transition-colors duration-300" />
+              <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
+                <FaReceipt className="w-5 h-5 text-primary group-hover:text-gray-900 transition-colors duration-300" />
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 bg-purple-500/10 text-purple-600 border border-purple-500/20 rounded-full">Partial</span>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full">Partial</span>
             </div>
             <p className="text-2xl font-extrabold text-gray-900 mb-1 tracking-tight">
               LKR {partialRevenue.toLocaleString()}
@@ -445,7 +456,7 @@ const FeesManagement = () => {
                 placeholder="Search by name, student ID or room…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-gray-900 placeholder-gray-600 rounded-xl text-sm outline-none transition-colors shadow-sm"
+                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-primary text-gray-900 placeholder-gray-600 rounded-xl text-sm outline-none transition-colors shadow-sm"
               />
             </div>
 
@@ -456,7 +467,7 @@ const FeesManagement = () => {
                 aria-label="Filter by fee status"
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-primary text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
               >
                 <option value="All">All Status</option>
                 <option value="Paid">Paid</option>
@@ -474,7 +485,7 @@ const FeesManagement = () => {
                 aria-label="Filter by fee type"
                 value={filterFeeType}
                 onChange={e => setFilterFeeType(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[160px]"
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-primary text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[160px]"
               >
                 <option value="All">All Fee Types</option>
                 <option value="Hostel Fee">Hostel Fee</option>
@@ -492,7 +503,7 @@ const FeesManagement = () => {
                 aria-label="Filter by semester"
                 value={filterSemester}
                 onChange={e => setFilterSemester(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-purple-500 text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-200 focus:border-primary text-sm text-gray-900 rounded-xl outline-none transition-colors min-w-[150px]"
               >
                 <option value="All">All Semesters</option>
                 {semesters.map(s => <option key={s} value={s}>{s}</option>)}
@@ -549,12 +560,12 @@ const FeesManagement = () => {
                     </td>
                   </tr>
                 ) : filteredFees.map(fee => (
-                  <tr key={fee._id} className="group hover:bg-purple-500/[0.03] transition-colors duration-150">
+                  <tr key={fee._id} className="group hover:bg-primary/[0.03] transition-colors duration-150">
 
                     {/* Student Info */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-emerald-600 flex items-center justify-center text-gray-900 text-xs font-bold shrink-0 shadow-lg">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-gray-900 text-xs font-bold shrink-0 shadow-lg">
                           {getInitials(fee.studentName)}
                         </div>
                         <div className="min-w-0">
@@ -575,8 +586,8 @@ const FeesManagement = () => {
                       <p className="text-sm font-bold text-gray-900">LKR {fee.amount.toLocaleString()}</p>
                       {fee.status === 'Partial' && (
                         <div className="mt-1 space-y-0.5">
-                          <p className="text-xs text-purple-600">↑ Paid: LKR {(fee.paidAmount || 0).toLocaleString()}</p>
-                          <p className="text-xs text-yellow-400">↓ Due: LKR {(fee.remainingAmount || 0).toLocaleString()}</p>
+                          <p className="text-xs text-primary">↑ Paid: LKR {(fee.paidAmount || 0).toLocaleString()}</p>
+                          <p className="text-xs text-warning">↓ Due: LKR {(fee.remainingAmount || 0).toLocaleString()}</p>
                         </div>
                       )}
                     </td>
@@ -620,7 +631,7 @@ const FeesManagement = () => {
                         <button
                           onClick={() => setViewingFee(fee)}
                           title="View Details"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-purple-500/15 border border-transparent hover:border-purple-500/30 text-gray-500 hover:text-purple-600 transition-all duration-200"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-primary/15 border border-transparent hover:border-primary/30 text-gray-500 hover:text-primary transition-all duration-200"
                         >
                           <FaEye className="w-3.5 h-3.5" />
                         </button>
@@ -630,7 +641,7 @@ const FeesManagement = () => {
                           <button
                             onClick={() => handleViewReceipt(fee)}
                             title="View Receipt"
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-purple-500/15 border border-transparent hover:border-purple-500/30 text-gray-500 hover:text-purple-600 transition-all duration-200"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-primary/15 border border-transparent hover:border-primary/30 text-gray-500 hover:text-primary transition-all duration-200"
                           >
                             <FaReceipt className="w-3.5 h-3.5" />
                           </button>
@@ -641,7 +652,7 @@ const FeesManagement = () => {
                           <button
                             onClick={() => { setSelectedFee(fee); setPaymentForm(p => ({ ...p, paidAmount: fee.amount })); setShowPaymentModal(true); }}
                             title="Record Payment"
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-yellow-500/15 border border-transparent hover:border-yellow-500/30 text-gray-500 hover:text-yellow-400 transition-all duration-200"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 hover:bg-yellow-500/15 border border-transparent hover:border-warning/30 text-gray-500 hover:text-warning transition-all duration-200"
                           >
                             <FaMoneyBillWave className="w-3.5 h-3.5" />
                           </button>
@@ -681,7 +692,7 @@ const FeesManagement = () => {
             </div>
             <div className="p-6 space-y-5">
               <div className="flex items-center gap-4 pb-5 border-b border-gray-200/50">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-emerald-600 flex items-center justify-center text-gray-900 text-lg font-bold shadow-lg">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-gray-900 text-lg font-bold shadow-lg">
                   {getInitials(viewingFee.studentName)}
                 </div>
                 <div>
@@ -742,7 +753,7 @@ const FeesManagement = () => {
                 {viewingFee.status === 'Paid' && (
                   <button
                     onClick={() => { handleViewReceipt(viewingFee); setViewingFee(null); }}
-                    className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
+                    className="px-5 py-2 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105"
                   >
                     <FaReceipt className="w-3.5 h-3.5" /> View Receipt
                   </button>
@@ -759,8 +770,8 @@ const FeesManagement = () => {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500/15 border border-purple-500/25 rounded-lg flex items-center justify-center">
-                  <FaPlus className="w-3.5 h-3.5 text-purple-600" />
+                <div className="w-8 h-8 bg-primary/15 border border-primary/25 rounded-lg flex items-center justify-center">
+                  <FaPlus className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Add New Fee</h2>
               </div>
@@ -771,22 +782,22 @@ const FeesManagement = () => {
             <form onSubmit={handleAddFee} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Student Name</label>
-                <input required value={addForm.studentName} onChange={e => setAddForm({ ...addForm, studentName: e.target.value })} placeholder="Full name" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                <input required value={addForm.studentName} onChange={e => setAddForm({ ...addForm, studentName: e.target.value })} placeholder="Full name" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Student ID</label>
-                  <input required value={addForm.studentId} onChange={e => setAddForm({ ...addForm, studentId: e.target.value })} placeholder="e.g. STU001" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                  <input required value={addForm.studentId} onChange={e => setAddForm({ ...addForm, studentId: e.target.value })} placeholder="e.g. STU001" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Room</label>
-                  <input required value={addForm.room} onChange={e => setAddForm({ ...addForm, room: e.target.value })} placeholder="e.g. A-101" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                  <input required value={addForm.room} onChange={e => setAddForm({ ...addForm, room: e.target.value })} placeholder="e.g. A-101" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Fee Type</label>
                 <div className="relative">
-                  <select required title="Fee type" aria-label="Fee type" value={addForm.feeType} onChange={e => setAddForm({ ...addForm, feeType: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors pr-10">
+                  <select required title="Fee type" aria-label="Fee type" value={addForm.feeType} onChange={e => setAddForm({ ...addForm, feeType: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors pr-10">
                     <option value="Hostel Fee">Hostel Fee</option>
                     <option value="Mess Fee">Mess Fee</option>
                     <option value="Library Fee">Library Fee</option>
@@ -797,23 +808,23 @@ const FeesManagement = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Amount (LKR) — min 4,000</label>
-                <input required title="Fee amount" type="number" min={4000} value={addForm.amount} onChange={e => setAddForm({ ...addForm, amount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                <input required title="Fee amount" type="number" min={4000} value={addForm.amount} onChange={e => setAddForm({ ...addForm, amount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Due Date</label>
-                  <input required title="Due date" type="date" value={addForm.dueDate} onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                  <input required title="Due date" type="date" value={addForm.dueDate} onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Semester</label>
-                  <input required placeholder="e.g. Spring 2026" value={addForm.semester} onChange={e => setAddForm({ ...addForm, semester: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-colors" />
+                  <input required placeholder="e.g. Spring 2026" value={addForm.semester} onChange={e => setAddForm({ ...addForm, semester: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors" />
                 </div>
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={actionLoading} className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
+                <button type="submit" disabled={actionLoading} className="px-6 py-2 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
                   {actionLoading ? <FaSpinner className="animate-spin w-3.5 h-3.5" /> : <FaPlus className="w-3.5 h-3.5" />}
                   Add Fee
                 </button>
@@ -830,7 +841,7 @@ const FeesManagement = () => {
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-yellow-500/15 border border-yellow-500/25 rounded-lg flex items-center justify-center">
-                  <FaMoneyBillWave className="w-3.5 h-3.5 text-yellow-400" />
+                  <FaMoneyBillWave className="w-3.5 h-3.5 text-warning" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Record Payment</h2>
               </div>
@@ -842,7 +853,7 @@ const FeesManagement = () => {
             {/* Fee summary */}
             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200/50">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-emerald-600 flex items-center justify-center text-gray-900 text-xs font-bold">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-gray-900 text-xs font-bold">
                   {getInitials(selectedFee.studentName)}
                 </div>
                 <div>
@@ -860,18 +871,18 @@ const FeesManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Paid Amount (LKR)</label>
-                  <input required title="Paid amount" type="number" min={1} max={selectedFee.amount} value={paymentForm.paidAmount} onChange={e => setPaymentForm({ ...paymentForm, paidAmount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                  <input required title="Paid amount" type="number" min={1} max={selectedFee.amount} value={paymentForm.paidAmount} onChange={e => setPaymentForm({ ...paymentForm, paidAmount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors" />
                   <p className="text-xs text-gray-600 mt-1">Max: LKR {selectedFee.amount.toLocaleString()}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Paid Date</label>
-                  <input required title="Paid date" type="date" value={paymentForm.paidDate} onChange={e => setPaymentForm({ ...paymentForm, paidDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                  <input required title="Paid date" type="date" value={paymentForm.paidDate} onChange={e => setPaymentForm({ ...paymentForm, paidDate: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Payment Method</label>
                 <div className="relative">
-                  <select required title="Payment method" aria-label="Payment method" value={paymentForm.paymentMethod} onChange={e => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
+                  <select required title="Payment method" aria-label="Payment method" value={paymentForm.paymentMethod} onChange={e => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors pr-10">
                     <option value="Online Transfer">Online Transfer</option>
                     <option value="Cash">Cash</option>
                     <option value="Bank Deposit">Bank Deposit</option>
@@ -882,13 +893,13 @@ const FeesManagement = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Transaction ID</label>
-                <input required value={paymentForm.transactionId} onChange={e => setPaymentForm({ ...paymentForm, transactionId: e.target.value })} placeholder="e.g. TXN123456" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                <input required value={paymentForm.transactionId} onChange={e => setPaymentForm({ ...paymentForm, transactionId: e.target.value })} placeholder="e.g. TXN123456" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-600 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors" />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => { setShowPaymentModal(false); setSelectedFee(null); }} className="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={actionLoading} className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
+                <button type="submit" disabled={actionLoading} className="px-6 py-2 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
                   {actionLoading ? <FaSpinner className="animate-spin w-3.5 h-3.5" /> : <FaCircleCheck className="w-3.5 h-3.5" />}
                   Confirm Payment
                 </button>
@@ -904,8 +915,8 @@ const FeesManagement = () => {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-md">
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500/15 border border-purple-500/25 rounded-lg flex items-center justify-center">
-                  <FaReceipt className="w-3.5 h-3.5 text-purple-600" />
+                <div className="w-8 h-8 bg-primary/15 border border-primary/25 rounded-lg flex items-center justify-center">
+                  <FaReceipt className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Payment Receipt</h2>
               </div>
@@ -915,10 +926,10 @@ const FeesManagement = () => {
             </div>
             <div className="p-6 space-y-4">
               <div className="text-center border-b border-gray-200/50 pb-4">
-                <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <FaDollarSign className="w-5 h-5 text-purple-600" />
+                <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <FaDollarSign className="w-5 h-5 text-primary" />
                 </div>
-                <p className="text-lg font-bold text-purple-600">Home Treats Hostel</p>
+                <p className="text-lg font-bold text-primary">Home Treats Hostel</p>
                 <p className="text-sm text-gray-500">Official Payment Receipt</p>
               </div>
               <div className="space-y-2.5 text-sm">
@@ -936,7 +947,7 @@ const FeesManagement = () => {
                 ))}
                 <div className="border-t border-gray-200/50 pt-2.5 flex justify-between">
                   <span className="text-gray-500 font-semibold">Amount</span>
-                  <span className="text-purple-600 font-bold text-base">LKR {receipt.amount.toLocaleString()}</span>
+                  <span className="text-primary font-bold text-base">LKR {receipt.amount.toLocaleString()}</span>
                 </div>
                 <div className="border-t border-gray-200/50 pt-2.5 space-y-2">
                   {[
@@ -956,7 +967,7 @@ const FeesManagement = () => {
                 <button onClick={() => { setShowReceiptModal(false); setReceipt(null); }} className="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-colors">
                   Close
                 </button>
-                <button onClick={handleDownloadReceipt} className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105">
+                <button onClick={handleDownloadReceipt} className="px-5 py-2 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105">
                   <FaDownload className="w-3.5 h-3.5" /> Download
                 </button>
               </div>
@@ -971,8 +982,8 @@ const FeesManagement = () => {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-sm">
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500/15 border border-purple-500/25 rounded-lg flex items-center justify-center">
-                  <FaChartBar className="w-3.5 h-3.5 text-purple-600" />
+                <div className="w-8 h-8 bg-primary/15 border border-primary/25 rounded-lg flex items-center justify-center">
+                  <FaChartBar className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Monthly Report</h2>
               </div>
@@ -983,12 +994,12 @@ const FeesManagement = () => {
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Year</label>
-                <input title="Report year" type="number" min={2020} max={2030} value={reportYear} onChange={e => setReportYear(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                <input title="Report year" type="number" min={2020} max={2030} value={reportYear} onChange={e => setReportYear(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Month</label>
                 <div className="relative">
-                  <select title="Report month" aria-label="Report month" value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-purple-500 transition-colors pr-10">
+                  <select title="Report month" aria-label="Report month" value={reportMonth} onChange={e => setReportMonth(Number(e.target.value))} className="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors pr-10">
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('default', { month: 'long' })}</option>
                     ))}
@@ -1000,7 +1011,7 @@ const FeesManagement = () => {
                 <button onClick={() => setShowReportPrompt(false)} className="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 rounded-xl text-sm transition-colors">
                   Cancel
                 </button>
-                <button onClick={handleFetchReport} disabled={actionLoading} className="px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
+                <button onClick={handleFetchReport} disabled={actionLoading} className="px-6 py-2 bg-primary hover:bg-primary text-white rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 transition-all hover:scale-105">
                   {actionLoading ? <FaSpinner className="animate-spin w-3.5 h-3.5" /> : <FaChartBar className="w-3.5 h-3.5" />}
                   Generate Report
                 </button>
@@ -1016,8 +1027,8 @@ const FeesManagement = () => {
           <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200/50 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-500/15 border border-purple-500/25 rounded-lg flex items-center justify-center">
-                  <FaChartBar className="w-3.5 h-3.5 text-purple-600" />
+                <div className="w-8 h-8 bg-primary/15 border border-primary/25 rounded-lg flex items-center justify-center">
+                  <FaChartBar className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <h2 className="text-lg font-bold text-gray-900">Monthly Report</h2>
               </div>
@@ -1028,8 +1039,8 @@ const FeesManagement = () => {
             <div className="p-6 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: 'Total Collected', val: `LKR ${(reportData.totalCollected || 0).toLocaleString()}`, color: 'text-purple-600', bg: 'bg-purple-500/10 border-purple-500/20' },
-                  { label: 'Total Pending',   val: `LKR ${(reportData.totalPending   || 0).toLocaleString()}`, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20' },
+                  { label: 'Total Collected', val: `LKR ${(reportData.totalCollected || 0).toLocaleString()}`, color: 'text-primary', bg: 'bg-primary/10 border-primary/20' },
+                  { label: 'Total Pending',   val: `LKR ${(reportData.totalPending   || 0).toLocaleString()}`, color: 'text-warning', bg: 'bg-yellow-500/10 border-yellow-500/20' },
                   { label: 'Total Records',   val: reportData.totalFees || 0,                                   color: 'text-gray-900',      bg: 'bg-gray-50 border-gray-200/50' },
                   { label: 'Overdue Count',   val: reportData.overdueCount || 0,                               color: 'text-red-400',    bg: 'bg-red-500/10 border-red-500/20' },
                 ].map((c) => (
@@ -1080,8 +1091,8 @@ const FeesManagement = () => {
             <div className="p-6">
               {unpaidStudents.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-14 h-14 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FaCircleCheck className="w-6 h-6 text-purple-600" />
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FaCircleCheck className="w-6 h-6 text-primary" />
                   </div>
                   <p className="text-gray-900 font-semibold mb-1">All clear!</p>
                   <p className="text-gray-500 text-sm">No unpaid students found.</p>

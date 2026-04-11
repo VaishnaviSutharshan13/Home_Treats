@@ -65,8 +65,8 @@ const ContactForm: React.FC = () => {
           
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <FaPhone className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-surface-active rounded-xl flex items-center justify-center">
+                <FaPhone className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Call Us</h3>
@@ -81,8 +81,8 @@ const ContactForm: React.FC = () => {
           
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <FaMapMarkerAlt className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-surface-active rounded-xl flex items-center justify-center">
+                <FaMapMarkerAlt className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">Visit Us</h3>
@@ -103,8 +103,8 @@ const ContactForm: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
             
             {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl">
-                <p className="text-purple-700 font-medium">Thank you for your message! We'll get back to you soon.</p>
+              <div className="mb-6 p-4 bg-surface-active border border-primary/25 rounded-xl">
+                <p className="text-primary font-medium">Thank you for your message! We'll get back to you soon.</p>
               </div>
             )}
             
@@ -208,7 +208,7 @@ const ContactForm: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {isSubmitting ? (
                   <>

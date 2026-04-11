@@ -94,7 +94,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-purple-200 text-purple-700 bg-white hover:bg-purple-50 font-semibold text-sm transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-primary/25 text-primary bg-white hover:bg-surface-active font-semibold text-sm transition-colors"
       >
         <FaBullhorn className="w-3.5 h-3.5" />
         {buttonLabel}
@@ -103,8 +103,8 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
       {open && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center px-4">
           <div className="fixed inset-0 bg-black/40" onClick={close} />
-          <div className="relative w-full max-w-xl bg-white rounded-2xl border border-purple-100 shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-purple-100 bg-[#faf5ff]">
+          <div className="relative w-full max-w-xl bg-white rounded-2xl border border-primary/15 shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-primary/15 bg-[#faf5ff]">
               <h3 className="text-base font-bold text-gray-900">Send Announcement / Notification</h3>
               <button
                 type="button"
@@ -136,7 +136,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                     onChange={(e) => setType(e.target.value as NotificationType)}
                     title="Notification type"
                     aria-label="Notification type"
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary"
                   >
                     <option value="announcement">Announcement</option>
                     <option value="student">Student</option>
@@ -155,7 +155,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                     onChange={(e) => setPriority(e.target.value as Priority)}
                     title="Notification priority"
                     aria-label="Notification priority"
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary"
                   >
                     <option value="normal">Normal</option>
                     <option value="important">Important</option>
@@ -170,7 +170,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                     onChange={(e) => setRecipientType(e.target.value as 'all_students' | 'selected_students')}
                     title="Notification recipients"
                     aria-label="Notification recipients"
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary"
                   >
                     <option value="all_students">All Students</option>
                     <option value="selected_students">Selected Students</option>
@@ -185,7 +185,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                     value={studentIdsText}
                     onChange={(e) => setStudentIdsText(e.target.value)}
                     placeholder="e.g. STU001, STU014, STU020"
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary"
                   />
                 </div>
               )}
@@ -196,7 +196,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary"
                   placeholder="Enter notification title"
                 />
               </div>
@@ -208,7 +208,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                   onChange={(e) => setMessage(e.target.value)}
                   required
                   rows={4}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary resize-none"
                   placeholder="Enter detailed message"
                 />
               </div>
@@ -227,7 +227,7 @@ const AdminNotificationComposer: React.FC<AdminNotificationComposerProps> = ({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover disabled:opacity-60"
                 >
                   <FaPaperPlane className="w-3.5 h-3.5" />
                   {submitting ? 'Sending...' : 'Send'}

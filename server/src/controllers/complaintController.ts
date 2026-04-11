@@ -4,7 +4,6 @@ import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { createNotification } from './notificationController';
 import { logAdminAction } from './adminLogController';
-import User from '../models/User';
 
 const ALLOWED_CATEGORIES = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Housekeeping'];
 const ALLOWED_PRIORITIES = ['High', 'Medium', 'Low'];
@@ -114,7 +113,6 @@ export const getComplaintsByStudent = async (req: AuthRequest, res: Response) =>
   try {
     // Students can only access their own complaints
     if (req.user?.role === 'student') {
-      const User = (await import('../models/User')).default;
       const currentUser = await User.findById(req.user.id);
       if (!currentUser || currentUser.studentId !== req.params.studentId) {
         return res.status(403).json({ success: false, message: 'Access denied. You can only view your own complaints.' });

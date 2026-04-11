@@ -25,7 +25,7 @@ const categories = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Hous
 const priorities = ['Low', 'Medium', 'High'];
 
 const inputClass =
-  'h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100';
+  'h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25';
 const labelClass = 'mb-2 block text-sm font-semibold text-gray-700';
 
 const ComplaintForm = ({
@@ -105,7 +105,7 @@ const ComplaintForm = ({
           className={`min-h-[120px] w-full rounded-xl border bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:ring-2 ${
             errors.description
               ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
-              : 'border-gray-200 focus:border-purple-400 focus:ring-purple-100'
+              : 'border-gray-200 focus:border-primary focus:ring-primary/25'
           }`}
           required
           maxLength={1200}
@@ -166,7 +166,7 @@ const ComplaintForm = ({
         <button
           type="submit"
           disabled={loading || submitDisabled}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:from-purple-700 hover:to-pink-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-primary to-accent px-5 text-sm font-semibold text-white shadow-sm transition hover:from-primary-hover hover:to-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading && <FaSpinner className="mr-2 animate-spin" />}
           {submitLabel}

@@ -96,20 +96,20 @@ const ActivityLog = () => {
 
   const getTargetIcon = (type: string) => {
     switch (type) {
-      case 'student': return <FaUsers className="w-3.5 h-3.5 text-purple-600" />;
-      case 'room': return <FaBed className="w-3.5 h-3.5 text-purple-600" />;
+      case 'student': return <FaUsers className="w-3.5 h-3.5 text-primary" />;
+      case 'room': return <FaBed className="w-3.5 h-3.5 text-primary" />;
       case 'complaint': return <FaExclamationTriangle className="w-3.5 h-3.5 text-amber-600" />;
-      case 'fee': return <FaMoneyBillWave className="w-3.5 h-3.5 text-violet-600" />;
+      case 'fee': return <FaMoneyBillWave className="w-3.5 h-3.5 text-secondary" />;
       default: return <FaHistory className="w-3.5 h-3.5 text-gray-500" />;
     }
   };
 
   const getTargetBadge = (type: string) => {
     const map: Record<string, string> = {
-      student: 'bg-purple-500/10 text-purple-600',
-      room: 'bg-purple-50 text-purple-700',
+      student: 'bg-primary/10 text-primary',
+      room: 'bg-surface-active text-primary',
       complaint: 'bg-amber-50 text-amber-700',
-      fee: 'bg-violet-50 text-violet-700',
+      fee: 'bg-secondary/10 text-primary',
     };
     return map[type] || 'bg-gray-100 text-gray-600';
   };
@@ -129,7 +129,7 @@ const ActivityLog = () => {
 
       <div className="lg:ml-64">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-purple-500/10 px-5 sm:px-7 lg:px-8 py-3.5">
+        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-primary/10 px-5 sm:px-7 lg:px-8 py-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -144,7 +144,7 @@ const ActivityLog = () => {
               <div>
                 <Link
                   to="/admin/dashboard"
-                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-purple-600 text-sm mb-1 transition-colors duration-200 group"
+                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-primary text-sm mb-1 transition-colors duration-200 group"
                 >
                   <FaChevronLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform duration-200" />
                   <span>Dashboard</span>
@@ -160,14 +160,14 @@ const ActivityLog = () => {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl border transition ${
                   showFilters || hasActiveFilters
-                    ? 'bg-purple-500/10 text-purple-600 border-purple-500/20'
-                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-purple-500/5'
+                    ? 'bg-primary/10 text-primary border-primary/20'
+                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-primary/5'
                 }`}
               >
                 <FaFilter className="w-3.5 h-3.5" />
                 Filters
                 {hasActiveFilters && (
-                  <span className="w-2 h-2 rounded-full bg-purple-500" />
+                  <span className="w-2 h-2 rounded-full bg-primary" />
                 )}
               </button>
             </div>
@@ -192,7 +192,7 @@ const ActivityLog = () => {
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
                     placeholder="Search admin..."
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
               </div>
@@ -205,7 +205,7 @@ const ActivityLog = () => {
                   value={filterAction}
                   onChange={(e) => setFilterAction(e.target.value)}
                   placeholder="e.g. Added, Deleted..."
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 />
               </div>
 
@@ -217,7 +217,7 @@ const ActivityLog = () => {
                   aria-label="Filter by target type"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none bg-gray-100 text-gray-900"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-gray-100 text-gray-900"
                 >
                   <option value="">All Types</option>
                   <option value="student">Student</option>
@@ -238,7 +238,7 @@ const ActivityLog = () => {
                     aria-label="Start date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
               </div>
@@ -254,7 +254,7 @@ const ActivityLog = () => {
                     aria-label="End date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                   />
                 </div>
               </div>
@@ -280,8 +280,8 @@ const ActivityLog = () => {
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
                   <div className="relative w-12 h-12 mx-auto mb-3">
-                    <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
-                    <div className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin" />
+                    <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+                    <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
                   </div>
                   <p className="text-sm text-gray-500">Loading activity logs...</p>
                 </div>
@@ -293,7 +293,7 @@ const ActivityLog = () => {
                   <p className="text-sm text-red-600">{error}</p>
                   <button
                     onClick={() => fetchLogs(pagination.page)}
-                    className="mt-3 px-4 py-1.5 text-sm font-medium text-purple-600 bg-purple-500/10 rounded-lg hover:bg-purple-500/10 transition"
+                    className="mt-3 px-4 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-lg hover:bg-primary/10 transition"
                   >
                     Retry
                   </button>
@@ -326,10 +326,10 @@ const ActivityLog = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {logs.map((log) => (
-                        <tr key={log._id} className="hover:bg-purple-500/5 transition-colors border-b border-gray-200/50">
+                        <tr key={log._id} className="hover:bg-primary/5 transition-colors border-b border-gray-200/50">
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0">
                                 {log.adminName.split('@')[0].slice(0, 2).toUpperCase()}
                               </div>
                               <span className="text-sm font-medium text-gray-100 truncate max-w-[140px]">{log.adminName}</span>
@@ -366,7 +366,7 @@ const ActivityLog = () => {
                   {logs.map((log) => (
                     <div key={log._id} className="p-4 hover:bg-gray-100 transition-colors">
                       <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0 mt-0.5">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0 mt-0.5">
                           {log.adminName.split('@')[0].slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -430,7 +430,7 @@ const ActivityLog = () => {
                         onClick={() => fetchLogs(pageNum)}
                         className={`w-8 h-8 rounded-lg text-sm font-medium transition ${
                           pageNum === pagination.page
-                            ? 'bg-purple-600 text-white shadow-sm'
+                            ? 'bg-primary text-white shadow-sm'
                             : 'text-gray-500 hover:bg-gray-100'
                         }`}
                       >
