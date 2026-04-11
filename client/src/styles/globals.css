@@ -7,44 +7,8 @@
  */
 @import "tailwindcss";
 
-/* Class-based dark mode (toggle sets .dark on <html>) */
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* ─── Light mode ─── */
+/* ─── Global theme (Dark mode only) ─── */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-foreground: #ffffff;
-  --secondary: #10b981;
-  --secondary-foreground: #ffffff;
-  --accent: #f59e0b;
-  --accent-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --subtle: #94a3b8;
-  --navbar: #ffffff;
-  --sidebar: #1e293b;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-muted: #94a3b8;
-  --sidebar-hover: #334155;
-  --sidebar-active: #334155;
-  --border: #e2e8f0;
-  --divider: #cbd5f5;
-  --surface-hover: #eff6ff;
-  --surface-active: #dbeafe;
-  --success: #22c55e;
-  --warning: #facc15;
-  --error: #ef4444;
-  --info: #3b82f6;
-  --ring: #2563eb;
-}
-
-/* ─── Dark mode ─── */
-.dark {
   --background: #0f172a;
   --foreground: #f1f5f9;
   --card: #1e293b;
@@ -145,19 +109,6 @@
 @layer utilities {
   /* Hero overlay: only primary + secondary tones from the palette */
   .landing-mesh {
-    background-color: #1e293b;
-    background-image:
-      radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.35) 0px, transparent 52%),
-      radial-gradient(
-        at 85% 15%,
-        rgba(16, 185, 129, 0.18) 0px,
-        transparent 42%
-      ),
-      radial-gradient(at 10% 70%, rgba(37, 99, 235, 0.15) 0px, transparent 48%),
-      radial-gradient(at 90% 85%, rgba(245, 158, 11, 0.08) 0px, transparent 45%);
-  }
-
-  .dark .landing-mesh {
     background-color: #020617;
     background-image:
       radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.3) 0px, transparent 52%),

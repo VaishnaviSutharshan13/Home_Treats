@@ -219,22 +219,22 @@ const MyComplaints = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       <div className="lg:ml-64">
-        <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur">
+        <header className="sticky top-0 z-10 border-b border-border bg-navbar/95 backdrop-blur w-full">
           <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowNewComplaint(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow-sm flex items-center gap-2"
+                className="px-4 py-2 rounded-lg shadow-sm bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 flex items-center gap-2"
               >
                 <FaBars />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Complaint Management</h1>
-                <p className="text-sm text-gray-500">Create, track, and manage your complaints</p>
+                <h1 className="text-2xl font-bold text-foreground">Complaint Management</h1>
+                <p className="text-sm text-muted-foreground">Create, track, and manage your complaints</p>
               </div>
             </div>
             <button
@@ -252,8 +252,8 @@ const MyComplaints = () => {
             <div
               className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${
                 toast.type === 'success'
-                  ? 'border-green-200 bg-green-50 text-green-700'
-                  : 'border-red-200 bg-red-50 text-red-700'
+                  ? 'border-primary/20 bg-primary/10 text-primary'
+                  : 'border-error/20 bg-error/10 text-error'
               }`}
             >
               {toast.message}
@@ -261,32 +261,32 @@ const MyComplaints = () => {
           )}
 
           <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <p className="text-2xl font-bold text-yellow-600">{summary.pending}</p>
-              <p className="mt-1 text-sm text-gray-500">Pending</p>
+              <p className="mt-1 text-sm text-muted-foreground">Pending</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-2xl font-bold text-blue-600">{summary.inProgress}</p>
-              <p className="mt-1 text-sm text-gray-500">In Progress</p>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="text-2xl font-bold text-info">{summary.inProgress}</p>
+              <p className="mt-1 text-sm text-muted-foreground">In Progress</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-2xl font-bold text-green-600">{summary.resolved}</p>
-              <p className="mt-1 text-sm text-gray-500">Resolved</p>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="text-2xl font-bold text-primary">{summary.resolved}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Resolved</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-2xl font-bold text-red-600">{summary.rejected}</p>
-              <p className="mt-1 text-sm text-gray-500">Rejected</p>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="text-2xl font-bold text-error">{summary.rejected}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Rejected</p>
             </div>
           </section>
 
-          <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+          <section className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px_140px]">
               <div className="relative">
                 <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
+                  className="w-full rounded-xl pl-10 pr-4 h-12 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                   placeholder="Search by title, description, or category"
                 />
               </div>
@@ -294,7 +294,7 @@ const MyComplaints = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
+                className="rounded-xl px-4 h-12 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
               >
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
@@ -305,7 +305,7 @@ const MyComplaints = () => {
 
               <button
                 onClick={fetchComplaints}
-                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="h-12 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted/70"
               >
                 Refresh
               </button>
@@ -313,13 +313,13 @@ const MyComplaints = () => {
           </section>
 
           {loading ? (
-            <div className="rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-16 text-center shadow-sm">
               <FaSpinner className="mx-auto mb-3 animate-spin text-2xl text-primary" />
-              <p className="text-sm text-gray-500">Loading complaints...</p>
+              <p className="text-sm text-muted-foreground">Loading complaints...</p>
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-red-200 bg-white p-16 text-center shadow-sm">
-              <p className="text-sm font-semibold text-red-600">{error}</p>
+            <div className="rounded-2xl border border-error/20 bg-card p-16 text-center shadow-sm">
+              <p className="text-sm font-semibold text-error">{error}</p>
               <button
                 onClick={fetchComplaints}
                 className="mt-4 h-11 rounded-xl bg-gradient-to-r from-primary to-accent px-5 text-sm font-semibold text-white"
@@ -339,7 +339,7 @@ const MyComplaints = () => {
             />
           )}
 
-          {deletingId && <div className="mt-3 text-sm text-gray-500">Deleting complaint...</div>}
+          {deletingId && <div className="mt-3 text-sm text-muted-foreground">Deleting complaint...</div>}
         </main>
       </div>
 
@@ -349,18 +349,18 @@ const MyComplaints = () => {
           onClick={closeModal}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-6 shadow-lg sm:p-8"
+            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-card p-6 shadow-lg sm:p-8"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-muted hover:text-muted-foreground"
               aria-label="Close complaint form"
             >
               <FaTimes className="h-4 w-4" />
             </button>
 
-            <h2 className="mb-6 pr-12 text-xl font-bold text-gray-900">
+            <h2 className="mb-6 pr-12 text-xl font-bold text-foreground">
               {editingComplaint ? 'Edit Complaint' : 'Create Complaint'}
             </h2>
             <ComplaintForm
@@ -379,15 +379,15 @@ const MyComplaints = () => {
 
       {confirmDeleteId && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900">Delete Complaint</h3>
-            <p className="mt-2 text-sm text-gray-600">
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-foreground">Delete Complaint</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
               Are you sure you want to delete this complaint? This action cannot be undone.
             </p>
             <div className="mt-5 flex justify-end gap-3">
               <button
                 onClick={() => setConfirmDeleteId(null)}
-                className="h-11 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="h-11 rounded-xl border border-border px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted/70"
               >
                 Cancel
               </button>
@@ -397,7 +397,7 @@ const MyComplaints = () => {
                   setConfirmDeleteId(null);
                   if (id) await handleDelete(id);
                 }}
-                className="h-11 rounded-xl bg-red-600 px-4 text-sm font-semibold text-white transition hover:bg-red-700"
+                className="h-11 rounded-xl bg-error text-error-foreground hover:bg-error/90 transition-all"
               >
                 Delete
               </button>

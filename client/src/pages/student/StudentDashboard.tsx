@@ -148,46 +148,46 @@ const StudentDashboard = () => {
     {
       title: 'My Room',
       value: booking?.roomNumber || user?.room || 'N/A',
-      icon: <FaBed className="w-8 h-8 text-blue-600" />,
+      icon: <FaBed className="w-8 h-8 text-info" />,
       detail: 'Assigned room',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-info/15 border border-info/20',
     },
     {
       title: 'Monthly Fees',
       value: `LKR ${totalPendingAmount.toLocaleString()}`,
       icon: <FaDollarSign className="w-8 h-8 text-primary" />,
       detail: `${pendingFees.length} pending payment(s)`,
-      bgColor: 'bg-surface-active',
+      bgColor: 'bg-primary/15 border border-primary/20',
     },
     {
       title: 'My Complaints',
       value: String(complaintCount),
-      icon: <FaExclamationTriangle className="w-8 h-8 text-orange-600" />,
+      icon: <FaExclamationTriangle className="w-8 h-8 text-warning" />,
       detail: `${pendingComplaints.length} pending, ${resolvedComplaints.length} resolved`,
-      bgColor: 'bg-orange-50',
+      bgColor: 'bg-warning/15 border border-warning/20',
     },
     {
       title: 'Profile Status',
       value: user?.status === 'Inactive' ? 'Inactive' : 'Active',
       icon: <FaUser className="w-8 h-8 text-primary" />,
       detail: user?.approvalStatus || 'Student account',
-      bgColor: 'bg-surface-active',
+      bgColor: 'bg-primary/15 border border-primary/20',
     },
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <FaSpinner className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading dashboard...</p>
+          <FaSpinner className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Shared Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -198,7 +198,7 @@ const StudentDashboard = () => {
       {/* Main Content Area */}
       <div className="lg:ml-64">
         {/* Top Navigation Bar */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Mobile Menu Button */}
@@ -206,7 +206,7 @@ const StudentDashboard = () => {
                 title="Open sidebar"
                 aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                className="lg:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -214,18 +214,18 @@ const StudentDashboard = () => {
               </button>
 
               {/* Page Title */}
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
+              <div className="flex-1 ml-4 lg:ml-0">
+                <h1 className="text-2xl font-bold text-foreground">Student Dashboard</h1>
               </div>
 
               {/* Student Profile */}
               <div className="flex items-center space-x-4">
                 <NotificationBell />
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.name || 'Student'}</p>
-                  <p className="text-xs text-gray-500">{user?.email || ''}</p>
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-medium text-foreground">{user?.name || 'Student'}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email || ''}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
                   <span className="text-white font-semibold">{userInitials}</span>
                 </div>
               </div>
@@ -236,32 +236,32 @@ const StudentDashboard = () => {
         {/* Student Analytics Cards */}
         <div className="p-4 sm:p-6 lg:p-8">
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">My Overview</h2>
-            <p className="text-gray-600">Your personal hostel information and status</p>
+            <h2 className="text-xl font-semibold text-foreground mb-2">My Overview</h2>
+            <p className="text-muted-foreground">Your personal hostel information and status</p>
           </div>
 
           {booking && (
-            <div className="mb-8 bg-white rounded-xl shadow-lg border border-primary/20 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Details</h3>
+            <div className="mb-8 bg-card rounded-xl shadow-md border border-border p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Booking Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
-                  <p className="text-xs text-gray-500">Booked Room Number</p>
+                <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                  <p className="text-xs text-muted-foreground">Booked Room Number</p>
                   <p className="text-base font-bold text-primary mt-1">{booking.roomNumber}</p>
                 </div>
-                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
-                  <p className="text-xs text-gray-500">Floor Number</p>
+                <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                  <p className="text-xs text-muted-foreground">Floor Number</p>
                   <p className="text-base font-bold text-primary mt-1">{booking.selectedFloor}</p>
                 </div>
-                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
-                  <p className="text-xs text-gray-500">Bed Number</p>
+                <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                  <p className="text-xs text-muted-foreground">Bed Number</p>
                   <p className="text-base font-bold text-primary mt-1">Bed {booking.bedNumber}</p>
                 </div>
-                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
-                  <p className="text-xs text-gray-500">Monthly Rent</p>
+                <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                  <p className="text-xs text-muted-foreground">Monthly Rent</p>
                   <p className="text-base font-bold text-primary mt-1">LKR {booking.monthlyRent}</p>
                 </div>
-                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
-                  <p className="text-xs text-gray-500">Booking Status</p>
+                <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                  <p className="text-xs text-muted-foreground">Booking Status</p>
                   <p className="text-base font-bold text-primary mt-1">{booking.status}</p>
                 </div>
               </div>
@@ -271,19 +271,19 @@ const StudentDashboard = () => {
           {/* Student Analytics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {studentAnalytics.map((item, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
+              <div key={index} className="bg-card rounded-xl shadow-md border border-border hover:shadow-lg transition-all duration-300 p-6 hover:border-primary/50 group">
                 {/* Card Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-16 h-16 ${item.bgColor} rounded-xl flex items-center justify-center`}>
+                  <div className={`w-16 h-16 ${item.bgColor} rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300`}>
                     {item.icon}
                   </div>
                 </div>
 
                 {/* Card Content */}
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{item.value}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{item.title}</p>
-                  <p className="text-xs text-gray-500">{item.detail}</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-1">{item.value}</h3>
+                  <p className="text-muted-foreground text-sm mb-2">{item.title}</p>
+                  <p className="text-xs text-subtle">{item.detail}</p>
                 </div>
               </div>
             ))}
@@ -292,28 +292,28 @@ const StudentDashboard = () => {
           {/* Additional Student Content */}
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Notifications */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Notifications</h3>
+            <div className="bg-card border border-border rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Recent Notifications</h3>
               <div className="space-y-3">
                 {recentNotifications.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-4">No recent notifications</p>
+                  <p className="text-sm text-muted-foreground text-center py-4">No recent notifications</p>
                 ) : (
                   recentNotifications.map((notification, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-start space-x-3 p-3 rounded-lg ${
-                        notification.color === 'green' ? 'bg-surface-active' : 'bg-orange-50'
+                      className={`flex items-start space-x-3 p-3 rounded-lg border ${
+                        notification.color === 'green' ? 'bg-primary/5 border-primary/20' : 'bg-warning/5 border-warning/20'
                       }`}
                     >
                       <div
                         className={`w-2 h-2 rounded-full mt-2 ${
-                          notification.color === 'green' ? 'bg-primary' : 'bg-orange-600'
+                          notification.color === 'green' ? 'bg-primary' : 'bg-warning'
                         }`}
                       ></div>
                       <div>
-                        <p className="text-sm text-gray-700 font-medium">{notification.title}</p>
-                        <p className="text-xs text-gray-500">{notification.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">{formatTimeAgo(notification.date)}</p>
+                        <p className="text-sm text-foreground font-medium">{notification.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{notification.description}</p>
+                        <p className="text-xs text-subtle mt-1">{formatTimeAgo(notification.date)}</p>
                       </div>
                     </div>
                   ))
@@ -322,42 +322,42 @@ const StudentDashboard = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <div className="bg-card border border-border rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
                   to="/student/my-complaints"
-                  className="block w-full text-left p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors duration-200"
+                  className="block w-full text-left p-4 bg-warning/5 border border-warning/20 hover:bg-warning/10 rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
-                    <FaExclamationTriangle className="w-5 h-5 text-orange-600" />
+                    <FaExclamationTriangle className="w-5 h-5 text-warning" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">My Complaints</p>
-                      <p className="text-xs text-gray-500">View or submit complaints</p>
+                      <p className="text-sm font-medium text-foreground">My Complaints</p>
+                      <p className="text-xs text-muted-foreground">View or submit complaints</p>
                     </div>
                   </div>
                 </Link>
                 <Link
                   to="/student/my-fees"
-                  className="block w-full text-left p-4 bg-surface-active hover:bg-surface-active rounded-lg transition-colors duration-200"
+                  className="block w-full text-left p-4 bg-primary/5 border border-primary/20 hover:bg-primary/10 rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
                     <FaDollarSign className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">My Fees</p>
-                      <p className="text-xs text-gray-500">View fees &amp; payment history</p>
+                      <p className="text-sm font-medium text-foreground">My Fees</p>
+                      <p className="text-xs text-muted-foreground">View fees &amp; payment history</p>
                     </div>
                   </div>
                 </Link>
                 <Link
                   to="/student/profile"
-                  className="block w-full text-left p-4 bg-surface-active hover:bg-surface-active rounded-lg transition-colors duration-200"
+                  className="block w-full text-left p-4 bg-primary/5 border border-primary/20 hover:bg-primary/10 rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
                     <FaUser className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Profile</p>
-                      <p className="text-xs text-gray-500">View &amp; edit personal information</p>
+                      <p className="text-sm font-medium text-foreground">Profile</p>
+                      <p className="text-xs text-muted-foreground">View &amp; edit personal information</p>
                     </div>
                   </div>
                 </Link>
@@ -366,14 +366,14 @@ const StudentDashboard = () => {
           </div>
 
           {/* Important Notice */}
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="mt-8 bg-info/10 border border-info/30 rounded-xl p-6 shadow-sm">
             <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white text-xs font-bold">i</span>
+              <div className="w-6 h-6 bg-info rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-info-foreground text-xs font-bold">i</span>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-blue-900 mb-1">Important Notice</h4>
-                <p className="text-sm text-blue-800">
+                <h4 className="text-sm font-semibold text-info mb-1">Important Notice</h4>
+                <p className="text-sm text-info/90">
                   Please ensure your profile information is up to date. Contact the hostel office for any room change requests or emergency situations.
                 </p>
               </div>
