@@ -148,6 +148,8 @@ const testimonials = [
   },
 ];
 
+const location = import.meta.env.VITE_HOSTEL_LOCATION || 'Jaffna, Sri Lanka';
+
 /* ──────────────────────────────────────────────────
    COMPONENT
 ────────────────────────────────────────────────── */
