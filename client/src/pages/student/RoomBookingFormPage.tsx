@@ -219,7 +219,7 @@ const RoomBookingFormPage: React.FC = () => {
               {errors.duration && <p className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">{errors.duration}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground/90 mb-2">Additional Notes <span className="text-gray-400">(optional)</span></label>
+              <label className="block text-sm font-medium text-foreground/90 mb-2">Additional Notes <span className="text-muted-foreground">(optional)</span></label>
               <textarea
                 name="notes"
                 value={form.notes}

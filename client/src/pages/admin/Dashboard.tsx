@@ -96,7 +96,7 @@ const getOccupancyColorClasses = (name: string) => {
     case 'maintenance':
       return { dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-500' };
     default:
-      return { dot: 'bg-gray-500', bg: 'bg-gray-100', text: 'text-gray-600' };
+      return { dot: 'bg-muted0', bg: 'bg-muted', text: 'text-muted-foreground' };
   }
 };
 
@@ -106,12 +106,12 @@ const RevenueTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-surface-active/50 rounded-xl border border-primary/20 px-4 py-3">
-      <p className="text-sm font-semibold text-gray-700 mb-1">{label}</p>
+      <p className="text-sm font-semibold text-foreground/90 mb-1">{label}</p>
       <p className="text-sm text-primary">
         Revenue: <span className="font-bold">LKR {payload[0].value.toLocaleString()}</span>
       </p>
       {payload[0].payload.count > 0 && (
-        <p className="text-xs text-gray-500 mt-1">{payload[0].payload.count} payment{payload[0].payload.count !== 1 ? 's' : ''}</p>
+        <p className="text-xs text-muted-foreground mt-1">{payload[0].payload.count} payment{payload[0].payload.count !== 1 ? 's' : ''}</p>
       )}
     </div>
   );
@@ -124,10 +124,10 @@ const OccupancyTooltip = ({ active, payload }: any) => {
     <div className="bg-surface-active/50 rounded-xl border border-primary/20 px-4 py-3">
       <div className="flex items-center gap-2">
         <div className={`w-3 h-3 rounded-full ${colors.dot}`} />
-        <span className="text-sm font-medium text-gray-700">{payload[0].name}</span>
+        <span className="text-sm font-medium text-foreground/90">{payload[0].name}</span>
       </div>
-      <p className="text-sm text-gray-500 mt-1">
-        <span className="font-bold text-gray-900">{payload[0].value}</span> rooms
+      <p className="text-sm text-muted-foreground mt-1">
+        <span className="font-bold text-foreground">{payload[0].value}</span> rooms
       </p>
     </div>
   );
@@ -269,13 +269,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
 
       {/* Main Content — offset by fixed sidebar on desktop */}
       <div className="lg:ml-64">
         {/* Sticky Header */}
-        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-primary/10 px-5 sm:px-7 lg:px-8 py-3.5">
+        <div className="relative z-10 bg-navbar border-b border-border w-full px-5 sm:px-7 lg:px-8 py-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -283,18 +283,18 @@ const Dashboard = () => {
                 title="Open sidebar"
                 aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+                className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted transition"
               >
                 <FaBars className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Dashboard Overview</h1>
-                <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Welcome back! Here is your hostel analytics.</p>
+                <h1 className="text-xl font-bold text-foreground">Dashboard Overview</h1>
+                <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">Welcome back! Here is your hostel analytics.</p>
               </div>
             </div>
-            <div className="hidden sm:flex items-center gap-3 text-sm text-gray-500">
+            <div className="hidden sm:flex items-center gap-3 text-sm text-muted-foreground">
               <NotificationBell />
-              <div className="w-px h-5 bg-gray-100" />
+              <div className="w-px h-5 bg-muted" />
               <FaCalendarAlt className="w-3.5 h-3.5" />
               <span className="text-xs">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
@@ -309,7 +309,7 @@ const Dashboard = () => {
               <Link
                 key={idx}
                 to={card.link}
-                className={`group bg-white rounded-2xl border border-gray-200 p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 ${
+                className={`group bg-card rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 ${
                   idx === 0 ? 'delay-75' : idx === 1 ? 'delay-150' : idx === 2 ? 'delay-200' : 'delay-300'
                 } ${
                   chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -321,24 +321,24 @@ const Dashboard = () => {
                   </div>
                   <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
                     card.trend === 'up' ? 'bg-primary/15 text-primary' :
-                    card.trend === 'down' ? 'bg-red-500/15 text-red-400' :
-                    'bg-gray-100/60 text-gray-500'
+                    card.trend === 'down' ? 'bg-error/10 border border-error/30 text-error' :
+                    'bg-muted/60 text-muted-foreground'
                   }`}>
                     {card.trend === 'up' ? <FaArrowUp className="w-2.5 h-2.5" /> :
                      card.trend === 'down' ? <FaArrowDown className="w-2.5 h-2.5" /> : null}
                     <span>{card.trendValue}</span>
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">{card.value}</h3>
-                <p className="text-sm font-medium text-gray-500 mt-1">{card.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{card.subtitle}</p>
+                <h3 className="text-2xl font-bold text-foreground">{card.value}</h3>
+                <p className="text-sm font-medium text-muted-foreground mt-1">{card.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{card.subtitle}</p>
               </Link>
             ))}
           </div>
 
           {/* --- ROW 2: Monthly Revenue Chart --- */}
           <div
-            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-300 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -346,31 +346,32 @@ const Dashboard = () => {
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Monthly Revenue (LKR)</h3>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Total {revenueYear}: <span className="font-semibold text-gray-700">{formatLKR(totalAnnual)}</span>
+                <h3 className="text-lg font-semibold text-foreground">Monthly Revenue (LKR)</h3>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Total {revenueYear}: <span className="font-semibold text-foreground/90">{formatLKR(totalAnnual)}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setRevenueYear(revenueYear - 1)}
-                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-gray-500"
+                  className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-muted-foreground"
                 >
                   &larr;
                 </button>
-                <span className="text-sm font-semibold text-gray-700 min-w-[3rem] text-center">{revenueYear}</span>
+                <span className="text-sm font-semibold text-foreground/90 min-w-[3rem] text-center">{revenueYear}</span>
                 <button
                   onClick={() => setRevenueYear(revenueYear + 1)}
                   disabled={revenueYear >= new Date().getFullYear()}
-                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-muted-foreground disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   &rarr;
                 </button>
               </div>
             </div>
 
-            <div className="h-72 sm:h-80">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-72 sm:h-80 w-full min-w-0">
+              {chartsLoaded ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -403,6 +404,9 @@ const Dashboard = () => {
                   />
                 </AreaChart>
               </ResponsiveContainer>
+              ) : (
+                <div className="h-full w-full rounded-xl bg-muted/30 animate-pulse" aria-hidden />
+              )}
             </div>
           </div>
 
@@ -411,25 +415,26 @@ const Dashboard = () => {
 
             {/* Room Occupancy Donut */}
             <div
-              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-500 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Room Occupancy Overview</h3>
-              <p className="text-sm text-gray-500 mb-4">{adminStats.rooms.total} total rooms</p>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Room Occupancy Overview</h3>
+              <p className="text-sm text-muted-foreground mb-4">{adminStats.rooms.total} total rooms</p>
 
               {occupancyData.every(d => d.value === 0) ? (
-                <div className="flex items-center justify-center h-64 text-gray-500">
+                <div className="flex items-center justify-center h-64 text-muted-foreground">
                   <div className="text-center">
                     <FaBed className="w-10 h-10 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No room data available</p>
                   </div>
                 </div>
               ) : (
-                <div className="h-64 sm:h-72">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="h-64 sm:h-72 w-full min-w-0">
+                  {chartsLoaded ? (
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
                       <Pie
                         data={occupancyData}
@@ -452,11 +457,14 @@ const Dashboard = () => {
                         verticalAlign="bottom"
                         height={36}
                         formatter={(value: string) => (
-                          <span className="text-sm text-gray-600">{value}</span>
+                          <span className="text-sm text-muted-foreground">{value}</span>
                         )}
                       />
                     </PieChart>
                   </ResponsiveContainer>
+                  ) : (
+                    <div className="h-full w-full rounded-xl bg-muted/30 animate-pulse" aria-hidden />
+                  )}
                 </div>
               )}
 
@@ -468,7 +476,7 @@ const Dashboard = () => {
                     className={`text-center p-2 rounded-xl ${getOccupancyColorClasses(item.name).bg}`}
                   >
                     <p className={`text-xl font-bold ${getOccupancyColorClasses(item.name).text}`}>{item.value}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{item.name}</p>
                   </div>
                 ))}
               </div>
@@ -476,7 +484,7 @@ const Dashboard = () => {
 
             {/* Recent Students Widget */}
             <div
-              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-500 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -484,8 +492,8 @@ const Dashboard = () => {
             >
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Students</h3>
-                  <p className="text-sm text-gray-500">Latest registrations</p>
+                  <h3 className="text-lg font-semibold text-foreground">Recent Students</h3>
+                  <p className="text-sm text-muted-foreground">Latest registrations</p>
                 </div>
                 <Link
                   to="/admin/student-management"
@@ -496,7 +504,7 @@ const Dashboard = () => {
               </div>
 
               {recentStudents.length === 0 ? (
-                <div className="flex items-center justify-center h-64 text-gray-500">
+                <div className="flex items-center justify-center h-64 text-muted-foreground">
                   <div className="text-center">
                     <FaUserGraduate className="w-10 h-10 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No students registered yet</p>
@@ -519,21 +527,21 @@ const Dashboard = () => {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{student.name}</p>
+                          <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
                           <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
-                            student.status === 'Active' ? 'bg-primary/20 text-primary' : 'bg-gray-100 text-gray-500'
+                            student.status === 'Active' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
                           }`}>
                             {student.status}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           {student.studentId} &bull; Room {student.room}
                         </p>
                       </div>
 
                       {/* Date */}
                       <div className="text-right flex-shrink-0">
-                        <p className="text-xs text-gray-500">{formatDate(student.registeredAt)}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(student.registeredAt)}</p>
                       </div>
                     </div>
                   ))}
@@ -552,38 +560,38 @@ const Dashboard = () => {
 
           {/* --- ROW 4: Room Booking Requests --- */}
           <div
-            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-700 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Room Booking Requests</h3>
-              <span className="text-xs text-gray-500">Confirmed booking records</span>
+              <h3 className="text-lg font-semibold text-foreground">Room Booking Requests</h3>
+              <span className="text-xs text-muted-foreground">Confirmed booking records</span>
             </div>
 
             {bookings.length === 0 ? (
-              <div className="text-sm text-gray-500 py-6 text-center">No booking requests yet</div>
+              <div className="text-sm text-muted-foreground py-6 text-center">No booking requests yet</div>
             ) : (
               <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                 {bookings.map((booking) => (
                   <div key={booking._id} className="flex items-center justify-between p-3 bg-surface-active/50 rounded-xl border border-primary/10">
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">{booking.studentName}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-sm font-semibold text-foreground">{booking.studentName}</p>
+                      <p className="text-xs text-muted-foreground">
                         {booking.email}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-muted-foreground">
                         Room {booking.roomNumber} • Floor {booking.selectedFloor} • Bed {booking.bedNumber}
                       </p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
                         {new Date(booking.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                        booking.status === 'Confirmed' ? 'bg-primary/15 text-primary' : 'bg-red-50 text-red-400'
+                        booking.status === 'Confirmed' ? 'bg-primary/15 text-primary' : 'bg-error/10 border border-error/20 text-error'
                       }`}>
                         {booking.status}
                       </span>
@@ -591,7 +599,7 @@ const Dashboard = () => {
                         <button
                           type="button"
                           onClick={() => handleBookingStatusUpdate(booking._id, 'Cancelled')}
-                          className="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition"
+                          className="text-xs px-2 py-1 rounded-lg border border-error/30 text-error hover:bg-error/10 border border-error/20 transition"
                         >
                           Cancel
                         </button>
@@ -616,13 +624,13 @@ const Dashboard = () => {
 
             {/* Complaint Status */}
             <div
-              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Complaint Status</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Complaint Status</h3>
               <div className="space-y-4">
                 {[
                   { label: 'Pending', count: adminStats.complaints.pending, color: 'bg-amber-500', bgLight: 'bg-amber-500/10' },
@@ -637,9 +645,9 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
                           <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
-                          <span className="text-sm text-gray-500">{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{item.label}</span>
                         </div>
-                        <span className="text-sm font-semibold text-gray-700">{item.count}</span>
+                        <span className="text-sm font-semibold text-foreground/90">{item.count}</span>
                       </div>
                       <div className={`w-full ${item.bgLight} rounded-full h-2`}>
                         <progress
@@ -652,9 +660,9 @@ const Dashboard = () => {
                   );
                 })}
               </div>
-              <div className="mt-5 pt-4 border-t border-gray-200">
+              <div className="mt-5 pt-4 border-t border-border">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Resolution Rate</span>
+                  <span className="text-muted-foreground">Resolution Rate</span>
                   <span className="font-bold text-primary">{adminStats.complaints.resolutionRate}%</span>
                 </div>
               </div>
@@ -669,13 +677,13 @@ const Dashboard = () => {
 
             {/* Fee Collection Overview */}
             <div
-              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Fee Collection</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Fee Collection</h3>
 
               {/* Circular progress */}
               <div className="flex items-center justify-center mb-5">
@@ -694,23 +702,23 @@ const Dashboard = () => {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-900">{adminStats.fees.collectionRate}%</span>
-                    <span className="text-xs text-gray-500">Collected</span>
+                    <span className="text-2xl font-bold text-foreground">{adminStats.fees.collectionRate}%</span>
+                    <span className="text-xs text-muted-foreground">Collected</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Collected</span>
+                  <span className="text-sm text-muted-foreground">Collected</span>
                   <span className="text-sm font-semibold text-primary">{formatLKR(adminStats.fees.totalRevenue)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Pending</span>
+                  <span className="text-sm text-muted-foreground">Pending</span>
                   <span className="text-sm font-semibold text-amber-400">{formatLKR(adminStats.fees.pendingRevenue)}</span>
                 </div>
                 {adminStats.fees.unpaidStudents > 0 && (
-                  <div className="flex items-center gap-2 bg-red-500/10 text-red-400 text-xs rounded-xl px-3 py-2 mt-2 font-medium">
+                  <div className="flex items-center gap-2 bg-error/10 border border-error/30 text-error text-xs rounded-xl px-3 py-2 mt-2 font-medium">
                     <FaExclamationTriangle className="w-3.5 h-3.5 flex-shrink-0" />
                     <span>{adminStats.fees.unpaidStudents} student{adminStats.fees.unpaidStudents !== 1 ? 's' : ''} with unpaid fees</span>
                   </div>
@@ -727,15 +735,15 @@ const Dashboard = () => {
 
             {/* Recent Activity */}
             <div
-              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
               {activities.length === 0 ? (
-                <div className="flex items-center justify-center h-40 text-gray-500">
+                <div className="flex items-center justify-center h-40 text-muted-foreground">
                   <p className="text-sm">No recent activity</p>
                 </div>
               ) : (
@@ -750,8 +758,8 @@ const Dashboard = () => {
                         {activity.type === 'student' ? <FaUserGraduate /> : activity.type === 'complaint' ? <FaExclamationTriangle /> : <FaMoneyBillWave />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate">{activity.action}</p>
-                        <p className="text-xs text-gray-500">{activity.details} &bull; {activity.time}</p>
+                        <p className="text-sm font-medium text-foreground/90 truncate">{activity.action}</p>
+                        <p className="text-xs text-muted-foreground">{activity.details} &bull; {activity.time}</p>
                       </div>
                     </div>
                   ))}
@@ -762,13 +770,13 @@ const Dashboard = () => {
 
           {/* --- ROW 5: Quick Actions --- */}
           <div
-            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-1000 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
           >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
                 { label: 'Students', link: '/admin/student-management', icon: <FaUsers className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },

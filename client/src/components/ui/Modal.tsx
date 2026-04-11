@@ -54,14 +54,14 @@ const Modal: React.FC<ModalProps> = ({
             <div className="border-b border-gray-200 bg-white px-6 py-4">
               <div className="flex items-center justify-between">
                 {title && (
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {title}
                   </h3>
                 )}
                 {showCloseButton && (
                   <button
                     type="button"
-                    className="rounded-md text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white"
+                    className="rounded-md text-muted-foreground hover:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white"
                     onClick={onClose}
                   >
                     <span className="sr-only">Close</span>
@@ -75,7 +75,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
 
           {/* Body */}
-          <div className="bg-white px-6 py-4 sm:py-6 text-gray-700">
+          <div className="bg-white px-6 py-4 sm:py-6 text-foreground/90">
             {children}
           </div>
         </div>

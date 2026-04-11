@@ -100,7 +100,7 @@ const ActivityLog = () => {
       case 'room': return <FaBed className="w-3.5 h-3.5 text-primary" />;
       case 'complaint': return <FaExclamationTriangle className="w-3.5 h-3.5 text-amber-600" />;
       case 'fee': return <FaMoneyBillWave className="w-3.5 h-3.5 text-secondary" />;
-      default: return <FaHistory className="w-3.5 h-3.5 text-gray-500" />;
+      default: return <FaHistory className="w-3.5 h-3.5 text-muted-foreground" />;
     }
   };
 
@@ -111,7 +111,7 @@ const ActivityLog = () => {
       complaint: 'bg-amber-50 text-amber-700',
       fee: 'bg-secondary/10 text-primary',
     };
-    return map[type] || 'bg-gray-100 text-gray-600';
+    return map[type] || 'bg-muted text-muted-foreground';
   };
 
   const formatDateTime = (ts: string) =>
@@ -124,12 +124,12 @@ const ActivityLog = () => {
     });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
 
       <div className="lg:ml-64">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-primary/10 px-5 sm:px-7 lg:px-8 py-3.5">
+        <div className="relative z-10 bg-navbar border-b border-border w-full px-5 sm:px-7 lg:px-8 py-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -137,22 +137,22 @@ const ActivityLog = () => {
                 title="Open sidebar"
                 aria-label="Open sidebar"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+                className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted transition"
               >
                 <FaBars className="w-5 h-5" />
               </button>
               <div>
                 <Link
                   to="/admin/dashboard"
-                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-primary text-sm mb-1 transition-colors duration-200 group"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary text-sm mb-1 transition-colors duration-200 group"
                 >
                   <FaChevronLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform duration-200" />
                   <span>Dashboard</span>
-                  <span className="text-gray-600 mx-0.5">/</span>
-                  <span className="text-gray-500">Activity Log</span>
+                  <span className="text-muted-foreground mx-0.5">/</span>
+                  <span className="text-muted-foreground">Activity Log</span>
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">Activity Log</h1>
-                <p className="text-sm text-gray-500 mt-0.5">Track all admin actions across the system</p>
+                <h1 className="text-2xl font-bold text-foreground">Activity Log</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">Track all admin actions across the system</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ const ActivityLog = () => {
                 className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl border transition ${
                   showFilters || hasActiveFilters
                     ? 'bg-primary/10 text-primary border-primary/20'
-                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-primary/5'
+                    : 'bg-muted text-muted-foreground border-border hover:bg-primary/5'
                 }`}
               >
                 <FaFilter className="w-3.5 h-3.5" />
@@ -177,47 +177,47 @@ const ActivityLog = () => {
         <div className="p-6 sm:p-8 lg:p-10 space-y-6">
           {/* Filters Panel */}
           <div
-            className={`bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden transition-all duration-300 ${
+            className={`bg-muted rounded-2xl border border-border overflow-hidden transition-all duration-300 ${
               showFilters ? 'max-h-96 opacity-100 p-5' : 'max-h-0 opacity-0 p-0 border-0'
             }`}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Search admin name */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Admin Name</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Admin Name</label>
                 <div className="relative">
-                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <input
                     type="text"
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
                     placeholder="Search admin..."
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full rounded-xl py-2 pl-9 pr-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                   />
                 </div>
               </div>
 
               {/* Filter by action */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Action</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Action</label>
                 <input
                   type="text"
                   value={filterAction}
                   onChange={(e) => setFilterAction(e.target.value)}
                   placeholder="e.g. Added, Deleted..."
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                  className="w-full rounded-xl px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                 />
               </div>
 
               {/* Filter by target type */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Target Type</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Target Type</label>
                 <select
                   title="Filter by target type"
                   aria-label="Filter by target type"
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-gray-100 text-gray-900"
+                  className="w-full rounded-xl px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                 >
                   <option value="">All Types</option>
                   <option value="student">Student</option>
@@ -229,32 +229,32 @@ const ActivityLog = () => {
 
               {/* Start date */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Start Date</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Start Date</label>
                 <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <input
                     type="date"
                     title="Start date"
                     aria-label="Start date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full rounded-xl py-2 pl-9 pr-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                   />
                 </div>
               </div>
 
               {/* End date */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">End Date</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">End Date</label>
                 <div className="relative">
-                  <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <input
                     type="date"
                     title="End date"
                     aria-label="End date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    className="w-full rounded-xl py-2 pl-9 pr-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                   />
                 </div>
               </div>
@@ -264,18 +264,18 @@ const ActivityLog = () => {
               <div className="mt-4 flex items-center gap-2">
                 <button
                   onClick={clearFilters}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-error bg-error/10 border border-error/20 rounded-lg hover:bg-error/20 border border-error/30 transition"
                 >
                   <FaTimes className="w-3 h-3" />
                   Clear Filters
                 </button>
-                <span className="text-xs text-gray-500">{pagination.total} result{pagination.total !== 1 ? 's' : ''} found</span>
+                <span className="text-xs text-muted-foreground">{pagination.total} result{pagination.total !== 1 ? 's' : ''} found</span>
               </div>
             )}
           </div>
 
           {/* Table Card */}
-          <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-muted rounded-2xl border border-border overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
@@ -283,14 +283,14 @@ const ActivityLog = () => {
                     <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
                     <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
                   </div>
-                  <p className="text-sm text-gray-500">Loading activity logs...</p>
+                  <p className="text-sm text-muted-foreground">Loading activity logs...</p>
                 </div>
               </div>
             ) : error ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <FaExclamationTriangle className="w-8 h-8 text-red-400 mx-auto mb-2" />
-                  <p className="text-sm text-red-600">{error}</p>
+                  <FaExclamationTriangle className="w-8 h-8 text-error mx-auto mb-2" />
+                  <p className="text-sm text-error">{error}</p>
                   <button
                     onClick={() => fetchLogs(pagination.page)}
                     className="mt-3 px-4 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-lg hover:bg-primary/10 transition"
@@ -302,9 +302,9 @@ const ActivityLog = () => {
             ) : logs.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <FaHistory className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-500 font-medium">No activity logs found</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <FaHistory className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground font-medium">No activity logs found</p>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {hasActiveFilters ? 'Try adjusting your filters' : 'Admin actions will appear here'}
                   </p>
                 </div>
@@ -315,28 +315,28 @@ const ActivityLog = () => {
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Admin</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Action</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Type</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Target ID</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Details</th>
-                        <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Date & Time</th>
+                      <tr className="bg-muted border-b border-border">
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Admin</th>
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Action</th>
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Type</th>
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Target ID</th>
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Details</th>
+                        <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 py-3">Date & Time</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-border">
                       {logs.map((log) => (
-                        <tr key={log._id} className="hover:bg-primary/5 transition-colors border-b border-gray-200/50">
+                        <tr key={log._id} className="hover:bg-primary/5 transition-colors border-b border-border">
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-foreground text-xs font-semibold flex-shrink-0">
                                 {log.adminName.split('@')[0].slice(0, 2).toUpperCase()}
                               </div>
                               <span className="text-sm font-medium text-gray-100 truncate max-w-[140px]">{log.adminName}</span>
                             </div>
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className="text-sm text-gray-600">{log.action}</span>
+                            <span className="text-sm text-muted-foreground">{log.action}</span>
                           </td>
                           <td className="px-5 py-3.5">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${getTargetBadge(log.targetType)}`}>
@@ -345,15 +345,15 @@ const ActivityLog = () => {
                             </span>
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded text-gray-600">
+                            <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded text-muted-foreground">
                               {log.targetId.length > 12 ? `${log.targetId.slice(0, 6)}...${log.targetId.slice(-4)}` : log.targetId}
                             </span>
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className="text-sm text-gray-500 truncate max-w-[160px] block">{log.details || '—'}</span>
+                            <span className="text-sm text-muted-foreground truncate max-w-[160px] block">{log.details || '—'}</span>
                           </td>
                           <td className="px-5 py-3.5">
-                            <span className="text-sm text-gray-500 whitespace-nowrap">{formatDateTime(log.timestamp)}</span>
+                            <span className="text-sm text-muted-foreground whitespace-nowrap">{formatDateTime(log.timestamp)}</span>
                           </td>
                         </tr>
                       ))}
@@ -362,26 +362,26 @@ const ActivityLog = () => {
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="md:hidden divide-y divide-gray-100">
+                <div className="md:hidden divide-y divide-border">
                   {logs.map((log) => (
-                    <div key={log._id} className="p-4 hover:bg-gray-100 transition-colors">
+                    <div key={log._id} className="p-4 hover:bg-muted transition-colors">
                       <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-gray-900 text-xs font-semibold flex-shrink-0 mt-0.5">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-foreground text-xs font-semibold flex-shrink-0 mt-0.5">
                           {log.adminName.split('@')[0].slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-100">{log.action}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{log.adminName}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{log.adminName}</p>
                           <div className="flex items-center gap-2 mt-2 flex-wrap">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full ${getTargetBadge(log.targetType)}`}>
                               {getTargetIcon(log.targetType)}
                               {log.targetType}
                             </span>
                             {log.details && (
-                              <span className="text-xs text-gray-500">{log.details}</span>
+                              <span className="text-xs text-muted-foreground">{log.details}</span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-500 mt-1.5">{formatDateTime(log.timestamp)}</p>
+                          <p className="text-xs text-muted-foreground mt-1.5">{formatDateTime(log.timestamp)}</p>
                         </div>
                       </div>
                     </div>
@@ -392,8 +392,8 @@ const ActivityLog = () => {
 
             {/* Pagination */}
             {pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50">
-                <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between px-5 py-3 border-t border-border bg-muted">
+                <p className="text-sm text-muted-foreground">
                   Page {pagination.page} of {pagination.totalPages}
                   <span className="hidden sm:inline"> — {pagination.total} total entries</span>
                 </p>
@@ -404,7 +404,7 @@ const ActivityLog = () => {
                     aria-label="Previous page"
                     onClick={() => fetchLogs(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg text-muted-foreground hover:bg-muted transition disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <FaChevronLeft className="w-3.5 h-3.5" />
                   </button>
@@ -430,8 +430,8 @@ const ActivityLog = () => {
                         onClick={() => fetchLogs(pageNum)}
                         className={`w-8 h-8 rounded-lg text-sm font-medium transition ${
                           pageNum === pagination.page
-                            ? 'bg-primary text-white shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-100'
+                            ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 shadow-sm'
+                            : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
                         {pageNum}
@@ -445,7 +445,7 @@ const ActivityLog = () => {
                     aria-label="Next page"
                     onClick={() => fetchLogs(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg text-muted-foreground hover:bg-muted transition disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <FaChevronRight className="w-3.5 h-3.5" />
                   </button>

@@ -6,6 +6,7 @@ import type { ComplaintFormValues } from '../../components/complaints/ComplaintF
 import ComplaintList from '../../components/complaints/ComplaintList';
 import type { ComplaintItem } from '../../components/complaints/ComplaintCard';
 import { complaintService } from '../../services';
+import { useAuth } from '../../context/AuthContext';
 
 const initialFormValues: ComplaintFormValues = {
   title: '',
@@ -43,6 +44,7 @@ const validateComplaintForm = (values: ComplaintFormValues) => {
 };
 
 const MyComplaints = () => {
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [complaints, setComplaints] = useState<ComplaintItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,8 +87,8 @@ const MyComplaints = () => {
   };
 
   useEffect(() => {
-    fetchComplaints();
-  }, []);
+    void fetchComplaints();
+  }, [user?.studentId]);
 
   useEffect(() => {
     if (!showFormModal) return;
@@ -223,12 +225,14 @@ const MyComplaints = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       <div className="lg:ml-64">
-        <header className="sticky top-0 z-10 border-b border-border bg-navbar/95 backdrop-blur w-full">
+        <header className="relative z-10 border-b border-border bg-navbar w-full">
           <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setShowNewComplaint(true)}
-                className="px-4 py-2 rounded-lg shadow-sm bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 flex items-center gap-2"
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden px-4 py-2 rounded-lg border border-border bg-card text-foreground flex items-center gap-2"
+                aria-label="Open menu"
               >
                 <FaBars />
               </button>
@@ -262,7 +266,7 @@ const MyComplaints = () => {
 
           <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <p className="text-2xl font-bold text-yellow-600">{summary.pending}</p>
+              <p className="text-2xl font-bold text-warning">{summary.pending}</p>
               <p className="mt-1 text-sm text-muted-foreground">Pending</p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -282,7 +286,7 @@ const MyComplaints = () => {
           <section className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px_140px]">
               <div className="relative">
-                <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -354,7 +358,7 @@ const MyComplaints = () => {
           >
             <button
               onClick={closeModal}
-              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-400 transition hover:bg-muted hover:text-muted-foreground"
+              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-muted-foreground"
               aria-label="Close complaint form"
             >
               <FaTimes className="h-4 w-4" />

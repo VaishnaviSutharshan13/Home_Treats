@@ -79,7 +79,7 @@ const Floors = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
+    <div className="min-h-screen bg-muted pb-10">
       <section className="w-full relative overflow-hidden flex flex-col items-center justify-center text-center py-28 sm:py-24">
         <img src={FALLBACK_IMAGE} alt="Hostel room hero" className="absolute inset-0 w-full h-full object-cover scale-110 blur-[2px]" loading="eager" />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(37,99,235,0.75),rgba(88,28,135,0.7),rgba(15,23,42,0.85))]" />
@@ -98,7 +98,7 @@ const Floors = () => {
 
       <section className="max-w-7xl mx-auto mt-8 px-4 md:px-6">
         {loading ? (
-          <div className="text-center py-12 text-gray-500">Loading floors...</div>
+          <div className="text-center py-12 text-muted-foreground">Loading floors...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch justify-items-center">
             {floors.map((floor) => (
@@ -116,26 +116,26 @@ const Floors = () => {
                   <div
                     className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
                       floor.status === 'available'
-                        ? 'bg-green-100/95 text-green-800'
+                        ? 'bg-primary/20 border border-primary/20/95 text-primary'
                         : floor.status === 'limited'
-                          ? 'bg-yellow-100/95 text-yellow-800'
-                          : 'bg-red-100/95 text-red-800'
+                          ? 'bg-warning/20 border border-warning/30/95 text-warning'
+                          : 'bg-error/20 border border-error/30/95 text-error'
                     }`}
                   >
                     {getStatusBadge(floor.status)}
                   </div>
 
-                  <button type="button" className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 text-gray-500 hover:text-red-500 shadow-sm grid place-items-center transition-colors" aria-label="Add to favorites">
+                  <button type="button" className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 text-muted-foreground hover:text-error shadow-sm grid place-items-center transition-colors" aria-label="Add to favorites">
                     <FaHeart />
                   </button>
                 </div>
 
                 <div className="p-5 flex flex-col h-full">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">{floor.name}</h3>
-                  <p className="text-gray-600 mb-4 text-center min-h-[48px]">{floor.description}</p>
+                  <h3 className="text-xl font-bold text-foreground/90 mb-2 text-center">{floor.name}</h3>
+                  <p className="text-muted-foreground mb-4 text-center min-h-[48px]">{floor.description}</p>
                   <div className="flex justify-between mb-4">
-                    <span className="text-sm text-gray-500">{floor.totalRooms} Rooms</span>
-                    <span className="text-sm text-gray-500">{floor.availableRooms} Available</span>
+                    <span className="text-sm text-muted-foreground">{floor.totalRooms} Rooms</span>
+                    <span className="text-sm text-muted-foreground">{floor.availableRooms} Available</span>
                   </div>
                   <p className="text-lg font-semibold text-primary mb-4 text-center">{floor.priceRange} / month</p>
                   <div className="flex flex-wrap gap-2 mb-6 min-h-[56px] content-start">

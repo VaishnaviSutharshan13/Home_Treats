@@ -198,7 +198,7 @@ const StudentDashboard = () => {
       {/* Main Content Area */}
       <div className="lg:ml-64">
         {/* Top Navigation Bar */}
-        <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full">
+        <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Mobile Menu Button */}

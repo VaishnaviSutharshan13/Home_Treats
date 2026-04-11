@@ -52,7 +52,7 @@ const FacilityBadge: React.FC<FacilityBadgeProps> = ({ name }) => (
     <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-200">
       {facilityIcons[name] || <FaCheckCircle />}
     </div>
-    <span className="text-gray-700 font-medium text-sm">{name}</span>
+    <span className="text-foreground/90 font-medium text-sm">{name}</span>
   </div>
 );
 
@@ -60,18 +60,18 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon, title, time, day, note, accen
   <div className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
     <div className="flex items-center gap-3 mb-4">
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${accentColor} text-white shadow-md`}>{icon}</div>
-      <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+      <h3 className="text-lg font-bold text-foreground">{title}</h3>
     </div>
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <FaClock className="w-4 h-4 text-gray-400" />
-        <span className="text-gray-700 font-medium">{time}</span>
+        <FaClock className="w-4 h-4 text-muted-foreground" />
+        <span className="text-foreground/90 font-medium">{time}</span>
       </div>
       <div className="flex items-center gap-2">
-        <FaCalendarCheck className="w-4 h-4 text-gray-400" />
-        <span className="text-gray-600 text-sm">{day}</span>
+        <FaCalendarCheck className="w-4 h-4 text-muted-foreground" />
+        <span className="text-muted-foreground text-sm">{day}</span>
       </div>
-      <p className="text-gray-500 text-sm italic mt-2 pl-1 border-l-2 border-primary/25 ml-1">{note}</p>
+      <p className="text-muted-foreground text-sm italic mt-2 pl-1 border-l-2 border-primary/25 ml-1">{note}</p>
     </div>
   </div>
 );
@@ -132,7 +132,7 @@ const RoomDetailsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -140,11 +140,11 @@ const RoomDetailsPage: React.FC = () => {
 
   if (!floor) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="text-center px-6">
           <div className="text-7xl mb-6">🏠</div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">Floor Not Found</h2>
-          <p className="text-gray-500 mb-8 max-w-md mx-auto">The floor you are looking for does not exist.</p>
+          <h2 className="text-3xl font-bold text-foreground/90 mb-3">Floor Not Found</h2>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">The floor you are looking for does not exist.</p>
           <button onClick={() => navigate('/floors')} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-semibold px-6 py-3 rounded-xl shadow-lg">
             <FaArrowLeft className="w-4 h-4" /> Back to Floors
           </button>
@@ -154,7 +154,7 @@ const RoomDetailsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <div className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <img src={floor.image} alt={floor.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -174,7 +174,7 @@ const RoomDetailsPage: React.FC = () => {
               <span className="flex items-center gap-2">
                 <FaBed className="w-4 h-4" /> {floor.totalRooms} Rooms
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/90 text-white">{floor.availableRooms} Available</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 border border-primary/200/90 text-white">{floor.availableRooms} Available</span>
             </div>
           </div>
         </div>
@@ -184,12 +184,12 @@ const RoomDetailsPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">About This Floor</h2>
-              <p className="text-gray-600 leading-relaxed">{floor.description}</p>
+              <h2 className="text-xl font-bold text-foreground mb-3">About This Floor</h2>
+              <p className="text-muted-foreground leading-relaxed">{floor.description}</p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-5">Facilities & Amenities</h2>
+              <h2 className="text-xl font-bold text-foreground mb-5">Facilities & Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {floor.facilities.map((facility) => (
                   <FacilityBadge key={facility} name={facility} />
@@ -198,10 +198,10 @@ const RoomDetailsPage: React.FC = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-5">Check-in & Check-out Information</h2>
+              <h2 className="text-xl font-bold text-foreground mb-5">Check-in & Check-out Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoCard icon={<FaCalendarCheck className="w-5 h-5" />} title="Check-in" time={floor.checkIn.time} day={floor.checkIn.day} note={floor.checkIn.note} accentColor="bg-green-500" />
-                <InfoCard icon={<FaCalendarTimes className="w-5 h-5" />} title="Check-out" time={floor.checkOut.time} day={floor.checkOut.day} note={floor.checkOut.note} accentColor="bg-red-500" />
+                <InfoCard icon={<FaCalendarCheck className="w-5 h-5" />} title="Check-in" time={floor.checkIn.time} day={floor.checkIn.day} note={floor.checkIn.note} accentColor="bg-primary/10 border border-primary/200" />
+                <InfoCard icon={<FaCalendarTimes className="w-5 h-5" />} title="Check-out" time={floor.checkOut.time} day={floor.checkOut.day} note={floor.checkOut.note} accentColor="bg-error/10 border border-error/200" />
               </div>
             </div>
           </div>
@@ -209,23 +209,23 @@ const RoomDetailsPage: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg sticky top-24 p-6 md:p-8 border border-gray-100">
               <div className="text-center mb-6">
-                <div className="text-sm text-gray-500 mb-1">Monthly Price Range</div>
+                <div className="text-sm text-muted-foreground mb-1">Monthly Price Range</div>
                 <div className="text-4xl font-bold text-primary">Rs. {floor.priceMin.toLocaleString()} - {floor.priceMax.toLocaleString()}</div>
-                <div className="text-sm text-gray-500 mt-1">per month</div>
+                <div className="text-sm text-muted-foreground mt-1">per month</div>
               </div>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-gray-500">Total Rooms</span><span className="font-medium text-gray-900">{floor.totalRooms}</span></div>
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-gray-500">Available Rooms</span><span className="font-medium text-gray-900">{floor.availableRooms}</span></div>
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-gray-500">Status</span><span className="font-medium text-green-600 flex items-center gap-1.5"><FaCheckCircle className="w-4 h-4" />Live from DB</span></div>
-                <div className="flex justify-between py-3"><span className="text-gray-500">Location</span><span className="font-medium text-gray-900 flex items-center gap-1.5"><FaMapMarkerAlt className="w-3.5 h-3.5 text-red-500" />{floor.location}</span></div>
+                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Total Rooms</span><span className="font-medium text-foreground">{floor.totalRooms}</span></div>
+                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Available Rooms</span><span className="font-medium text-foreground">{floor.availableRooms}</span></div>
+                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Status</span><span className="font-medium text-primary flex items-center gap-1.5"><FaCheckCircle className="w-4 h-4" />Live from DB</span></div>
+                <div className="flex justify-between py-3"><span className="text-muted-foreground">Location</span><span className="font-medium text-foreground flex items-center gap-1.5"><FaMapMarkerAlt className="w-3.5 h-3.5 text-error" />{floor.location}</span></div>
               </div>
 
               <button onClick={() => navigate(`/floor/${floor.id}/rooms`)} className="w-full py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white rounded-xl font-semibold text-lg transition-all duration-300 shadow-md">
                 View Rooms
               </button>
 
-              <p className="text-xs text-gray-400 text-center mt-4">Select a specific room from this floor</p>
+              <p className="text-xs text-muted-foreground text-center mt-4">Select a specific room from this floor</p>
             </div>
           </div>
         </div>

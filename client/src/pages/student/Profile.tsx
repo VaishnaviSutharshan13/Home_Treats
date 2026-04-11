@@ -1,21 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaBed,
-  FaEdit,
-  FaLock,
-  FaSave,
-  FaTimes,
-  FaSpinner,
-  FaIdBadge,
-  FaGraduationCap,
-  FaCheckCircle,
-  FaExclamationCircle,
-  FaClock,
-  FaMoneyBillWave,
-} from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
 import Sidebar from '../../components/layout/Sidebar';
 import { authService, feesService } from '../../services';
@@ -189,6 +173,25 @@ const Profile = () => {
         {/* PROFILE TAB */}
         {activeTab === 'profile' && profile && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
+              <div className="rounded-lg border border-border bg-card p-4 text-center">
+                <p className="text-xs text-muted-foreground">Fee records</p>
+                <p className="text-xl font-bold text-foreground">{paymentSummary.total}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4 text-center">
+                <p className="text-xs text-muted-foreground">Paid</p>
+                <p className="text-xl font-bold text-primary">{paymentSummary.paid}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4 text-center">
+                <p className="text-xs text-muted-foreground">Pending</p>
+                <p className="text-xl font-bold text-warning">{paymentSummary.pending}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4 text-center">
+                <p className="text-xs text-muted-foreground">Overdue</p>
+                <p className="text-xl font-bold text-error">{paymentSummary.overdue}</p>
+              </div>
+            </div>
+
             {/* Left Card */}
             <div className="bg-card p-6 rounded-xl text-center">
               <div className="w-24 h-24 bg-primary rounded-full mx-auto flex items-center justify-center text-white text-2xl">
@@ -199,7 +202,12 @@ const Profile = () => {
               <p className="text-sm mt-2">{profile.studentId}</p>
               <p className="text-sm">Room: {profile.room}</p>
 
-              <button onClick={handleEdit} className="mt-4 px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
+              <button
+                type="button"
+                onClick={handleEdit}
+                disabled={saving}
+                className="mt-4 px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 disabled:opacity-50"
+              >
                 Edit
               </button>
             </div>
@@ -223,8 +231,13 @@ const Profile = () => {
               />
 
               {isEditing && (
-                <button onClick={handleSave} className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
-                  Save
+                <button
+                  type="button"
+                  onClick={() => void handleSave()}
+                  disabled={saving}
+                  className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save'}
                 </button>
               )}
             </div>
@@ -254,8 +267,12 @@ const Profile = () => {
               className="w-full mb-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             />
 
-            <button className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">
-              Change Password
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 rounded bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 disabled:opacity-50"
+            >
+              {saving ? 'Updating...' : 'Change Password'}
             </button>
           </form>
         )}

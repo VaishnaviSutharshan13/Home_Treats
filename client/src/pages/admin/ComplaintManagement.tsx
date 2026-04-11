@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FaBars,
   FaChevronLeft,
-  FaSearch,
   FaFilter,
   FaSpinner,
   FaExclamationTriangle,
@@ -11,7 +9,6 @@ import {
   FaClock,
   FaTimesCircle,
   FaEye,
-  FaComment,
   FaEdit,
   FaTrash,
 } from 'react-icons/fa';
@@ -19,12 +16,6 @@ import {
 import Sidebar from '../../components/layout/Sidebar';
 import { complaintService } from '../../services';
 import type { ComplaintItem } from '../../components/complaints/ComplaintCard';
-
-interface Comment {
-  text: string;
-  author: string;
-  createdAt: string;
-}
 
 type Status = 'Pending' | 'In Progress' | 'Resolved' | 'Rejected';
 
@@ -52,11 +43,6 @@ const ComplaintManagement = () => {
   const [rejectModal, setRejectModal] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
-  const [commentBox, setCommentBox] = useState<string | null>(null);
-  const [commentText, setCommentText] = useState('');
-  const [commentAuthor, setCommentAuthor] = useState('');
-
-  const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -104,14 +90,11 @@ const ComplaintManagement = () => {
 
   const updateStatus = async (id: string, newStatus: Status, payload?: any) => {
     try {
-      setLoadingAction(id);
       await complaintService.update(id, { status: newStatus, ...payload });
       showToast('Updated successfully', 'success');
       await refresh();
     } catch (e: any) {
       showToast(e?.response?.data?.message || 'Update failed', 'error');
-    } finally {
-      setLoadingAction(null);
     }
   };
 
@@ -142,27 +125,6 @@ const ComplaintManagement = () => {
     setRejectReason('');
   };
 
-  const addComment = async (id: string) => {
-    if (!commentText.trim() || !commentAuthor.trim()) return;
-
-    try {
-      setLoadingAction(id);
-      await complaintService.addComment(id, {
-        text: commentText,
-        author: commentAuthor,
-      });
-      showToast('Comment added', 'success');
-      setCommentBox(null);
-      setCommentText('');
-      setCommentAuthor('');
-      await refresh();
-    } catch {
-      showToast('Failed to add comment', 'error');
-    } finally {
-      setLoadingAction(null);
-    }
-  };
-
   const deleteComplaint = async (id: string) => {
     if (!confirm('Delete this complaint?')) return;
 
@@ -187,7 +149,7 @@ const ComplaintManagement = () => {
 
   // ── Render ─────────────────────
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
 
       <div className="lg:ml-64 p-6">
@@ -195,7 +157,7 @@ const ComplaintManagement = () => {
         {/* Toast */}
         {toast && (
           <div className={`fixed top-5 right-5 px-4 py-2 rounded text-white ${
-            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            toast.type === 'success' ? 'bg-primary/10 border border-primary/200' : 'bg-error/10 border border-error/200'
           }`}>
             {toast.message}
           </div>
@@ -203,11 +165,11 @@ const ComplaintManagement = () => {
 
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <Link to="/admin/dashboard" className="text-gray-500 flex items-center gap-2">
+          <Link to="/admin/dashboard" className="text-muted-foreground flex items-center gap-2">
             <FaChevronLeft /> Dashboard
           </Link>
 
-          <button onClick={refresh} className="flex items-center gap-2 bg-white px-3 py-2 rounded">
+          <button onClick={refresh} className="flex items-center gap-2 bg-card px-3 py-2 rounded">
             <FaFilter /> Refresh
           </button>
         </div>
@@ -215,20 +177,20 @@ const ComplaintManagement = () => {
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
           <input
-            className="p-2 border rounded"
+            className="rounded bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 border rounded">
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">
             <option>All</option>
             <option>Maintenance</option>
             <option>IT Support</option>
             <option>Plumbing</option>
           </select>
 
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="p-2 border rounded">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">
             <option>All</option>
             <option>Pending</option>
             <option>In Progress</option>
@@ -236,7 +198,7 @@ const ComplaintManagement = () => {
             <option>Rejected</option>
           </select>
 
-          <select value={priority} onChange={(e) => setPriority(e.target.value)} className="p-2 border rounded">
+          <select value={priority} onChange={(e) => setPriority(e.target.value)} className="rounded bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">
             <option>All</option>
             <option>High</option>
             <option>Medium</option>
@@ -246,12 +208,12 @@ const ComplaintManagement = () => {
 
         {/* States */}
         {loading && <FaSpinner className="animate-spin text-2xl" />}
-        {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-error">{error}</p>}
 
         {/* List */}
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map((c) => (
-            <div key={c._id} className="bg-white p-4 rounded shadow">
+            <div key={c._id} className="bg-card p-4 rounded shadow">
 
               <div className="flex justify-between">
                 <div className="flex items-center gap-2">
@@ -262,7 +224,7 @@ const ComplaintManagement = () => {
                 <span className="text-sm">{c.priority}</span>
               </div>
 
-              <p className="text-sm text-gray-600">{c.description}</p>
+              <p className="text-sm text-muted-foreground">{c.description}</p>
 
               <div className="mt-3 text-sm">
                 <p><b>Student:</b> {c.student}</p>
@@ -273,7 +235,7 @@ const ComplaintManagement = () => {
               {/* Actions */}
               <div className="flex gap-2 mt-4 flex-wrap">
 
-                <button onClick={() => setActiveComplaint(c)} className="px-2 py-1 bg-gray-200 rounded flex items-center gap-1">
+                <button onClick={() => setActiveComplaint(c)} className="px-2 py-1 bg-muted/70 rounded flex items-center gap-1">
                   <FaEye /> View
                 </button>
 
@@ -282,23 +244,23 @@ const ComplaintManagement = () => {
                     complaintId: c._id,
                     assignedTo: '',
                     estimatedResolution: '',
-                  })} className="px-2 py-1 bg-blue-600 text-white rounded">
+                  })} className="px-2 py-1 bg-primary/10 text-primary0 text-white rounded">
                     <FaEdit /> Assign
                   </button>
                 )}
 
                 {c.status === 'In Progress' && (
                   <>
-                    <button onClick={() => resolveComplaint(c._id)} className="px-2 py-1 bg-green-600 text-white rounded">
+                    <button onClick={() => resolveComplaint(c._id)} className="px-2 py-1 bg-primary/10 border border-primary/200 text-white rounded">
                       Resolve
                     </button>
-                    <button onClick={() => setRejectModal(c._id)} className="px-2 py-1 bg-red-600 text-white rounded">
+                    <button onClick={() => setRejectModal(c._id)} className="px-2 py-1 bg-error/10 border border-error/200 text-white rounded">
                       Reject
                     </button>
                   </>
                 )}
 
-                <button onClick={() => deleteComplaint(c._id)} className="px-2 py-1 bg-red-200 text-red-700 rounded">
+                <button onClick={() => deleteComplaint(c._id)} className="px-2 py-1 bg-error/20 border border-error/30 text-error rounded">
                   <FaTrash />
                 </button>
               </div>
@@ -309,19 +271,19 @@ const ComplaintManagement = () => {
         {/* Modals (simplified for clarity) */}
         {assignModal && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white p-5 rounded w-96">
+            <div className="bg-card p-5 rounded w-96">
               <h3 className="font-bold mb-3">Assign Complaint</h3>
 
               <input
                 placeholder="Assign to"
-                className="border p-2 w-full mb-2"
+                className="w-full mb-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                 value={assignModal.assignedTo}
                 onChange={(e) =>
                   setAssignModal({ ...assignModal, assignedTo: e.target.value })
                 }
               />
 
-              <button onClick={assignComplaint} className="bg-blue-600 text-white px-3 py-2 rounded w-full">
+              <button onClick={assignComplaint} className="bg-primary/10 text-primary0 text-white px-3 py-2 rounded w-full">
                 Assign
               </button>
             </div>
@@ -330,13 +292,46 @@ const ComplaintManagement = () => {
 
         {activeComplaint && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white p-6 rounded w-[600px]">
+            <div className="bg-card p-6 rounded w-[600px]">
               <h2 className="text-xl font-bold">{activeComplaint.title}</h2>
               <p className="mt-2">{activeComplaint.description}</p>
 
-              <button onClick={() => setActiveComplaint(null)} className="mt-4 px-3 py-2 bg-gray-200 rounded">
+              <button onClick={() => setActiveComplaint(null)} className="mt-4 px-3 py-2 bg-muted/70 rounded">
                 Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {rejectModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-card p-5 rounded w-full max-w-md mx-4">
+              <h3 className="font-bold mb-3">Reject complaint</h3>
+              <textarea
+                className="w-full mb-3 min-h-[100px] rounded bg-muted/30 border border-border text-foreground p-2"
+                placeholder="Reason for rejection"
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRejectModal(null);
+                    setRejectReason('');
+                  }}
+                  className="px-3 py-2 rounded bg-muted/70"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void rejectComplaint()}
+                  className="px-3 py-2 rounded bg-error/20 text-error"
+                >
+                  Reject
+                </button>
+              </div>
             </div>
           </div>
         )}

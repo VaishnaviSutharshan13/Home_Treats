@@ -97,7 +97,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-[calc(100vh-4rem)] flex">
       {/* Left Side - Hostel Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div
@@ -112,7 +112,7 @@ const ForgotPassword = () => {
         {/* Overlay Content */}
         <div className="relative z-10 flex flex-col justify-center items-center h-full text-white p-12">
           <div className="text-center">
-            <div className="w-20 h-20 bg-gray-100 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/20">
+            <div className="w-20 h-20 bg-muted backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/20">
               <FaShieldAlt className="w-10 h-10 text-blue-300" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -127,13 +127,13 @@ const ForgotPassword = () => {
             {/* Step indicator */}
             <div className="flex items-center justify-center space-x-4 mb-10">
               <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${step === 'email' ? 'bg-white/20 border border-white/30' : 'bg-blue-400/20'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === 'email' ? 'bg-blue-400 text-white' : 'bg-blue-300 text-blue-900'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === 'email' ? 'bg-blue-400 text-white' : 'bg-blue-300 text-primary'}`}>
                   {step === 'reset' ? <FaCheck className="w-3 h-3" /> : '1'}
                 </div>
                 <span className="text-sm text-blue-100">Verify Email</span>
               </div>
               <div className="w-8 h-0.5 bg-white/30"></div>
-              <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${step === 'reset' ? 'bg-white/20 border border-white/30' : 'bg-gray-50'}`}>
+              <div className={`flex items-center space-x-2 px-4 py-2 rounded-full ${step === 'reset' ? 'bg-white/20 border border-white/30' : 'bg-muted'}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${step === 'reset' ? 'bg-blue-400 text-white' : 'bg-white/20 text-white/60'}`}>
                   2
                 </div>
@@ -161,7 +161,7 @@ const ForgotPassword = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                 <FaHome className="w-5 h-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+              <span className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                 Home_Treats
               </span>
             </Link>
@@ -171,17 +171,17 @@ const ForgotPassword = () => {
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
                 {step === 'email' ? (
-                  <FaEnvelope className="w-8 h-8 text-blue-600" />
+                  <FaEnvelope className="w-8 h-8 text-primary" />
                 ) : (
-                  <FaKey className="w-8 h-8 text-blue-600" />
+                  <FaKey className="w-8 h-8 text-primary" />
                 )}
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
                 {step === 'email' ? 'Forgot Password' : 'Reset Password'}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {step === 'email'
                   ? "Enter your email address and we'll verify your account"
                   : 'Enter your new password below'}
@@ -202,10 +202,10 @@ const ForgotPassword = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50/80 backdrop-blur border border-red-200 rounded-xl">
+              <div className="mb-6 p-4 bg-error/10 border border-error/20/80 backdrop-blur border border-red-200 rounded-xl">
                 <div className="flex items-center space-x-2">
-                  <FaExclamationTriangle className="w-5 h-5 text-red-600" />
-                  <span className="text-red-700 text-sm font-medium">{error}</span>
+                  <FaExclamationTriangle className="w-5 h-5 text-error" />
+                  <span className="text-error text-sm font-medium">{error}</span>
                 </div>
               </div>
             )}
@@ -214,12 +214,12 @@ const ForgotPassword = () => {
             {!success && step === 'email' && (
               <form onSubmit={handleEmailSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground/90 mb-2">
                     Email Address
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FaEnvelope className="w-5 h-5 text-gray-500" />
+                      <FaEnvelope className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <input
                       type="email"
@@ -228,8 +228,8 @@ const ForgotPassword = () => {
                         setEmail(e.target.value);
                         if (error) setError(null);
                       }}
-                      className={`w-full pl-12 pr-4 py-3 bg-gray-500 backdrop-blur border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ${
-                        error ? 'border-red-500 focus:ring-red-500 bg-red-50/50' : 'border-gray-300 hover:border-gray-400'
+                      className={`w-full pl-12 pr-4 py-3 bg-muted0 backdrop-blur border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ${
+                        error ? 'border-red-500 focus:ring-red-500 bg-error/10 border border-error/20/50' : 'border-gray-300 hover:border-gray-400'
                       }`}
                       placeholder="john@example.com"
                     />
@@ -260,10 +260,10 @@ const ForgotPassword = () => {
             {!success && step === 'reset' && (
               <form onSubmit={handleResetPassword} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                  <label className="block text-sm font-medium text-foreground/90 mb-2">New Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FaLock className="w-5 h-5 text-gray-500" />
+                      <FaLock className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -272,13 +272,13 @@ const ForgotPassword = () => {
                         setNewPassword(e.target.value);
                         setError(null);
                       }}
-                      className="w-full pl-12 pr-12 py-3 bg-gray-500 backdrop-blur border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-300"
+                      className="w-full pl-12 pr-12 py-3 bg-muted0 backdrop-blur border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-300"
                       placeholder="Minimum 6 characters"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 transition-colors duration-200"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground transition-colors duration-200"
                     >
                       {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
                     </button>
@@ -286,10 +286,10 @@ const ForgotPassword = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                  <label className="block text-sm font-medium text-foreground/90 mb-2">Confirm Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FaLock className="w-5 h-5 text-gray-500" />
+                      <FaLock className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -298,13 +298,13 @@ const ForgotPassword = () => {
                         setConfirmPassword(e.target.value);
                         setError(null);
                       }}
-                      className="w-full pl-12 pr-12 py-3 bg-gray-500 backdrop-blur border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-300"
+                      className="w-full pl-12 pr-12 py-3 bg-muted0 backdrop-blur border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-300"
                       placeholder="Re-enter your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 transition-colors duration-200"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground transition-colors duration-200"
                     >
                       {showConfirmPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
                     </button>
@@ -348,7 +348,7 @@ const ForgotPassword = () => {
             <div className="mt-6 text-center">
               <Link
                 to="/login"
-                className="inline-flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                className="inline-flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 <FaArrowLeft className="w-4 h-4" />
                 <span>Back to Login</span>

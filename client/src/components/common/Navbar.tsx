@@ -62,9 +62,11 @@ const Navbar = () => {
     "text-muted-foreground hover:bg-surface-hover hover:text-primary";
   const linkActive = "bg-surface-active text-foreground";
 
+  // Navbar is now permanently visible on all routes!
+
   return (
     <nav
-      className={`fixed inset-x-0 top-0 z-50 isolate border-b border-border bg-navbar/95 backdrop-blur-md transition-shadow duration-300 ${
+      className={`sticky inset-x-0 top-0 z-50 isolate border-b border-border bg-navbar/95 backdrop-blur-md transition-shadow duration-300 ${
         scrolled
           ? "shadow-md shadow-foreground/10"
           : "shadow-sm shadow-foreground/5"
@@ -90,21 +92,32 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden items-center gap-0.5 md:flex">
+          {!isAuthenticated && (
+            <>
+              <Link
+                to="/"
+                className={`${linkBase} ${location.pathname === "/" ? linkActive : linkIdle}`}
+              >
+                <FaHome className="h-4 w-4" />
+                Home
+              </Link>
+              <Link
+                to="/about"
+                className={`${linkBase} ${location.pathname === "/about" ? linkActive : linkIdle}`}
+              >
+                About Us
+              </Link>
+            </>
+          )}
+
           <Link
-            to="/"
-            className={`${linkBase} ${location.pathname === "/" ? linkActive : linkIdle}`}
+            to="/contact"
+            className={`${linkBase} ${location.pathname === "/contact" ? linkActive : linkIdle}`}
           >
-            <FaHome className="h-4 w-4" />
-            Home
+            Contact Us
           </Link>
-          <Link
-            to="/rooms"
-            className={`${linkBase} ${location.pathname === "/rooms" ? linkActive : linkIdle}`}
-          >
-            <FaBed className="h-4 w-4" />
-            Rooms
-          </Link>
-          {dashboardLink && (
+
+          {isAuthenticated && dashboardLink && (
             <Link
               to={dashboardLink.href}
               className={`${linkBase} ${location.pathname === dashboardLink.href ? linkActive : linkIdle}`}
@@ -116,12 +129,6 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            to="/contact"
-            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30 transition hover:bg-primary-hover"
-          >
-            Book now
-          </Link>
           {isAuthenticated ? (
             <>
               <Link
@@ -151,13 +158,21 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <Link
-              to="/login"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover hover:text-primary"
-            >
-              <FaSignInAlt className="h-4 w-4" />
-              Login
-            </Link>
+            <>
+              <Link
+                to="/login"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-hover hover:text-primary transition"
+              >
+                <FaSignInAlt className="h-4 w-4" />
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/30 transition hover:bg-primary-hover"
+              >
+                Sign Up
+              </Link>
+            </>
           )}
         </div>
 
@@ -179,38 +194,43 @@ const Navbar = () => {
       {mobileOpen && (
         <div className="border-t border-border bg-navbar px-4 py-3 md:hidden">
           <div className="flex flex-col gap-1">
+            {!isAuthenticated && (
+              <>
+                <Link
+                  to="/"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"
+                  onClick={() => setMobileOpen(false)}
+                >
+                   Home
+                </Link>
+                <Link
+                  to="/about"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  About Us
+                </Link>
+              </>
+            )}
+            
             <Link
-              to="/"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
+              to="/contact"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"
               onClick={() => setMobileOpen(false)}
             >
-              Home
+              Contact Us
             </Link>
-            <Link
-              to="/rooms"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
-              onClick={() => setMobileOpen(false)}
-            >
-              Rooms
-            </Link>
-            {dashboardLink && (
+
+            {isAuthenticated && dashboardLink && (
               <Link
                 to={dashboardLink.href}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"
                 onClick={() => setMobileOpen(false)}
               >
                 {dashboardLink.name}
               </Link>
             )}
-            <div className="mt-2 flex gap-2">
-              <Link
-                to="/contact"
-                className="flex-[2] rounded-xl bg-primary py-3 text-center text-sm font-semibold text-primary-foreground"
-                onClick={() => setMobileOpen(false)}
-              >
-                Book now
-              </Link>
-            </div>
+
             {isAuthenticated ? (
               <div className="mt-2 flex flex-col gap-1 border-t border-border pt-3">
                 <Link
@@ -229,13 +249,22 @@ const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="mt-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
-                onClick={() => setMobileOpen(false)}
-              >
-                Login
-              </Link>
+              <div className="mt-2 flex flex-col gap-2">
+                <Link
+                  to="/login"
+                  className="rounded-lg px-3 py-2.5 text-center text-sm font-medium bg-muted hover:bg-surface-hover text-foreground"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="rounded-lg px-3 py-2.5 text-center text-sm font-medium bg-primary text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         </div>

@@ -1,13 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FaCalendarAlt,
   FaCheckCircle,
   FaClock,
   FaCloudUploadAlt,
+  FaDollarSign,
   FaFilePdf,
-  FaMoneyBillWave,
+  FaReceipt,
+  FaSearch,
   FaSpinner,
   FaTimes,
+  FaTimesCircle,
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import { feesService, paymentService } from '../../services';
@@ -28,8 +31,6 @@ interface Fee {
   paymentMethod: string | null;
   transactionId: string | null;
   semester: string;
-  paidAmount?: number;
-  remainingAmount?: number;
 }
 
 interface Receipt {
@@ -80,6 +81,15 @@ interface PaymentErrors {
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
 
+const emptyPaymentForm = (): PaymentForm => ({
+  bankName: '',
+  accountHolder: '',
+  transactionId: '',
+  paymentDate: '',
+  amount: '',
+  slip: null,
+});
+
 const MyFees = () => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -92,26 +102,43 @@ const MyFees = () => {
   const [submitting, setSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [form, setForm] = useState<PaymentForm>({
-    bankName: '',
-    accountHolder: '',
-    transactionId: '',
-    paymentDate: '',
-    amount: '',
-    slip: null,
-  });
+  const [form, setForm] = useState<PaymentForm>(emptyPaymentForm());
   const [errors, setErrors] = useState<PaymentErrors>({});
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [receiptLoading, setReceiptLoading] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
 
   const apiOrigin = useMemo(() => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     return apiUrl.replace(/\/api\/?$/, '');
   }, []);
 
-  const getStudentId = () => {
+  const acceptedFileInfo = useMemo(
+    () => `JPG, PNG or PDF · max ${MAX_FILE_SIZE / (1024 * 1024)} MB`,
+    [],
+  );
+
+  const formatSlipUrl = useCallback(
+    (url: string) => {
+      if (!url) return '#';
+      if (url.startsWith('http')) return url;
+      return `${apiOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
+    },
+    [apiOrigin],
+  );
+
+  const getStudentId = useCallback(() => {
     if (user?.studentId) return user.studentId;
-    const localUser = JSON.parse(localStorage.getItem('user') || '{}');
-    return localUser?.studentId || '';
-  };
+    try {
+      const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+      return localUser?.studentId || '';
+    } catch {
+      return '';
+    }
+  }, [user?.studentId]);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -125,46 +152,9 @@ const MyFees = () => {
     return Math.max(due, 0);
   };
 
-  const getEffectiveStatus = (fee: Fee): 'Paid' | 'Pending' | 'Overdue' | 'Partial' => {
-    const status = String(fee.paymentStatus || fee.status || '').toLowerCase();
-    if (status === 'paid') return 'Paid';
-    if (status === 'partial') return 'Partial';
-
-    const due = new Date(fee.dueDate);
-    due.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return due < today ? 'Overdue' : 'Pending';
-  };
-
-  const loadStudentFees = async () => {
-    try {
-      const studentId = getStudentId();
-      if (!studentId) return;
-      const res = await feesService.getByStudent(studentId);
-      setFees(res.data || []);
-    } catch (_err) {
-      showToast('error', 'Failed to load fees');
-    }
-  };
-
-  const loadPaymentHistory = async () => {
-    try {
-      const res = await paymentService.getStudent();
-      setPayments(res.data || []);
-    } catch (_err) {
-      showToast('error', 'Failed to load payment history');
-    }
-  };
-
-  useEffect(() => {
-    if (user?.studentId) {
-      fetchFees();
-    }
-  }, [user?.studentId]);
-
-  const fetchFees = async () => {
-    if (!user?.studentId) {
+  const fetchFees = useCallback(async () => {
+    const studentId = getStudentId();
+    if (!studentId) {
       setError('User information not available');
       setLoading(false);
       return;
@@ -172,14 +162,37 @@ const MyFees = () => {
     try {
       setLoading(true);
       setError('');
-      const res = await feesService.getByStudent(user.studentId);
+      const res = await feesService.getByStudent(studentId);
       if (res.success) setFees(res.data || []);
-    } catch (err) {
+      else setFees(res.data || []);
+    } catch {
       setError('Failed to load fee information');
+      showToast('error', 'Failed to load fees');
     } finally {
       setLoading(false);
     }
-  };
+  }, [getStudentId]);
+
+  const loadPaymentHistory = useCallback(async () => {
+    if (!getStudentId()) {
+      setPaymentsLoading(false);
+      return;
+    }
+    try {
+      setPaymentsLoading(true);
+      const res = await paymentService.getStudent();
+      setPayments(res.data || []);
+    } catch {
+      showToast('error', 'Failed to load payment history');
+    } finally {
+      setPaymentsLoading(false);
+    }
+  }, [getStudentId]);
+
+  useEffect(() => {
+    void fetchFees();
+    void loadPaymentHistory();
+  }, [fetchFees, loadPaymentHistory]);
 
   const formatLKR = (amount: number) => `LKR ${amount.toLocaleString()}`;
 
@@ -191,39 +204,145 @@ const MyFees = () => {
         setReceipt(res.data);
         setShowReceipt(true);
       }
-    } catch (err) {
-      console.error('Failed to load receipt');
+    } catch {
+      showToast('error', 'Failed to load receipt');
     } finally {
       setReceiptLoading(false);
     }
   };
 
-  const filteredFees = fees.filter(fee => {
-    const matchesSearch = fee.feeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredFees = fees.filter((fee) => {
+    const matchesSearch =
+      fee.feeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
       fee.semester.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'All' || fee.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  const totalPending = fees.filter(f => f.status === 'Pending' || f.status === 'Overdue').reduce((sum, f) => sum + f.amount, 0);
-  const totalPaid = fees.filter(f => f.status === 'Paid').reduce((sum, f) => sum + f.amount, 0);
+  const totalPending = fees
+    .filter((f) => f.status === 'Pending' || f.status === 'Overdue')
+    .reduce((sum, f) => sum + f.amount, 0);
+  const totalPaid = fees.filter((f) => f.status === 'Paid').reduce((sum, f) => sum + f.amount, 0);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Paid': return 'bg-surface-active text-primary';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800';
-      case 'Overdue': return 'bg-error/10 text-error';
-      case 'Partial': return 'bg-info/10 text-info';
-      default: return 'bg-gray-100 text-foreground/90';
+      case 'Paid':
+        return 'bg-surface-active text-primary';
+      case 'Pending':
+        return 'bg-warning/20 border border-warning/30 text-warning';
+      case 'Overdue':
+        return 'bg-error/10 text-error';
+      case 'Partial':
+        return 'bg-info/10 text-info';
+      default:
+        return 'bg-muted text-foreground/90';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Paid': return <FaCheckCircle className="text-primary" />;
-      case 'Pending': return <FaClock className="text-yellow-600" />;
-      case 'Overdue': return <FaTimesCircle className="text-error" />;
-      default: return <FaClock className="text-muted-foreground" />;
+      case 'Paid':
+        return <FaCheckCircle className="text-primary" />;
+      case 'Pending':
+        return <FaClock className="text-warning" />;
+      case 'Overdue':
+        return <FaTimesCircle className="text-error" />;
+      default:
+        return <FaClock className="text-muted-foreground" />;
+    }
+  };
+
+  const openPaymentModal = (fee: Fee) => {
+    setSelectedFee(fee);
+    setForm(emptyPaymentForm());
+    setErrors({});
+    setShowModal(true);
+  };
+
+  const closePaymentModal = () => {
+    setShowModal(false);
+    setSelectedFee(null);
+    setForm(emptyPaymentForm());
+    setErrors({});
+    setDragActive(false);
+  };
+
+  const onFilePicked = (file: File | null) => {
+    setErrors((prev) => ({ ...prev, slip: undefined, general: undefined }));
+    if (!file) {
+      setForm((prev) => ({ ...prev, slip: null }));
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setErrors((prev) => ({ ...prev, slip: 'Use JPG, PNG, or PDF' }));
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setErrors((prev) => ({ ...prev, slip: 'File is too large' }));
+      return;
+    }
+    setForm((prev) => ({ ...prev, slip: file }));
+  };
+
+  const submitDisabled =
+    submitting ||
+    !form.bankName ||
+    !form.accountHolder.trim() ||
+    !form.transactionId.trim() ||
+    !form.paymentDate ||
+    !form.amount ||
+    !form.slip;
+
+  const handleSubmitPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFee) return;
+
+    const next: PaymentErrors = {};
+    if (!form.bankName) next.bankName = 'Select a bank';
+    if (!form.accountHolder.trim()) next.accountHolder = 'Required';
+    if (!form.transactionId.trim()) next.transactionId = 'Required';
+    if (!form.paymentDate) next.paymentDate = 'Required';
+    const amt = Number(form.amount);
+    if (!Number.isFinite(amt) || amt <= 0) next.amount = 'Enter a valid amount';
+    const due = getDueAmount(selectedFee);
+    if (Number.isFinite(amt) && amt > due + 0.01) next.amount = `Cannot exceed ${due.toLocaleString()}`;
+    if (!form.slip) next.slip = 'Upload your bank slip';
+
+    setErrors(next);
+    if (Object.keys(next).length) return;
+
+    try {
+      setSubmitting(true);
+      const fd = new FormData();
+      fd.append('feeId', selectedFee._id);
+      fd.append('bankName', form.bankName);
+      fd.append('accountHolder', form.accountHolder.trim());
+      fd.append('transactionId', form.transactionId.trim());
+      fd.append('paymentDate', form.paymentDate);
+      fd.append('amount', String(amt));
+      if (form.slip) fd.append('slip', form.slip);
+      await paymentService.create(fd);
+      showToast('success', 'Payment proof submitted');
+      closePaymentModal();
+      await fetchFees();
+      await loadPaymentHistory();
+    } catch (err: unknown) {
+      const message =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data &&
+        typeof (err.response.data as { message: unknown }).message === 'string'
+          ? (err.response.data as { message: string }).message
+          : 'Submission failed';
+      setErrors({ general: message });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -231,14 +350,17 @@ const MyFees = () => {
     <div className="min-h-screen bg-background flex">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
-      <div className="lg:ml-64">
-        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full">
+      <div className="lg:ml-64 flex-1 min-w-0">
+        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground/90">My Fees</h1>
               <p className="text-muted-foreground text-sm mt-1">View your fee records and payment history</p>
             </div>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -247,6 +369,18 @@ const MyFees = () => {
         </header>
 
         <div className="p-6">
+          {toast && (
+            <div
+              className={`mb-4 rounded-lg border px-4 py-2 text-sm font-medium ${
+                toast.type === 'success'
+                  ? 'border-primary/30 bg-primary/10 text-primary'
+                  : 'border-error/30 bg-error/10 text-error'
+              }`}
+            >
+              {toast.message}
+            </div>
+          )}
+
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <FaSpinner className="animate-spin text-4xl text-primary" />
@@ -254,11 +388,15 @@ const MyFees = () => {
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-error mb-4">{error}</p>
-              <button onClick={fetchFees} className="px-4 py-2 rounded-lg shadow-sm bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300">Retry</button>
+              <button
+                onClick={() => void fetchFees()}
+                className="px-4 py-2 rounded-lg shadow-sm bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300"
+              >
+                Retry
+              </button>
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-card rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3">
@@ -273,12 +411,12 @@ const MyFees = () => {
                 </div>
                 <div className="bg-card rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                      <FaClock className="text-yellow-600" />
+                    <div className="w-10 h-10 bg-warning/20 border border-warning/30 rounded-lg flex items-center justify-center">
+                      <FaClock className="text-warning" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Pending Amount</p>
-                      <p className="text-xl font-bold text-yellow-600">{formatLKR(totalPending)}</p>
+                      <p className="text-xl font-bold text-warning">{formatLKR(totalPending)}</p>
                     </div>
                   </div>
                 </div>
@@ -295,7 +433,6 @@ const MyFees = () => {
                 </div>
               </div>
 
-              {/* Search & Filter */}
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -320,7 +457,6 @@ const MyFees = () => {
                 </select>
               </div>
 
-              {/* Fee Records */}
               {filteredFees.length === 0 ? (
                 <div className="text-center py-12 bg-card rounded-xl shadow-sm border">
                   <FaDollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
@@ -349,8 +485,10 @@ const MyFees = () => {
                             </td>
                             <td className="px-6 py-4">
                               <div className="text-sm font-semibold text-foreground">{formatLKR(fee.amount)}</div>
-                              {fee.status === 'Partial' && fee.remainingAmount && (
-                                <div className="text-xs text-muted-foreground">Remaining: {formatLKR(fee.remainingAmount)}</div>
+                              {fee.status === 'Partial' && fee.remainingAmount != null && (
+                                <div className="text-xs text-muted-foreground">
+                                  Remaining: {formatLKR(fee.remainingAmount)}
+                                </div>
                               )}
                             </td>
                             <td className="px-6 py-4 text-sm text-foreground">
@@ -362,7 +500,9 @@ const MyFees = () => {
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-2">
                                 {getStatusIcon(fee.status)}
-                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(fee.status)}`}>
+                                <span
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(fee.status)}`}
+                                >
                                   {fee.status}
                                 </span>
                               </div>
@@ -377,15 +517,25 @@ const MyFees = () => {
                                 <span className="text-muted-foreground">—</span>
                               )}
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-6 py-4 space-y-1">
                               {fee.status === 'Paid' && (
                                 <button
-                                  onClick={() => handleViewReceipt(fee._id)}
+                                  type="button"
+                                  onClick={() => void handleViewReceipt(fee._id)}
                                   disabled={receiptLoading}
-                                  className="text-info hover:text-info flex items-center gap-1 text-sm"
+                                  className="text-info hover:text-info flex items-center gap-1 text-sm disabled:opacity-50"
                                 >
                                   <FaReceipt className="w-3 h-3" />
                                   Receipt
+                                </button>
+                              )}
+                              {fee.status !== 'Paid' && (
+                                <button
+                                  type="button"
+                                  onClick={() => openPaymentModal(fee)}
+                                  className="text-primary text-sm font-medium hover:underline"
+                                >
+                                  Submit payment
                                 </button>
                               )}
                             </td>
@@ -400,10 +550,9 @@ const MyFees = () => {
           )}
         </div>
 
-        {/* Receipt Modal */}
         {showReceipt && receipt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-card rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-card rounded-xl shadow-2xl max-w-md w-full p-6">
               <div className="text-center mb-6">
                 <FaReceipt className="w-10 h-10 text-primary mx-auto mb-2" />
                 <h3 className="text-xl font-bold text-foreground/90">Payment Receipt</h3>
@@ -412,7 +561,9 @@ const MyFees = () => {
               <div className="space-y-3 border-t border-b py-4 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Student</span>
-                  <span className="font-medium">{receipt.studentName} ({receipt.studentId})</span>
+                  <span className="font-medium">
+                    {receipt.studentName} ({receipt.studentId})
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Fee Type</span>
@@ -424,7 +575,9 @@ const MyFees = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Amount</span>
-                  <span className="font-bold text-primary">{receipt.currency} {receipt.amount.toLocaleString()}</span>
+                  <span className="font-bold text-primary">
+                    {receipt.currency} {receipt.amount.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Payment Date</span>
@@ -443,8 +596,9 @@ const MyFees = () => {
                 Generated: {new Date(receipt.generatedAt).toLocaleString()}
               </p>
               <button
+                type="button"
                 onClick={() => setShowReceipt(false)}
-                className="w-full px-4 py-2 bg-gray-100 text-foreground/90 rounded-lg hover:bg-gray-200"
+                className="w-full px-4 py-2 bg-muted text-foreground/90 rounded-lg hover:bg-muted/70"
               >
                 Close
               </button>
@@ -452,7 +606,7 @@ const MyFees = () => {
           </div>
         )}
 
-        <div className="mt-8 bg-card/85 backdrop-blur-sm rounded-2xl border border-border shadow-lg overflow-hidden">
+        <div className="mx-6 mb-10 bg-card/85 backdrop-blur-sm rounded-2xl border border-border shadow-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground/90">Payment History</h2>
             {paymentsLoading && <FaSpinner className="animate-spin text-secondary" />}
@@ -480,8 +634,12 @@ const MyFees = () => {
                     <tr key={payment._id} className="hover:bg-secondary/10/40">
                       <td className="px-4 py-3 text-sm font-medium text-foreground/90">{payment.transactionId}</td>
                       <td className="px-4 py-3 text-sm text-foreground/90">{payment.bankName}</td>
-                      <td className="px-4 py-3 text-sm text-foreground/90">LKR {Number(payment.amount || 0).toLocaleString()}</td>
-                      <td className="px-4 py-3 text-sm text-foreground/90">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-sm text-foreground/90">
+                        LKR {Number(payment.amount || 0).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-foreground/90">
+                        {new Date(payment.paymentDate).toLocaleDateString()}
+                      </td>
                       <td className="px-4 py-3 text-sm">
                         <a
                           href={formatSlipUrl(payment.slipUrl)}
@@ -524,17 +682,23 @@ const MyFees = () => {
                   Due amount: LKR {getDueAmount(selectedFee).toLocaleString()} | {selectedFee.feeType}
                 </p>
               </div>
-              <button onClick={closePaymentModal} className="p-2 text-muted-foreground hover:text-foreground/90 rounded-lg hover:bg-muted">
+              <button
+                type="button"
+                onClick={closePaymentModal}
+                className="p-2 text-muted-foreground hover:text-foreground/90 rounded-lg hover:bg-muted"
+              >
                 <FaTimes />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitPayment} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form onSubmit={(e) => void handleSubmitPayment(e)} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-medium text-foreground/90 mb-1.5">Bank Selection</label>
                 <select
                   value={form.bankName}
-                  onChange={(e) => setForm((prev) => ({ ...prev, bankName: e.target.value as PaymentForm['bankName'] }))}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, bankName: e.target.value as PaymentForm['bankName'] }))
+                  }
                   className="w-full rounded-xl px-4 py-3 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                 >
                   <option value="">Select bank</option>
@@ -571,7 +735,7 @@ const MyFees = () => {
               <div>
                 <label className="block text-sm font-medium text-foreground/90 mb-1.5">Payment Date</label>
                 <div className="relative">
-                  <FaCalendarAlt className="absolute left-4 top-4 text-gray-400" />
+                  <FaCalendarAlt className="absolute left-4 top-4 text-muted-foreground" />
                   <input
                     type="date"
                     max={new Date().toISOString().split('T')[0]}

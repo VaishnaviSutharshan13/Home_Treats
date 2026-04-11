@@ -1,25 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  FaBars,
-  FaCheck,
   FaChevronLeft,
   FaEdit,
   FaEye,
-  FaFilter,
-  FaPause,
-  FaPlay,
   FaPlus,
-  FaSearch,
   FaSpinner,
-  FaTimes,
-  FaUserCheck,
-  FaUserPlus,
-  FaUserSlash,
   FaTrash,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../components/layout/Sidebar';
-import { roomService, studentService } from '../../services';
+import { studentService } from '../../services';
 
 type StudentStatus = 'Pending' | 'Approved' | 'Rejected' | 'Inactive';
 
@@ -54,14 +44,6 @@ interface StudentForm {
   roomNumber: string;
   course: string;
   status: StudentStatus;
-}
-
-interface RoomOption {
-  _id: string;
-  roomNumber: string;
-  status: 'Available' | 'Occupied' | 'Maintenance';
-  occupied: number;
-  capacity: number;
 }
 
 type StudentFormErrors = Partial<Record<'email' | 'phone' | 'emergencyContact', string>>;
@@ -100,7 +82,6 @@ const StudentManagement = () => {
   const [viewing, setViewing] = useState<StudentRow | null>(null);
   const [form, setForm] = useState<StudentForm>(emptyForm);
   const [formErrors, setFormErrors] = useState<StudentFormErrors>({});
-  const [rooms, setRooms] = useState<RoomOption[]>([]);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ type, message });
@@ -122,16 +103,8 @@ const StudentManagement = () => {
     }
   };
 
-  const fetchRooms = async () => {
-    try {
-      const res = await roomService.getAll();
-      setRooms(res.data || []);
-    } catch {}
-  };
-
   useEffect(() => {
     fetchStudents();
-    fetchRooms();
   }, []);
 
   useEffect(() => {
@@ -140,6 +113,10 @@ const StudentManagement = () => {
   }, [search, statusFilter]);
 
   const validateForm = () => {
+    if (editing) {
+      setFormErrors({});
+      return true;
+    }
     const errors: StudentFormErrors = {};
     if (!isEmailFormatValid(form.email)) errors.email = 'Invalid email';
     if (!TEN_DIGIT_REGEX.test(form.phone)) errors.phone = 'Phone must be 10 digits';
@@ -185,19 +162,31 @@ const StudentManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8ff]">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} userRole="admin" />
 
       <div className="lg:ml-64 p-6">
+        {toast && (
+          <div
+            className={`fixed top-5 right-5 z-50 px-4 py-2 rounded-lg text-sm font-medium ${
+              toast.type === 'success'
+                ? 'bg-primary/15 text-primary border border-primary/30'
+                : 'bg-error/15 text-error border border-error/30'
+            }`}
+          >
+            {toast.message}
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex justify-between mb-4">
           <div>
-            <Link to="/admin/dashboard" className="text-sm text-gray-500 flex items-center gap-1">
+            <Link to="/admin/dashboard" className="text-sm text-muted-foreground flex items-center gap-1">
               <FaChevronLeft /> Dashboard
             </Link>
             <h1 className="text-2xl font-bold">Student Management</h1>
           </div>
-          <button onClick={() => setShowModal(true)} className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 px-4 py-2 rounded-lg flex items-center gap-2">
             <FaPlus /> Add
           </button>
         </div>
@@ -208,9 +197,9 @@ const StudentManagement = () => {
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border px-3 py-2 rounded-lg"
+            className="rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
           />
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="border px-3 py-2 rounded-lg">
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">
             <option>All</option>
             <option>Pending</option>
             <option>Approved</option>
@@ -223,8 +212,8 @@ const StudentManagement = () => {
         {loading ? (
           <div className="flex justify-center py-10"><FaSpinner className="animate-spin" /></div>
         ) : (
-          <table className="w-full bg-white rounded-xl overflow-hidden">
-            <thead className="bg-surface-active">
+          <table className="w-full bg-card rounded-xl overflow-hidden">
+            <thead className="bg-surface-active border-b border-border">
               <tr>
                 <th className="p-3 text-left">Name</th>
                 <th>Email</th>
@@ -235,7 +224,7 @@ const StudentManagement = () => {
             </thead>
             <tbody>
               {students.map((s) => (
-                <tr key={s._id} className="border-t">
+                <tr key={s._id} className="border-t border-border hover:bg-muted/40 transition-colors">
                   <td className="p-3">{s.name}</td>
                   <td>{s.email}</td>
                   <td>{s.status}</td>
@@ -243,7 +232,7 @@ const StudentManagement = () => {
                   <td className="flex gap-2 p-3">
                     <button onClick={() => setViewing(s)}><FaEye /></button>
                     <button onClick={() => { setEditing(s); setShowModal(true); }}><FaEdit /></button>
-                    <button onClick={() => deleteStudent(s)} className="text-red-600"><FaTrash /></button>
+                    <button onClick={() => deleteStudent(s)} className="text-error"><FaTrash /></button>
                   </td>
                 </tr>
               ))}
@@ -254,27 +243,66 @@ const StudentManagement = () => {
         {/* Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <form onSubmit={submit} className="bg-white p-6 rounded-xl space-y-3 w-full max-w-md">
+            <form onSubmit={submit} className="bg-card p-6 rounded-xl space-y-3 w-full max-w-md">
               <h2 className="text-lg font-bold">{editing ? 'Edit' : 'Add'} Student</h2>
 
-              <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-              <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-              <input placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: sanitizePhone(e.target.value) })} required />
+              <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
+              <div>
+                <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
+                {formErrors.email && <p className="text-error text-xs mt-1">{formErrors.email}</p>}
+              </div>
+              <div>
+                <input placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: sanitizePhone(e.target.value) })} required className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
+                {formErrors.phone && <p className="text-error text-xs mt-1">{formErrors.phone}</p>}
+              </div>
 
-              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as StudentStatus })}>
+              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as StudentStatus })} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30 appearance-none">
                 <option>Pending</option>
                 <option>Approved</option>
                 <option>Rejected</option>
                 <option>Inactive</option>
               </select>
 
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" disabled={submitting} className="bg-primary text-white px-4 py-2 rounded">
+              {!editing && (
+                <div>
+                  <input
+                    placeholder="Emergency contact (10 digits)"
+                    value={form.emergencyContact}
+                    onChange={(e) => setForm({ ...form, emergencyContact: sanitizePhone(e.target.value) })}
+                    required
+                    className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                  />
+                  {formErrors.emergencyContact && <p className="text-error text-xs mt-1">{formErrors.emergencyContact}</p>}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="bg-muted hover:bg-muted/70 text-foreground transition-colors px-4 py-2 rounded-lg">Cancel</button>
+                <button type="submit" disabled={submitting} className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 px-4 py-2 rounded-lg">
                   {submitting ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {viewing && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div className="bg-card rounded-xl p-6 max-w-lg w-full space-y-2 text-sm">
+              <h3 className="text-lg font-bold text-foreground">{viewing.name}</h3>
+              <p><span className="text-muted-foreground">Email:</span> {viewing.email}</p>
+              <p><span className="text-muted-foreground">Student ID:</span> {viewing.studentId}</p>
+              <p><span className="text-muted-foreground">Phone:</span> {viewing.phone}</p>
+              <p><span className="text-muted-foreground">Status:</span> {viewing.status}</p>
+              <p><span className="text-muted-foreground">Room:</span> {viewing.roomNumber || '—'}</p>
+              <button
+                type="button"
+                onClick={() => setViewing(null)}
+                className="mt-4 w-full py-2 rounded-lg bg-muted hover:bg-muted/70 text-foreground"
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
       </div>

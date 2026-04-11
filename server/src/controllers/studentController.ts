@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import User from '../models/User';
+import Student from '../models/Student';
 import Booking from '../models/Booking';
 import Fee from '../models/Fee';
 import Room from '../models/Room';
@@ -116,7 +118,12 @@ export const getAllStudents = async (req: Request, res: Response) => {
 
 export const getStudentById = async (req: Request, res: Response) => {
   try {
-    const student = await User.findOne({ _id: req.params.id, role: 'student' });
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid student id' });
+    }
+    const student = await User.findOne({ _id: id, role: 'student' });
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
@@ -411,10 +418,21 @@ export const activateStudent = async (req: AuthRequest, res: Response) => {
     }
 
     student.approvalStatus = 'Approved';
+    student.status = 'Approved';
     student.approvedAt = new Date();
     student.rejectedAt = undefined;
     student.isActive = true;
     await student.save();
+
+    await Student.findOneAndUpdate(
+      {
+        $or: [
+          ...(student.studentId ? [{ studentId: student.studentId }] : []),
+          { email: student.email },
+        ],
+      },
+      { status: 'Active' },
+    );
 
     await createNotification(
       'Account Activated',
@@ -465,10 +483,21 @@ export const approveStudent = async (req: AuthRequest, res: Response) => {
     }
 
     student.approvalStatus = 'Approved';
+    student.status = 'Approved';
     student.approvedAt = new Date();
     student.rejectedAt = undefined;
     student.isActive = true;
     await student.save();
+
+    await Student.findOneAndUpdate(
+      {
+        $or: [
+          ...(student.studentId ? [{ studentId: student.studentId }] : []),
+          { email: student.email },
+        ],
+      },
+      { status: 'Active' },
+    );
 
     await createNotification(
       'Registration Approved',
@@ -499,10 +528,21 @@ export const rejectStudent = async (req: AuthRequest, res: Response) => {
     }
 
     student.approvalStatus = 'Rejected';
+    student.status = 'Rejected';
     student.rejectedAt = new Date();
     student.approvedAt = undefined;
     student.isActive = false;
     await student.save();
+
+    await Student.findOneAndUpdate(
+      {
+        $or: [
+          ...(student.studentId ? [{ studentId: student.studentId }] : []),
+          { email: student.email },
+        ],
+      },
+      { status: 'Inactive' },
+    );
 
     await createNotification(
       'Registration Rejected',
