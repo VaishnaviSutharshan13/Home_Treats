@@ -10,7 +10,7 @@ import {
   FaTwitter,
   FaWhatsapp,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -18,9 +18,14 @@ const Footer = () => {
   const onNewsletter = (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    window.location.href = `mailto:info@gowsitreats.lk?subject=Newsletter&body=Please add ${encodeURIComponent(email)} to updates.`;
+    window.location.href = `mailto:info@HomeTreats.lk?subject=Newsletter&body=Please add ${encodeURIComponent(email)} to updates.`;
     setEmail("");
   };
+
+  const location = useLocation();
+  if (['/login', '/register', '/forgot-password','/student/dashboard'].includes(location.pathname)) {
+    return null;
+  }
 
   return (
     <footer className="w-full border-t border-border bg-navbar">
@@ -107,10 +112,10 @@ const Footer = () => {
               <li className="flex items-start gap-2">
                 <FaEnvelope className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <a
-                  href="mailto:info@gowsitreats.lk"
+                  href="mailto:info@HomeTreats.lk"
                   className="hover:text-primary"
                 >
-                  info@gowsitreats.lk
+                  info@HomeTreats.lk
                 </a>
               </li>
               <li className="flex items-start gap-2">

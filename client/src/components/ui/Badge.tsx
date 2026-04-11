@@ -13,7 +13,7 @@ const Badge: React.FC<BadgeProps> = ({ children, variant = 'primary', size = 'md
     primary: 'border-primary/30 bg-primary/15 text-primary',
     secondary: 'border-secondary/30 bg-secondary/15 text-secondary',
     success: 'border-success/30 bg-success/15 text-success',
-    warning: 'border-warning/40 bg-warning/20 text-foreground dark:text-warning',
+    warning: 'border-warning/40 bg-warning/20 text-warning',
     error: 'border-error/30 bg-error/15 text-error',
     neutral: 'border-border bg-muted text-muted-foreground',
   };

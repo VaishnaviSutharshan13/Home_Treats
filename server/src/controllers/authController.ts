@@ -1,19 +1,30 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import User from '../models/User';
-import Student from '../models/Student';
+import crypto from "crypto";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import Student from "../models/Student";
+import User from "../models/User";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_here";
+const VALID_COURSES = [
+  "Computer Science",
+  "Engineering",
+  "Business",
+  "Medicine",
+  "Arts",
+  "Science",
+];
+const VALID_YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
 // LOGIN
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, studentId, identifier, password } = req.body;
-    const loginIdentifier = (identifier || email || studentId || '').trim();
+    const loginIdentifier = (identifier || email || studentId || "").trim();
 
     if (!loginIdentifier) {
-      return res.status(400).json({ success: false, message: 'Email or Student ID is required' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email or Student ID is required" });
     }
 
     const user = await User.findOne({
@@ -23,25 +34,31 @@ export const login = async (req: Request, res: Response) => {
       ],
     });
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     if (!user.isActive) {
-      return res.status(403).json({ success: false, message: 'Account is deactivated.' });
+      return res
+        .status(403)
+        .json({ success: false, message: "Account is deactivated." });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
-    if (user.role === 'student') {
+    if (user.role === "student") {
       const student = await Student.findOne({
         $or: [
           user.studentId ? { studentId: user.studentId } : null,
           { email: user.email },
         ].filter(Boolean) as any,
-      }).select('studentId room roomNumber status');
+      }).select("studentId room roomNumber status");
 
       // Backfill legacy student users that don't have studentId stored on User.
       if (!user.studentId && student?.studentId) {
@@ -55,37 +72,52 @@ export const login = async (req: Request, res: Response) => {
       }
 
       const studentStatus = student?.status;
-      let userStatusToSync: 'Pending' | 'Approved' | 'Rejected' | 'Inactive' | undefined;
-      
+      let userStatusToSync:
+        | "Pending"
+        | "Approved"
+        | "Rejected"
+        | "Inactive"
+        | undefined;
+
       // Convert Student status to User status
-      if (studentStatus === 'Active') {
-        userStatusToSync = 'Approved';
-      } else if (studentStatus === 'Inactive') {
-        userStatusToSync = 'Inactive';
+      if (studentStatus === "Active") {
+        userStatusToSync = "Approved";
+      } else if (studentStatus === "Inactive") {
+        userStatusToSync = "Inactive";
       } else {
         userStatusToSync = user.status;
       }
 
-      const latestStatus = userStatusToSync || user.status || 'Pending';
+      const latestStatus = userStatusToSync || user.status || "Pending";
 
-      if (user.status !== latestStatus || (!user.studentId && student?.studentId)) {
+      if (
+        user.status !== latestStatus ||
+        (!user.studentId && student?.studentId)
+      ) {
         user.status = latestStatus;
         await user.save();
       }
 
-      if (latestStatus === 'Pending') {
-        return res.status(403).json({ success: false, message: 'Your registration is waiting for admin approval.' });
+      if (latestStatus === "Pending") {
+        return res.status(403).json({
+          success: false,
+          message: "Your registration is waiting for admin approval.",
+        });
       }
 
-      if (latestStatus === 'Rejected') {
-        return res.status(403).json({ success: false, message: 'Your registration was rejected by the hostel administration.' });
+      if (latestStatus === "Rejected") {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Your registration was rejected by the hostel administration.",
+        });
       }
     }
 
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
     const userData: Record<string, any> = {
@@ -95,7 +127,7 @@ export const login = async (req: Request, res: Response) => {
       role: user.role,
       phone: user.phone,
     };
-    if (user.role === 'student') {
+    if (user.role === "student") {
       userData.studentId = user.studentId;
       userData.room = user.room;
       userData.roomNumber = user.roomNumber;
@@ -106,9 +138,15 @@ export const login = async (req: Request, res: Response) => {
       userData.status = user.status;
     }
 
-    res.json({ success: true, message: 'Login successful', data: { token, user: userData } });
+    res.json({
+      success: true,
+      message: "Login successful",
+      data: { token, user: userData },
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Login failed", error: error.message });
   }
 };
 
@@ -123,90 +161,128 @@ export const register = async (req: Request, res: Response) => {
       phone,
       studentId,
       gender,
+      university,
+      emergencyContact,
       course,
       year,
       address,
     } = req.body;
 
     if (password !== confirmPassword) {
-      return res.status(400).json({ success: false, message: 'Passwords do not match' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Passwords do not match" });
     }
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = String(email || "")
+      .toLowerCase()
+      .trim();
+    const normalizedStudentId = String(studentId || "")
+      .toUpperCase()
+      .trim();
+    const normalizedCourse = VALID_COURSES.includes(course)
+      ? course
+      : "Computer Science";
+    const normalizedYear = VALID_YEARS.includes(year) ? year : "1st Year";
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: 'User already exists with this email' });
+      return res.status(400).json({
+        success: false,
+        message: "User already exists with this email",
+      });
     }
 
-    const existingStudentId = await User.findOne({ studentId });
+    const existingStudentId = await User.findOne({
+      studentId: normalizedStudentId,
+    });
     if (existingStudentId) {
-      return res.status(400).json({ success: false, message: 'Student ID already exists' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Student ID already exists" });
     }
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
-      role: 'student',
+      role: "student",
       phone,
-      studentId,
+      studentId: normalizedStudentId,
+      university,
+      emergencyContact,
       gender,
-      course,
-      year,
+      course: normalizedCourse,
+      year: normalizedYear,
       address,
-      room: '',
-      roomNumber: '',
-      status: 'Pending',
+      room: "",
+      roomNumber: "",
+      status: "Pending",
+      approvalStatus: "Pending",
     });
 
     await Student.create({
-      studentId,
+      studentId: normalizedStudentId,
       name,
-      email,
+      email: normalizedEmail,
       phone,
-      course,
-      year,
-      roomNumber: '',
-      room: '',
-      status: 'Active',
+      course: normalizedCourse,
+      year: normalizedYear,
+      roomNumber: "",
+      room: "Unassigned",
+      status: "Inactive",
       joinDate: new Date(),
-      fees: 'Pending',
+      fees: "Pending",
       emergencyContact: {
-        name: '',
-        phone: '',
-        relationship: '',
+        name: "Guardian",
+        phone: emergencyContact,
+        relationship: "Parent",
       },
     });
 
     res.status(201).json({
       success: true,
-      message: 'Your registration request has been submitted. Please wait for admin approval.',
+      message:
+        "Your registration request has been submitted. Please wait for admin approval.",
       data: {
         id: user._id,
         status: user.status,
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Registration failed",
+      error: error.message,
+    });
   }
 };
 
 // VERIFY TOKEN
 export const verifyToken = async (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ success: false, message: 'No token provided' });
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided" });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: string };
-    const user = await User.findById(decoded.id).select('-password');
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: string;
+      email: string;
+      role: string;
+    };
+    const user = await User.findById(decoded.id).select("-password");
     if (!user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
     }
 
     res.json({
       success: true,
-      message: 'Token is valid',
+      message: "Token is valid",
       data: {
         id: user._id,
         name: user.name,
@@ -224,46 +300,68 @@ export const verifyToken = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(401).json({ success: false, message: 'Invalid token', error: error.message });
+    res
+      .status(401)
+      .json({ success: false, message: "Invalid token", error: error.message });
   }
 };
 
 // REFRESH TOKEN
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ success: false, message: 'No token provided' });
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided" });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: string;
+      email: string;
+      role: string;
+    };
     const newToken = jwt.sign(
       { id: decoded.id, email: decoded.email, role: decoded.role },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
 
-    res.json({ success: true, message: 'Token refreshed', data: { token: newToken } });
+    res.json({
+      success: true,
+      message: "Token refreshed",
+      data: { token: newToken },
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Token refresh failed', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Token refresh failed",
+      error: error.message,
+    });
   }
 };
 
 // LOGOUT
 export const logout = async (_req: Request, res: Response) => {
-  res.json({ success: true, message: 'Logout successful' });
+  res.json({ success: true, message: "Logout successful" });
 };
 
 // GET current user profile
 export const getProfile = async (req: any, res: Response) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
     res.json({ success: true, data: user });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error fetching profile', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching profile",
+      error: error.message,
+    });
   }
 };
 
@@ -273,7 +371,9 @@ export const updateProfile = async (req: any, res: Response) => {
     const { name, phone, password } = req.body;
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     if (name) user.name = name;
@@ -284,7 +384,7 @@ export const updateProfile = async (req: any, res: Response) => {
 
     res.json({
       success: true,
-      message: 'Profile updated',
+      message: "Profile updated",
       data: {
         id: user._id,
         name: user.name,
@@ -302,7 +402,11 @@ export const updateProfile = async (req: any, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error updating profile', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error updating profile",
+      error: error.message,
+    });
   }
 };
 
@@ -312,12 +416,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const { email } = req.body;
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      return res.status(404).json({ success: false, message: 'No account found with that email' });
+      return res
+        .status(404)
+        .json({ success: false, message: "No account found with that email" });
     }
 
     // Generate random reset token
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
     user.resetToken = hashedToken;
     user.resetExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
@@ -326,11 +435,15 @@ export const forgotPassword = async (req: Request, res: Response) => {
     // In production, send email with rawToken. For now, return it directly.
     res.json({
       success: true,
-      message: 'Password reset token generated. Use it within 30 minutes.',
+      message: "Password reset token generated. Use it within 30 minutes.",
       data: { resetToken: rawToken },
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error processing request', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error processing request",
+      error: error.message,
+    });
   }
 };
 
@@ -338,7 +451,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { token, password } = req.body;
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     const user = await User.findOne({
       resetToken: hashedToken,
@@ -346,7 +459,9 @@ export const resetPassword = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired reset token" });
     }
 
     user.password = password;
@@ -354,8 +469,15 @@ export const resetPassword = async (req: Request, res: Response) => {
     user.resetExpires = undefined;
     await user.save();
 
-    res.json({ success: true, message: 'Password has been reset successfully' });
+    res.json({
+      success: true,
+      message: "Password has been reset successfully",
+    });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error resetting password', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error resetting password",
+      error: error.message,
+    });
   }
 };

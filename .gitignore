@@ -96,5 +96,6 @@ data/
 # Upload Artifacts
 ############################
 server/uploads/
+database/
 
 .phase-plan-fixed-useeffect.md

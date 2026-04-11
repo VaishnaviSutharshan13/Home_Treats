@@ -1,9 +1,9 @@
-import api from './api';
+import api from "./api";
 
 // ─── Auth Services ───────────────────────────────────────────
 export const authService = {
   login: async (credentials: { email: string; password: string }) => {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post("/auth/login", credentials);
     return response.data;
   },
 
@@ -11,73 +11,89 @@ export const authService = {
     name: string;
     email: string;
     password: string;
+    confirmPassword: string;
     phone: string;
     studentId: string;
     university: string;
-    gender: 'Male' | 'Female' | 'Other';
+    gender: "Male" | "Female" | "Other";
     address: string;
     emergencyContact: string;
     course?: string;
   }) => {
-    const response = await api.post('/auth/register', userData);
+    const response = await api.post("/auth/register", userData);
     return response.data;
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   },
 
   getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     return userStr ? JSON.parse(userStr) : null;
   },
 
   verifyToken: async () => {
-    const response = await api.get('/auth/verify');
+    const response = await api.get("/auth/verify");
     return response.data;
   },
 
   getProfile: async () => {
-    const response = await api.get('/profile');
+    const response = await api.get("/profile");
     return response.data;
   },
 
-  updateProfile: async (data: { fullName?: string; name?: string; phone?: string; gender?: string; address?: string; password?: string }) => {
-    const response = await api.put('/profile', data);
+  updateProfile: async (data: {
+    fullName?: string;
+    name?: string;
+    phone?: string;
+    gender?: string;
+    address?: string;
+    password?: string;
+  }) => {
+    const response = await api.put("/profile", data);
     return response.data;
   },
 
   updateProfileImage: async (profileImage: File) => {
     const formData = new FormData();
-    formData.append('profileImage', profileImage);
+    formData.append("profileImage", profileImage);
 
-    const response = await api.put('/profile/image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await api.put("/profile/image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
 
   forgotPassword: async (email: string) => {
-    const response = await api.post('/auth/forgot-password', { email });
+    const response = await api.post("/auth/forgot-password", { email });
     return response.data;
   },
 
   resetPassword: async (token: string, password: string) => {
-    const response = await api.post('/auth/reset-password', { token, password });
+    const response = await api.post("/auth/reset-password", {
+      token,
+      password,
+    });
     return response.data;
   },
 };
 
 // ─── Student Services ────────────────────────────────────────
 export const studentService = {
-  getAll: async (filters?: { search?: string; status?: string; floor?: string; roomNumber?: string }) => {
-    const response = await api.get('/students', { params: filters || {} });
+  getAll: async (filters?: {
+    search?: string;
+    status?: string;
+    floor?: string;
+    roomNumber?: string;
+  }) => {
+    const response = await api.get("/students", { params: filters || {} });
     return response.data;
   },
 
   getPending: async () => {
-    const response = await api.get('/students/pending');
+    const response = await api.get("/students/pending");
     return response.data;
   },
 
@@ -87,7 +103,7 @@ export const studentService = {
   },
 
   create: async (studentData: Record<string, any>) => {
-    const response = await api.post('/students', studentData);
+    const response = await api.post("/students", studentData);
     return response.data;
   },
 
@@ -127,23 +143,23 @@ export const studentService = {
   },
 
   getApprovals: async () => {
-    const response = await api.get('/students/approvals');
+    const response = await api.get("/students/approvals");
     return response.data;
   },
 };
 
 export const settingsService = {
   getHeroImage: async () => {
-    const response = await api.get('/settings/hero-image');
+    const response = await api.get("/settings/hero-image");
     return response.data;
   },
 
   updateHeroImage: async (heroImage: File) => {
     const formData = new FormData();
-    formData.append('heroImage', heroImage);
+    formData.append("heroImage", heroImage);
 
-    const response = await api.post('/settings/hero-image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await api.post("/settings/hero-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
@@ -152,7 +168,7 @@ export const settingsService = {
 // ─── Room Services ───────────────────────────────────────────
 export const roomService = {
   getAll: async () => {
-    const response = await api.get('/rooms');
+    const response = await api.get("/rooms");
     return response.data;
   },
 
@@ -164,16 +180,16 @@ export const roomService = {
   create: async (roomData: Record<string, any>) => {
     const formData = new FormData();
     Object.entries(roomData).forEach(([key, value]) => {
-      if (key === 'image' && value instanceof File) {
-        formData.append('image', value);
-      } else if (key === 'facilities' && Array.isArray(value)) {
-        formData.append('facilities', JSON.stringify(value));
-      } else if (value !== undefined && value !== null && value !== '') {
+      if (key === "image" && value instanceof File) {
+        formData.append("image", value);
+      } else if (key === "facilities" && Array.isArray(value)) {
+        formData.append("facilities", JSON.stringify(value));
+      } else if (value !== undefined && value !== null && value !== "") {
         formData.append(key, String(value));
       }
     });
-    const response = await api.post('/rooms', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await api.post("/rooms", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
@@ -181,19 +197,19 @@ export const roomService = {
   update: async (id: string, roomData: Record<string, any>) => {
     const formData = new FormData();
     Object.entries(roomData).forEach(([key, value]) => {
-      if (key === 'image' && value instanceof File) {
-        formData.append('image', value);
-      } else if (key === 'image' && typeof value === 'string') {
+      if (key === "image" && value instanceof File) {
+        formData.append("image", value);
+      } else if (key === "image" && typeof value === "string") {
         // Don't re-send existing URL — only send if it's a File
         return;
-      } else if (key === 'facilities' && Array.isArray(value)) {
-        formData.append('facilities', JSON.stringify(value));
-      } else if (value !== undefined && value !== null && value !== '') {
+      } else if (key === "facilities" && Array.isArray(value)) {
+        formData.append("facilities", JSON.stringify(value));
+      } else if (value !== undefined && value !== null && value !== "") {
         formData.append(key, String(value));
       }
     });
     const response = await api.put(`/rooms/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
@@ -217,7 +233,7 @@ export const roomService = {
 // ─── Fees Services ───────────────────────────────────────────
 export const feesService = {
   getAll: async () => {
-    const response = await api.get('/fees');
+    const response = await api.get("/fees");
     return response.data;
   },
 
@@ -232,7 +248,7 @@ export const feesService = {
   },
 
   create: async (feeData: Record<string, any>) => {
-    const response = await api.post('/fees', feeData);
+    const response = await api.post("/fees", feeData);
     return response.data;
   },
 
@@ -252,7 +268,7 @@ export const feesService = {
   },
 
   getRevenue: async () => {
-    const response = await api.get('/fees/revenue');
+    const response = await api.get("/fees/revenue");
     return response.data;
   },
 
@@ -267,25 +283,30 @@ export const feesService = {
   },
 
   getUnpaid: async () => {
-    const response = await api.get('/fees/unpaid');
+    const response = await api.get("/fees/unpaid");
     return response.data;
   },
 
   getMyFees: async () => {
-    const response = await api.get('/fees/my-fees');
+    const response = await api.get("/fees/my-fees");
     return response.data;
   },
 };
 
 // ─── Complaint Services ──────────────────────────────────────
 export const complaintService = {
-  getAll: async (params?: { search?: string; category?: string; status?: string; priority?: string }) => {
-    const response = await api.get('/complaints', { params });
+  getAll: async (params?: {
+    search?: string;
+    category?: string;
+    status?: string;
+    priority?: string;
+  }) => {
+    const response = await api.get("/complaints", { params });
     return response.data;
   },
 
   getMy: async () => {
-    const response = await api.get('/complaints/user');
+    const response = await api.get("/complaints/user");
     return response.data;
   },
 
@@ -300,7 +321,7 @@ export const complaintService = {
   },
 
   create: async (complaintData: Record<string, any>) => {
-    const response = await api.post('/complaints', complaintData);
+    const response = await api.post("/complaints", complaintData);
     return response.data;
   },
 
@@ -314,7 +335,10 @@ export const complaintService = {
     return response.data;
   },
 
-  assign: async (id: string, data: { assignedTo: string; estimatedResolution?: string }) => {
+  assign: async (
+    id: string,
+    data: { assignedTo: string; estimatedResolution?: string },
+  ) => {
     const response = await api.put(`/complaints/${id}/assign`, data);
     return response.data;
   },
@@ -333,13 +357,13 @@ export const complaintService = {
 // ─── Admin Services ──────────────────────────────────────────
 export const adminService = {
   getStats: async () => {
-    const response = await api.get('/admin/stats');
+    const response = await api.get("/admin/stats");
     return response.data;
   },
 
   getActivities: async () => {
     try {
-      const response = await api.get('/admin/activities');
+      const response = await api.get("/admin/activities");
       return response.data;
     } catch (error) {
       // Return empty activities if endpoint doesn't exist
@@ -348,40 +372,50 @@ export const adminService = {
   },
 
   getMonthlyRevenue: async (year?: number) => {
-    const response = await api.get('/admin/revenue-monthly', { params: year ? { year } : {} });
+    const response = await api.get("/admin/revenue-monthly", {
+      params: year ? { year } : {},
+    });
     return response.data;
   },
 
   getRoomOccupancy: async () => {
-    const response = await api.get('/admin/room-occupancy');
+    const response = await api.get("/admin/room-occupancy");
     return response.data;
   },
 
   getRecentStudents: async (limit?: number) => {
-    const response = await api.get('/admin/recent-students', { params: limit ? { limit } : {} });
+    const response = await api.get("/admin/recent-students", {
+      params: limit ? { limit } : {},
+    });
     return response.data;
   },
 
   healthCheck: async () => {
-    const response = await api.get('/admin/health');
+    const response = await api.get("/admin/health");
     return response.data;
   },
 
   backup: async () => {
-    const response = await api.post('/admin/backup');
+    const response = await api.post("/admin/backup");
     return response.data;
   },
 };
 
 // ─── Notification Services ───────────────────────────────────
 export const notificationService = {
-  getAll: async (params?: { limit?: number; type?: string; unreadOnly?: boolean }) => {
-    const response = await api.get('/notifications', { params: params || {} });
+  getAll: async (params?: {
+    limit?: number;
+    type?: string;
+    unreadOnly?: boolean;
+  }) => {
+    const response = await api.get("/notifications", { params: params || {} });
     return response.data;
   },
 
   getUnreadCount: async (type?: string) => {
-    const response = await api.get('/notifications/unread-count', { params: type ? { type } : {} });
+    const response = await api.get("/notifications/unread-count", {
+      params: type ? { type } : {},
+    });
     return response.data;
   },
 
@@ -391,21 +425,26 @@ export const notificationService = {
   },
 
   markAllAsRead: async () => {
-    const response = await api.put('/notifications/mark-all-read');
+    const response = await api.put("/notifications/mark-all-read");
     return response.data;
   },
 
   sendAdminNotification: async (payload: {
     title: string;
     message: string;
-    type: 'announcement' | 'fee' | 'complaint' | 'room' | 'student';
-    source: 'Student Management' | 'Fees Management' | 'Complaint Management' | 'Room Management' | 'General Announcement';
-    recipientType: 'all_students' | 'selected_students';
+    type: "announcement" | "fee" | "complaint" | "room" | "student";
+    source:
+      | "Student Management"
+      | "Fees Management"
+      | "Complaint Management"
+      | "Room Management"
+      | "General Announcement";
+    recipientType: "all_students" | "selected_students";
     recipientStudentIds?: string[];
-    priority?: 'normal' | 'important' | 'urgent' | 'success';
+    priority?: "normal" | "important" | "urgent" | "success";
     relatedModuleId?: string;
   }) => {
-    const response = await api.post('/notifications', payload);
+    const response = await api.post("/notifications", payload);
     return response.data;
   },
 
@@ -415,29 +454,35 @@ export const notificationService = {
   },
 
   clearAll: async () => {
-    const response = await api.delete('/notifications/clear');
+    const response = await api.delete("/notifications/clear");
     return response.data;
   },
 };
 
 // ─── Booking Services ───────────────────────────────────────
 export const bookingService = {
-  confirm: async (payload: { fullName: string; email: string; phone: string; selectedFloor: string; roomId?: string }) => {
-    const response = await api.post('/bookings/confirm', payload);
+  confirm: async (payload: {
+    fullName: string;
+    email: string;
+    phone: string;
+    selectedFloor: string;
+    roomId?: string;
+  }) => {
+    const response = await api.post("/bookings/confirm", payload);
     return response.data;
   },
 
   getMyBooking: async () => {
-    const response = await api.get('/bookings/my-booking');
+    const response = await api.get("/bookings/my-booking");
     return response.data;
   },
 
   getAdminBookings: async () => {
-    const response = await api.get('/bookings/admin');
+    const response = await api.get("/bookings/admin");
     return response.data;
   },
 
-  updateStatus: async (id: string, status: 'Confirmed' | 'Cancelled') => {
+  updateStatus: async (id: string, status: "Confirmed" | "Cancelled") => {
     const response = await api.put(`/bookings/${id}/status`, { status });
     return response.data;
   },
@@ -446,23 +491,26 @@ export const bookingService = {
 // ─── Payment Services ───────────────────────────────────────
 export const paymentService = {
   create: async (formData: FormData) => {
-    const response = await api.post('/payments', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await api.post("/payments", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
 
   getStudent: async () => {
-    const response = await api.get('/payments/student');
+    const response = await api.get("/payments/student");
     return response.data;
   },
 
-  getAdmin: async (params?: { status?: 'Pending' | 'Approved' | 'Rejected'; date?: string }) => {
-    const response = await api.get('/payments/admin', { params });
+  getAdmin: async (params?: {
+    status?: "Pending" | "Approved" | "Rejected";
+    date?: string;
+  }) => {
+    const response = await api.get("/payments/admin", { params });
     return response.data;
   },
 
-  updateStatus: async (id: string, status: 'Approved' | 'Rejected') => {
+  updateStatus: async (id: string, status: "Approved" | "Rejected") => {
     const response = await api.put(`/payments/${id}`, { status });
     return response.data;
   },
@@ -484,7 +532,7 @@ export const adminLogService = {
     startDate?: string;
     endDate?: string;
   }) => {
-    const response = await api.get('/admin-logs', { params });
+    const response = await api.get("/admin-logs", { params });
     return response.data;
   },
 };

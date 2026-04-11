@@ -110,7 +110,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex pt-16">
       {/* Left Side - Hostel Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div 
@@ -131,43 +131,24 @@ const Login = () => {
             <p className="text-xl text-sidebar-foreground/90 mb-8 max-w-md">
               Your comfortable and affordable student accommodation awaits
             </p>
-            <Link 
-              to="/" 
-              className="inline-flex items-center space-x-2 text-info hover:text-white transition-colors duration-300"
-            >
-              <FaHome className="w-5 h-5" />
-              <span>Back to Home</span>
-            </Link>
           </div>
         </div>
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-background">
         <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
-            <Link to="/" className="inline-flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-hover rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                <FaHome className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
-                Home_Treats
-              </span>
-            </Link>
-          </div>
-
           {/* Glass Card Login Form */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+          <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/15">
                 <FaHome className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-foreground mb-2">
                 Sign In
               </h2>
-              <p className="text-gray-500">
+              <p className="text-muted-foreground">
                 Access your Home_Treats account
               </p>
             </div>
@@ -196,56 +177,56 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaEnvelope className="w-5 h-5 text-gray-500" />
+                    <FaEnvelope className="w-5 h-5 text-subtle" />
                   </div>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
+                    className={`w-full pl-12 pr-4 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
                       formErrors.email 
-                        ? 'border-red-400 focus:ring-red-400 bg-red-50' 
-                        : 'border-gray-200 hover:border-primary/30'
+                        ? 'border-error/50 focus:ring-error bg-error/10' 
+                        : 'border-border hover:border-primary/30'
                     }`}
                     placeholder="john@example.com"
                   />
                 </div>
                 {formErrors.email && (
-                  <p className="mt-2 text-sm text-red-400">{formErrors.email}</p>
+                  <p className="mt-2 text-sm text-error">{formErrors.email}</p>
                 )}
               </div>
 
               {/* Password Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaLock className="w-5 h-5 text-gray-500" />
+                    <FaLock className="w-5 h-5 text-subtle" />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-12 py-3 bg-white border rounded-xl text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
+                    className={`w-full pl-12 pr-12 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
                       formErrors.password 
-                        ? 'border-red-400 focus:ring-red-400 bg-red-50' 
-                        : 'border-gray-200 hover:border-primary/30'
+                        ? 'border-error/50 focus:ring-error bg-error/10' 
+                        : 'border-border hover:border-primary/30'
                     }`}
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-subtle hover:text-foreground transition-colors duration-200"
                   >
                     {showPassword ? (
                       <FaEyeSlash className="w-5 h-5" />
@@ -255,7 +236,7 @@ const Login = () => {
                   </button>
                 </div>
                 {formErrors.password && (
-                  <p className="mt-2 text-sm text-red-400">{formErrors.password}</p>
+                  <p className="mt-2 text-sm text-error">{formErrors.password}</p>
                 )}
               </div>
 
@@ -265,9 +246,9 @@ const Login = () => {
                   <input
                     id="remember"
                     type="checkbox"
-                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary bg-white"
+                    className="w-4 h-4 text-primary border-border rounded focus:ring-primary bg-muted/50"
                   />
-                  <label htmlFor="remember" className="ml-2 text-sm text-gray-500">
+                  <label htmlFor="remember" className="ml-2 text-sm text-muted-foreground">
                     Remember me
                   </label>
                 </div>
@@ -283,7 +264,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-primary-foreground py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
               >
                 {isLoading ? (
                   <>
@@ -301,7 +282,7 @@ const Login = () => {
 
             {/* Register Link */}
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <Link
                   to="/register"

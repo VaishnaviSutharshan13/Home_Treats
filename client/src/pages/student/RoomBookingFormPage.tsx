@@ -127,7 +127,7 @@ const RoomBookingFormPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-active via-background to-card py-10 px-2">
       <div className="w-full max-w-lg">
         {errorMessage && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          <div className="mb-4 rounded-lg border border-error/20 bg-error/10 px-4 py-3 text-sm text-error">
             {errorMessage}
           </div>
         )}
@@ -138,13 +138,13 @@ const RoomBookingFormPage: React.FC = () => {
             <h2 className="text-xl font-bold text-primary mb-1">
               Room {selectedRoom?.roomNumber || '-'}
             </h2>
-            <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+            <div className="flex flex-wrap gap-4 text-sm text-foreground/90">
               <span><span className="font-semibold text-primary">Floor:</span> {selectedRoom?.floor || '-'}</span>
               <span><span className="font-semibold text-primary">Total Beds:</span> {selectedRoom?.capacity || '-'}</span>
               <span><span className="font-semibold text-primary">Available Beds:</span> {loadingRoom ? 'Loading...' : availableBeds}</span>
               <span>
                 <span className="font-semibold text-primary">Status:</span>{' '}
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-primary">
                   {loadingRoom ? 'Loading...' : availableBeds > 0 ? 'Available' : 'Full'}
                 </span>
               </span>
@@ -153,7 +153,7 @@ const RoomBookingFormPage: React.FC = () => {
         </Card>
 
         {/* Booking Form Card */}
-        <Card className="bg-white/80 border-primary/10">
+        <Card className="bg-card/80 border-primary/10">
           <Card.Header>
             <h3 className="text-lg font-semibold text-primary mb-2">Room Booking Form</h3>
           </Card.Header>
@@ -204,28 +204,28 @@ const RoomBookingFormPage: React.FC = () => {
               error={errors.checkIn}
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Duration of Stay</label>
+              <label className="block text-sm font-medium text-foreground/90 mb-2">Duration of Stay</label>
               <select
                 name="duration"
                 value={form.duration}
                 onChange={handleChange}
-                className={`rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none w-full ${errors.duration ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                className={`rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none w-full ${errors.duration ? 'border-error/20 focus:border-error/20 focus:ring-red-500' : ''}`}
               >
                 <option value="">Select duration</option>
                 {DURATION_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              {errors.duration && <p className="mt-1 text-sm text-red-400">{errors.duration}</p>}
+              {errors.duration && <p className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">{errors.duration}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes <span className="text-gray-400">(optional)</span></label>
+              <label className="block text-sm font-medium text-foreground/90 mb-2">Additional Notes <span className="text-gray-400">(optional)</span></label>
               <textarea
                 name="notes"
                 value={form.notes}
                 onChange={handleChange}
                 rows={3}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none w-full"
+                className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                 placeholder="Any special requests or notes..."
               />
             </div>
@@ -255,8 +255,8 @@ const RoomBookingFormPage: React.FC = () => {
       {/* Success Modal */}
       <Modal isOpen={success} onClose={handleCloseModal} title="Booking Successful" size="sm">
         <div className="flex flex-col items-center justify-center py-6">
-          <FaCheckCircle className="text-green-500 w-14 h-14 mb-3" />
-          <h4 className="text-lg font-semibold text-gray-800 mb-2">Room booked successfully</h4>
+          <FaCheckCircle className="text-primary w-14 h-14 mb-3" />
+          <h4 className="text-lg font-semibold text-foreground/90 mb-2">Room booked successfully</h4>
           <Button onClick={handleCloseModal} size="md" className="mt-4 w-full">OK</Button>
         </div>
       </Modal>
