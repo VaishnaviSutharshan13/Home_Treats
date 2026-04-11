@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  FaCalendarAlt,
+  FaCheck,
+  FaCoins,
+  FaEdit,
+  FaExclamationTriangle,
+  FaEye,
+  FaMoneyBillWave,
+  FaSearch,
+  FaSpinner,
+  FaTrash,
+  FaUser,
+  FaWallet,
+} from 'react-icons/fa';
   FaPlus, FaMagnifyingGlass, FaDollarSign, FaReceipt,
   FaCircleCheck, FaCircleXmark, FaClock, FaSpinner, FaFileLines,
   FaUserSlash, FaEye, FaTrash, FaMoneyBillWave, FaChartBar,
@@ -9,6 +22,9 @@ import {
 } from 'react-icons/fa6';
 import { feesService } from '../../services';
 import Sidebar from '../../components/layout/Sidebar';
+import { feesService, paymentService, studentService } from '../../services';
+
+type FeeStatus = 'Paid' | 'Pending' | 'Overdue';
 import AdminNotificationComposer from '../../components/admin/AdminNotificationComposer';
 
 interface Fee {
@@ -68,6 +84,8 @@ const statusDot: Record<string, string> = {
    COMPONENT
 ═══════════════════════════════════════════════════ */
 const FeesManagement = () => {
+  const todayDate = getTodayDateString();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [fees, setFees] = useState<Fee[]>([]);
   const [loading, setLoading] = useState(true);
