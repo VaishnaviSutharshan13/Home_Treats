@@ -91,12 +91,12 @@ const MyRoom = () => {
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <FaSpinner className="animate-spin text-4xl text-indigo-600" />
+              <FaSpinner className="animate-spin text-4xl text-primary" />
             </div>
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchRoom} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm">
+              <button onClick={fetchRoom} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 shadow-sm">
                 Retry
               </button>
             </div>
@@ -123,7 +123,7 @@ const MyRoom = () => {
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                    room.status === 'Available' ? 'bg-purple-100 text-purple-800' :
+                    room.status === 'Available' ? 'bg-surface-active text-primary' :
                     room.status === 'Occupied' ? 'bg-blue-100 text-blue-800' :
                     'bg-yellow-100 text-yellow-800'
                   }`}>
@@ -156,7 +156,7 @@ const MyRoom = () => {
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
                   <p className="text-gray-500 text-sm">Monthly Rent</p>
-                  <p className="text-xl font-bold text-purple-600 mt-1">{formatLKR(room.price)}</p>
+                  <p className="text-xl font-bold text-primary mt-1">{formatLKR(room.price)}</p>
                 </div>
               </div>
 

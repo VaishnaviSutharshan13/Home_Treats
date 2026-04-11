@@ -382,7 +382,7 @@ const RoomManagement = () => {
           <div
             key={t.id}
             className={`px-5 py-3 rounded-xl shadow-lg text-gray-900 text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-              t.type === 'success' ? 'bg-purple-600' : 'bg-red-600'
+              t.type === 'success' ? 'bg-primary' : 'bg-red-600'
             }`}
           >
             {t.type === 'success' ? <FaCheck /> : <FaTimes />}
@@ -408,7 +408,7 @@ const RoomManagement = () => {
               <div className="flex flex-col">
                 <Link
                   to="/admin/dashboard"
-                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-purple-600 text-xs mb-1 transition-colors duration-200 group"
+                  className="inline-flex items-center gap-1.5 text-gray-500 hover:text-primary text-xs mb-1 transition-colors duration-200 group"
                 >
                   <FaChevronLeft className="w-2.5 h-2.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
                   <span>Dashboard</span>
@@ -427,7 +427,7 @@ const RoomManagement = () => {
               />
               <button
                 onClick={handleAddRoom}
-                className="bg-purple-600 text-white px-5 py-2.5 rounded-xl hover:bg-purple-600 transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
+                className="bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary transition-all duration-200 flex items-center font-medium shadow-sm hover:shadow-md"
               >
                 <FaPlus className="mr-2" />
                 Add New Room
@@ -441,7 +441,7 @@ const RoomManagement = () => {
       <div className="w-full px-6 sm:px-8 lg:px-10 pt-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
-            { label: 'Total Rooms', count: rooms.length, icon: <FaBed className="text-xl" />, color: 'bg-purple-500/10 text-purple-600' },
+            { label: 'Total Rooms', count: rooms.length, icon: <FaBed className="text-xl" />, color: 'bg-primary/10 text-primary' },
             { label: 'Total Beds', count: totalBeds, icon: <FaLayerGroup className="text-xl" />, color: 'bg-blue-50 text-blue-600' },
             { label: 'Occupied Beds', count: occupiedBeds, icon: <FaUsers className="text-xl" />, color: 'bg-red-50 text-red-600' },
             { label: 'Available Beds', count: availableBeds, icon: <FaCheck className="text-xl" />, color: 'bg-green-50 text-green-600' },
@@ -464,7 +464,7 @@ const RoomManagement = () => {
       <div className="w-full px-6 sm:px-8 lg:px-10 pt-6">
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <FaFilter className="text-purple-500 w-4 h-4" />
+            <FaFilter className="text-primary w-4 h-4" />
             <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">Filter Rooms</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
@@ -476,14 +476,14 @@ const RoomManagement = () => {
                 placeholder="Search name or room number..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm"
               />
             </div>
             {/* Room Type */}
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
             >
               <option value="All">All Types</option>
               <option value="Single Room">Single Room</option>
@@ -494,7 +494,7 @@ const RoomManagement = () => {
             <select
               value={filterBlock}
               onChange={(e) => setFilterBlock(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
             >
               <option value="All">All Blocks</option>
               {['Block A', 'Block B', 'Block C', 'Block D'].map((b) => (
@@ -505,7 +505,7 @@ const RoomManagement = () => {
             <select
               value={filterFloor}
               onChange={(e) => setFilterFloor(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
             >
               <option value="All">All Floors</option>
               {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((f) => (
@@ -517,7 +517,7 @@ const RoomManagement = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none appearance-none cursor-pointer"
+                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer"
               >
                 <option value="All">All Status</option>
                 <option value="Available">Available</option>
@@ -527,7 +527,7 @@ const RoomManagement = () => {
               </select>
               <button
                 onClick={resetFilters}
-                className="flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-purple-400 text-purple-600 font-semibold rounded-lg bg-white hover:bg-purple-50 transition-all text-sm shrink-0"
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 border-2 border-primary text-primary font-semibold rounded-lg bg-white hover:bg-surface-active transition-all text-sm shrink-0"
                 title="Reset all filters"
               >
                 <FaRedo className="w-3 h-3" />
@@ -541,7 +541,7 @@ const RoomManagement = () => {
       <div className="w-full px-6 sm:px-8 lg:px-10 py-6">
         {loading && (
           <div className="flex flex-col items-center justify-center py-24">
-            <FaSpinner className="w-10 h-10 text-purple-600 animate-spin mb-4" />
+            <FaSpinner className="w-10 h-10 text-primary animate-spin mb-4" />
             <p className="text-gray-500 text-lg">Loading rooms...</p>
           </div>
         )}
@@ -549,7 +549,7 @@ const RoomManagement = () => {
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24">
             <p className="text-red-600 text-lg mb-4">{error}</p>
-            <button onClick={fetchRooms} className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+            <button onClick={fetchRooms} className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary transition-colors">
               Retry
             </button>
           </div>
@@ -562,7 +562,7 @@ const RoomManagement = () => {
               {searchTerm || filterStatus !== 'All' ? 'No rooms match your search.' : 'No rooms yet.'}
             </p>
             {!searchTerm && filterStatus === 'All' && (
-              <button onClick={handleAddRoom} className="mt-4 text-purple-600 font-medium hover:underline">
+              <button onClick={handleAddRoom} className="mt-4 text-primary font-medium hover:underline">
                 Add your first room
               </button>
             )}
@@ -578,8 +578,8 @@ const RoomManagement = () => {
               <div
                 key={room._id}
                 onClick={() => setSelectedCardId(isSelected ? null : room._id)}
-                className={`bg-white rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${
-                  isSelected ? 'border-purple-500 ring-2 ring-purple-200' : 'border-gray-100'
+                className={`bg-white rounded-2xl border-2 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${
+                  isSelected ? 'border-primary ring-2 ring-primary/25' : 'border-gray-100'
                 }`}
               >
                 {/* Image */}
@@ -595,7 +595,7 @@ const RoomManagement = () => {
                   <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold ${getStatusStyle(room.status)}`}>
                     {room.status}
                   </span>
-                  <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-purple-700 shadow-sm">
+                  <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-primary shadow-sm">
                     {formatLKR(room.price)} / night
                   </span>
                 </div>
@@ -606,7 +606,7 @@ const RoomManagement = () => {
                   <h3 className="text-lg font-bold text-gray-900 leading-tight mb-0.5">
                     {room.roomNumber}
                   </h3>
-                  <p className="text-sm text-purple-600 font-medium line-clamp-1 mb-2">
+                  <p className="text-sm text-primary font-medium line-clamp-1 mb-2">
                     {room.name || 'Unnamed Room'}
                   </p>
 
@@ -632,7 +632,7 @@ const RoomManagement = () => {
                   {room.facilities && room.facilities.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {room.facilities.slice(0, 3).map((f) => (
-                        <span key={f} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-600 text-xs font-medium border border-purple-100">
+                        <span key={f} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-active text-primary text-xs font-medium border border-primary/15">
                           {FACILITY_ICONS[f] || null}
                           {f}
                         </span>
@@ -655,7 +655,7 @@ const RoomManagement = () => {
                   <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                     <button
                       onClick={(e) => { e.stopPropagation(); setViewingRoom(room); }}
-                      className="flex items-center justify-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 py-2 px-2.5 rounded-lg transition-colors border border-purple-100"
+                      className="flex items-center justify-center gap-1 text-xs font-medium text-primary bg-surface-active hover:bg-surface-active py-2 px-2.5 rounded-lg transition-colors border border-primary/15"
                       title="View Room"
                     >
                       <FaEye className="text-xs" /> View
@@ -684,7 +684,7 @@ const RoomManagement = () => {
                     {room.occupied < room.capacity && room.status !== 'Maintenance' && room.status !== 'Occupied' && (
                       <button
                         onClick={(e) => { e.stopPropagation(); openAllocateModal(room._id); }}
-                        className="flex items-center justify-center text-purple-600 bg-purple-50 hover:bg-purple-100 p-2 rounded-lg transition-colors border border-purple-100 ml-auto"
+                        className="flex items-center justify-center text-primary bg-surface-active hover:bg-surface-active p-2 rounded-lg transition-colors border border-primary/15 ml-auto"
                         title="Allocate Student"
                       >
                         <FaUserPlus className="text-xs" />
@@ -734,7 +734,7 @@ const RoomManagement = () => {
                     <label className="block text-sm font-medium text-gray-600 mb-2">Room Image</label>
                     <div className="flex items-center gap-4">
                       <div
-                        className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-300 hover:border-purple-400 flex items-center justify-center overflow-hidden cursor-pointer transition-colors relative group"
+                        className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-300 hover:border-primary flex items-center justify-center overflow-hidden cursor-pointer transition-colors relative group"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {formData.imagePreview ? (
@@ -763,7 +763,7 @@ const RoomManagement = () => {
                         <p>Click to upload room image</p>
                         <p className="mt-1">JPEG, PNG, WebP — Max 5 MB</p>
                         {formData.image && (
-                          <p className="mt-1 text-purple-600 font-medium">{formData.image.name}</p>
+                          <p className="mt-1 text-primary font-medium">{formData.image.name}</p>
                         )}
                       </div>
                     </div>
@@ -778,7 +778,7 @@ const RoomManagement = () => {
                       placeholder="e.g. Nallur Comfort Single"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                     />
                   </div>
 
@@ -792,7 +792,7 @@ const RoomManagement = () => {
                         placeholder="e.g. A-101"
                         value={formData.roomNumber}
                         onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -802,7 +802,7 @@ const RoomManagement = () => {
                         title="Room location"
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -815,7 +815,7 @@ const RoomManagement = () => {
                         title="Room block"
                         value={formData.block}
                         onChange={(e) => setFormData({ ...formData, block: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       >
                         {['Block A', 'Block B', 'Block C', 'Block D'].map((b) => (
                           <option key={b} value={b}>{b}</option>
@@ -828,7 +828,7 @@ const RoomManagement = () => {
                         title="Room floor"
                         value={formData.floor}
                         onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       >
                         {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((f) => (
                           <option key={f} value={f}>{f}</option>
@@ -845,7 +845,7 @@ const RoomManagement = () => {
                         title="Room type"
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       >
                         <option value="Single Room">Single Room</option>
                         <option value="Double Room">Double Room</option>
@@ -862,7 +862,7 @@ const RoomManagement = () => {
                         required
                         value={formData.capacity}
                         onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 1 })}
-                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                        className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -883,7 +883,7 @@ const RoomManagement = () => {
                           required
                           value={formData.price}
                           onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 pl-12 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 pl-12 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -894,7 +894,7 @@ const RoomManagement = () => {
                           title="Room availability"
                           value={formData.status}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
+                          className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
                         >
                           <option value="Available">Available</option>
                           <option value="Limited">Limited</option>
@@ -912,7 +912,7 @@ const RoomManagement = () => {
                       rows={3}
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all resize-none"
+                      className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
                       placeholder="Brief description of the room..."
                     />
                   </div>
@@ -926,7 +926,7 @@ const RoomManagement = () => {
                           key={facility}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all text-sm ${
                             formData.facilities.includes(facility)
-                              ? 'border-purple-500 bg-purple-500/10 text-purple-600'
+                              ? 'border-primary bg-primary/10 text-primary'
                               : 'border-gray-200 text-gray-600 hover:border-gray-300'
                           }`}
                         >
@@ -956,7 +956,7 @@ const RoomManagement = () => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                    className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
                   >
                     {submitting ? (
                       <>
@@ -1031,7 +1031,7 @@ const RoomManagement = () => {
                 value={studentIdInput}
                 onChange={(e) => setStudentIdInput(e.target.value)}
                 placeholder="Enter student ID..."
-                className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                className="w-full border border-gray-200 rounded-lg bg-gray-100 text-gray-900 px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary outline-none"
               />
             </div>
             <div className="mt-5 flex gap-3">
@@ -1046,7 +1046,7 @@ const RoomManagement = () => {
                 type="button"
                 onClick={handleAllocate}
                 disabled={allocating || !studentIdInput.trim()}
-                className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
                 {allocating ? (
                   <>
@@ -1111,7 +1111,7 @@ const RoomManagement = () => {
                   <p className="text-gray-500 font-medium text-sm mb-2">Facilities</p>
                   <div className="flex flex-wrap gap-2">
                     {viewingRoom.facilities.map((f) => (
-                      <span key={f} className="px-2 py-1 bg-purple-500/10 text-purple-600 text-xs rounded-full border border-purple-500/20">
+                      <span key={f} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full border border-primary/20">
                         {FACILITY_ICONS[f] || '•'} {f}
                       </span>
                     ))}
@@ -1125,8 +1125,8 @@ const RoomManagement = () => {
                 </div>
               )}
               <div className="flex justify-end space-x-3 pt-4 border-t">
-                <button onClick={() => setViewingRoom(null)} className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 text-gray-700 hover:bg-purple-500/5">Close</button>
-                <button onClick={() => { handleEditRoom(viewingRoom); setViewingRoom(null); }} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-600 flex items-center">
+                <button onClick={() => setViewingRoom(null)} className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-900 text-gray-700 hover:bg-primary/5">Close</button>
+                <button onClick={() => { handleEditRoom(viewingRoom); setViewingRoom(null); }} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary flex items-center">
                   <FaEdit className="mr-2" /> Edit Room
                 </button>
               </div>

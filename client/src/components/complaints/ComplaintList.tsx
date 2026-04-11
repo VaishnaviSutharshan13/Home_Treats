@@ -28,7 +28,7 @@ const ComplaintList = ({
         {onCreateClick && (
           <button
             onClick={onCreateClick}
-            className="mt-4 inline-flex h-11 items-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:from-purple-700 hover:to-pink-600"
+            className="mt-4 inline-flex h-11 items-center rounded-xl bg-gradient-to-r from-primary to-accent px-5 text-sm font-semibold text-white shadow-sm transition hover:from-primary-hover hover:to-accent"
           >
             Create Complaint
           </button>

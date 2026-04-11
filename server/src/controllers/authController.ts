@@ -6,64 +6,6 @@ import Student from '../models/Student';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
 
-// Seed default admin & student users on startup
-export const seedUsers = async () => {
-  try {
-    const adminExists = await User.findOne({ email: 'admin@hostel.com' });
-    if (!adminExists) {
-      await User.create({
-        name: 'Administrator',
-        email: 'admin@hostel.com',
-        password: 'admin123',
-        role: 'admin',
-        phone: '+94 77 123 4567',
-      });
-      console.log('Default admin seeded: admin@hostel.com / admin123');
-    }
-
-    const studentExists = await User.findOne({ email: 'student@hostel.com' });
-    if (!studentExists) {
-      await User.create({
-        name: 'Kavindu Perera',
-        email: 'student@hostel.com',
-        password: 'student123',
-        role: 'student',
-        phone: '+94 76 987 6543',
-        studentId: 'STU001',
-        room: 'A-101',
-        roomNumber: 'A-101',
-        course: 'Computer Science',
-        year: '2nd Year',
-        approvalStatus: 'Approved',
-      });
-      console.log('Default student seeded: student@hostel.com / student123');
-    }
-
-    const studentProfileExists = await Student.findOne({ studentId: 'STU001' });
-    if (!studentProfileExists) {
-      await Student.create({
-        name: 'Kavindu Perera',
-        email: 'student@hostel.com',
-        phone: '+94 76 987 6543',
-        studentId: 'STU001',
-        course: 'Computer Science',
-        year: '2nd Year',
-        room: 'A-101',
-        status: 'Active',
-        joinDate: new Date(),
-        fees: 'Pending',
-        emergencyContact: {
-          name: 'Amara Perera',
-          phone: '+94 71 123 4567',
-          relationship: 'Parent',
-        },
-      });
-    }
-  } catch (error) {
-    console.error('Error seeding users:', error);
-  }
-};
-
 // LOGIN
 export const login = async (req: Request, res: Response) => {
   try {

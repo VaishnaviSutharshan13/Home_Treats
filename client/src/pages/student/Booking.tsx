@@ -89,12 +89,12 @@ const Booking = () => {
     return (
       <div className="min-h-screen bg-white pt-20 pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#f5f3ff] rounded-2xl border border-purple-500/20 p-8 text-center">
+          <div className="bg-surface-active/50 rounded-2xl border border-primary/20 p-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-3">No Booking Details Found</h1>
             <p className="text-gray-600 mb-6">Please select a room from the Rooms page and continue the booking process.</p>
             <Link
               to="/rooms"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition-all"
             >
               <FaArrowLeft className="w-4 h-4" />
               Back to Rooms
@@ -110,13 +110,13 @@ const Booking = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-            Booking <span className="text-purple-600">Confirmation</span>
+            Booking <span className="text-primary">Confirmation</span>
           </h1>
           <p className="text-gray-600">Review your details before confirming your room booking.</p>
         </div>
 
         {successMessage && (
-          <div className="mb-6 flex items-center gap-3 bg-purple-500/10 border border-purple-500/30 text-purple-700 px-4 py-3 rounded-xl">
+          <div className="mb-6 flex items-center gap-3 bg-primary/10 border border-primary/30 text-primary px-4 py-3 rounded-xl">
             <FaCheckCircle className="w-5 h-5" />
             <span className="font-medium">{successMessage}</span>
           </div>
@@ -130,51 +130,51 @@ const Booking = () => {
         )}
 
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="bg-[#f5f3ff] border border-purple-500/20 rounded-2xl p-6">
+          <div className="bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Student Information</h2>
             <div className="space-y-3 text-sm">
-              <p><span className="font-semibold text-purple-600">Full Name:</span> <span className="text-gray-700">{bookingData.fullName}</span></p>
-              <p><span className="font-semibold text-purple-600">Email:</span> <span className="text-gray-700">{bookingData.email}</span></p>
-              <p><span className="font-semibold text-purple-600">Phone Number:</span> <span className="text-gray-700">{bookingData.phone}</span></p>
+              <p><span className="font-semibold text-primary">Full Name:</span> <span className="text-gray-700">{bookingData.fullName}</span></p>
+              <p><span className="font-semibold text-primary">Email:</span> <span className="text-gray-700">{bookingData.email}</span></p>
+              <p><span className="font-semibold text-primary">Phone Number:</span> <span className="text-gray-700">{bookingData.phone}</span></p>
             </div>
           </div>
 
-          <div className="bg-[#f5f3ff] border border-purple-500/20 rounded-2xl p-6">
+          <div className="bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Room Information</h2>
             <div className="space-y-3 text-sm">
-              <p><span className="font-semibold text-purple-600">Selected Floor:</span> <span className="text-gray-700">{bookingData.selectedFloor}</span></p>
-              <p><span className="font-semibold text-purple-600">Room Capacity:</span> <span className="text-gray-700">4 Students</span></p>
-              <p><span className="font-semibold text-purple-600">Number of Beds:</span> <span className="text-gray-700">4</span></p>
-              <p><span className="font-semibold text-purple-600">Monthly Rent:</span> <span className="text-gray-700">LKR 5500</span></p>
+              <p><span className="font-semibold text-primary">Selected Floor:</span> <span className="text-gray-700">{bookingData.selectedFloor}</span></p>
+              <p><span className="font-semibold text-primary">Room Capacity:</span> <span className="text-gray-700">Based on assigned room</span></p>
+              <p><span className="font-semibold text-primary">Number of Beds:</span> <span className="text-gray-700">Based on assigned room</span></p>
+              <p><span className="font-semibold text-primary">Monthly Rent:</span> <span className="text-gray-700">Based on assigned room</span></p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 bg-white border border-purple-500/20 rounded-2xl p-6 shadow-sm">
+        <div className="mt-6 bg-white border border-primary/20 rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Hostel Information</h2>
           <div className="space-y-3 text-sm text-gray-700">
-            <p><span className="font-semibold text-purple-600">Hostel Name:</span> Home_Treats Student Hostel</p>
+            <p><span className="font-semibold text-primary">Hostel Name:</span> Home_Treats Student Hostel</p>
             <div className="flex items-center gap-2">
-              <FaMapMarkerAlt className="w-4 h-4 text-purple-600" />
+              <FaMapMarkerAlt className="w-4 h-4 text-primary" />
               <span>No.11, Nallur, Jaffna, 40000, Sri Lanka</span>
             </div>
             <div className="flex items-center gap-2">
-              <FaEnvelope className="w-4 h-4 text-purple-600" />
+              <FaEnvelope className="w-4 h-4 text-primary" />
               <span>{bookingData.email}</span>
             </div>
             <div className="flex items-center gap-2">
-              <FaPhone className="w-4 h-4 text-purple-600" />
+              <FaPhone className="w-4 h-4 text-primary" />
               <span>{bookingData.phone}</span>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 bg-[#f5f3ff] border border-purple-500/20 rounded-2xl p-6">
+        <div className="mt-6 bg-surface-active/50 border border-primary/20 rounded-2xl p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Booking Confirmation</h2>
           <div className="space-y-2 text-sm text-gray-700 mb-6">
-            <p><span className="font-semibold text-purple-600">Selected Room:</span> {bookingData.selectedFloor}</p>
-            <p><span className="font-semibold text-purple-600">Monthly Price:</span> LKR 5500</p>
-            <p><span className="font-semibold text-purple-600">Student:</span> {bookingData.fullName}</p>
+            <p><span className="font-semibold text-primary">Selected Room:</span> {bookingData.selectedFloor}</p>
+            <p><span className="font-semibold text-primary">Monthly Price:</span> Based on assigned room</p>
+            <p><span className="font-semibold text-primary">Student:</span> {bookingData.fullName}</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -182,7 +182,7 @@ const Booking = () => {
               type="button"
               onClick={handleConfirm}
               disabled={submitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition-all disabled:opacity-60"
             >
               <FaCheckCircle className="w-4 h-4" />
               {submitting ? 'Confirming...' : 'Confirm Booking'}
@@ -190,7 +190,7 @@ const Booking = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-purple-300 text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-primary/30 text-primary rounded-xl font-semibold hover:bg-surface-active transition-all"
             >
               <FaTimes className="w-4 h-4" />
               Cancel

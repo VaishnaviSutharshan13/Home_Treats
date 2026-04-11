@@ -1,612 +1,550 @@
-/**
- * Home Page – Home_Treats Student Hostel
- * Redesigned landing page with unique layout:
- * Hero → About → Facilities → Why Choose → Gallery → Testimonials → CTA
- *
- * Room listings have been moved exclusively to the Rooms Page.
- */
-
-import { Link } from 'react-router-dom';
+import { useEffect } from "react";
 import {
-  FaWifi,
-  FaTshirt,
-  FaShieldAlt,
-  FaUtensils,
-  FaBed,
-  FaEnvelope,
   FaArrowRight,
-  FaMapMarkerAlt,
-  FaPhone,
-  FaStar,
+  FaBed,
+  FaBook,
   FaBuilding,
   FaCheckCircle,
+  FaChevronDown,
+  FaEnvelope,
   FaHeart,
-  FaBook,
-  FaWater,
-  FaHome,
+  FaMapMarkerAlt,
+  FaPhone,
   FaQuoteLeft,
-} from 'react-icons/fa';
+  FaShieldAlt,
+  FaStar,
+  FaTint,
+  FaTshirt,
+  FaUtensils,
+  FaWifi,
+} from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
 
-const HERO_ROOM_IMAGE = '/images/hostel-room.jpg';
-const HOSTEL_LOCATION = import.meta.env.VITE_HOSTEL_LOCATION || 'Jaffna, Sri Lanka';
+const HERO_IMAGE = "/images/hostel-room.jpg";
+const LOCATION = import.meta.env.VITE_HOSTEL_LOCATION || "Jaffna, Sri Lanka";
+const ADDRESS =
+  import.meta.env.VITE_HOSTEL_ADDRESS ||
+  "No. 11, Nallur, Jaffna 40000, Sri Lanka";
 
-/* ──────────────────────────────────────────────────
-   DATA
-────────────────────────────────────────────────── */
-
-const facilities = [
+const roomTypes = [
   {
-    icon: <FaWifi className="w-7 h-7" />,
-    title: 'High-Speed WiFi',
-    desc: 'Fibre broadband internet available throughout the entire building, 24/7.',
+    name: "Deluxe double",
+    blurb: "Spacious room with study corner and wardrobe.",
+    price: "From Rs. 18,000",
+    period: "/ month",
+    capacity: "2 guests",
+    highlights: ["AC & fan", "High-speed WiFi", "Attached bath"],
+    featured: true,
   },
   {
-    icon: <FaBook className="w-7 h-7" />,
-    title: 'Study Area',
-    desc: 'Dedicated quiet study rooms with comfortable desks on every floor.',
+    name: "Standard twin",
+    blurb: "Bunk-friendly layout ideal for sharing with a course mate.",
+    price: "From Rs. 12,500",
+    period: "/ month",
+    capacity: "2 guests",
+    highlights: ["WiFi", "Shared bath nearby", "Desk per bed"],
+    featured: false,
   },
   {
-    icon: <FaWater className="w-7 h-7" />,
-    title: '24/7 Clean Water',
-    desc: 'Uninterrupted clean water supply including RO-filtered drinking water dispensers.',
-  },
-  {
-    icon: <FaShieldAlt className="w-7 h-7" />,
-    title: 'Security System',
-    desc: 'CCTV cameras, biometric entry and on-site security personnel round the clock.',
-  },
-  {
-    icon: <FaTshirt className="w-7 h-7" />,
-    title: 'Laundry Area',
-    desc: 'Washing machines and dryers available for all residents on the ground floor.',
-  },
-  {
-    icon: <FaUtensils className="w-7 h-7" />,
-    title: 'Common Kitchen',
-    desc: 'Fully equipped shared kitchen with modern appliances for all students.',
+    name: "Single studio",
+    blurb: "Quiet solo space when you need zero distractions.",
+    price: "From Rs. 22,000",
+    period: "/ month",
+    capacity: "1 guest",
+    highlights: ["Private bath", "Kitchenette", "WiFi"],
+    featured: false,
   },
 ];
 
-const whyChoose = [
+const facilities = [
   {
-    icon: <FaHeart className="w-8 h-8" />,
-    title: 'Affordable Living',
-    desc: 'We offer the most competitive room rates in the area with flexible monthly payment plans — perfect for students on a budget.',
-    color: 'from-purple-500 to-violet-600',
+    icon: <FaWifi className="h-7 w-7" />,
+    title: "WiFi",
+    desc: "Fiber-backed connectivity across all floors.",
   },
   {
-    icon: <FaShieldAlt className="w-8 h-8" />,
-    title: 'Safe Environment',
-    desc: 'Your safety is our top priority. With 24/7 security, CCTV surveillance and biometric access, you can feel completely at home.',
-    color: 'from-violet-500 to-purple-700',
+    icon: <FaBook className="h-7 w-7" />,
+    title: "Study areas",
+    desc: "Quiet zones and shared desks for exams.",
   },
   {
-    icon: <FaBed className="w-8 h-8" />,
-    title: 'Comfortable Rooms',
-    desc: 'Every room is fully furnished with quality beds, study desks, wardrobes and reliable electricity so you can focus on your studies.',
-    color: 'from-purple-600 to-fuchsia-600',
+    icon: <FaTint className="h-7 w-7" />,
+    title: "Water 24/7",
+    desc: "RO drinking points and steady supply.",
+  },
+  {
+    icon: <FaShieldAlt className="h-7 w-7" />,
+    title: "Security",
+    desc: "CCTV, access control, on-site staff.",
+  },
+  {
+    icon: <FaTshirt className="h-7 w-7" />,
+    title: "Laundry",
+    desc: "Washers and dryers on the ground floor.",
+  },
+  {
+    icon: <FaUtensils className="h-7 w-7" />,
+    title: "Kitchen",
+    desc: "Equipped shared kitchen for residents.",
   },
 ];
 
 const galleryImages = [
   {
-    url: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80',
-    label: 'Building Exterior',
-    span: 'col-span-2 row-span-2',
+    url: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80",
+    label: "Exterior",
   },
   {
-    url: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
-    label: 'Room Interior',
-    span: '',
+    url: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80",
+    label: "Master room",
   },
   {
-    url: 'https://images.unsplash.com/photo-1541123437800-1bb1317badc2?w=600&q=80',
-    label: 'Study Area',
-    span: '',
+    url: "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?w=600&q=80",
+    label: "Study corner",
   },
   {
-    url: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=600&q=80',
-    label: 'Dining Area',
-    span: '',
+    url: "https://images.unsplash.com/photo-1567521464027-f127ff144326?w=600&q=80",
+    label: "Dining",
   },
   {
-    url: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&q=80',
-    label: 'Common Area',
-    span: '',
+    url: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&q=80",
+    label: "Lounge",
   },
   {
-    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80',
-    label: 'Bathroom',
-    span: '',
+    url: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80",
+    label: "Washroom",
   },
 ];
 
 const testimonials = [
   {
-    name: 'Amal Perera',
-    course: 'BSc Computer Science, Year 2',
-    review:
-      'Living at Home_Treats has been an amazing experience. The WiFi is fast, the rooms are clean and the management is very helpful. I feel completely safe here!',
+    name: "Tharani S.",
+    meta: "Medicine, Year 3",
+    text: "Clean rooms, honest pricing, and staff who reply on WhatsApp. Best stay I have had near campus.",
     rating: 5,
-    avatar: 'AP',
+    initials: "TS",
   },
   {
-    name: 'Nishadi Fernando',
-    course: 'BA Business Administration, Year 3',
-    review:
-      'The study rooms are a lifesaver during exam season. The staff is friendly and the facilities are well-maintained. Highly recommend to all students.',
+    name: "Ruvan P.",
+    meta: "Engineering, Year 2",
+    text: "WiFi never dropped during online labs. The study room on floor 2 is a lifesaver.",
     rating: 5,
-    avatar: 'NF',
+    initials: "RP",
   },
   {
-    name: 'Kasun Jayasinghe',
-    course: 'BEng Electrical Engineering, Year 1',
-    review:
-      'Very affordable and comfortable. The 24/7 water supply and backup electricity are great. The location is perfect — right near the university.',
+    name: "Meera K.",
+    meta: "Business, Year 1",
+    text: "Felt safe walking in late after society events. Laundry and kitchen are actually maintained.",
     rating: 4,
-    avatar: 'KJ',
+    initials: "MK",
   },
 ];
 
-const location = import.meta.env.VITE_HOSTEL_LOCATION || 'Jaffna, Sri Lanka';
-
-/* ──────────────────────────────────────────────────
-   COMPONENT
-────────────────────────────────────────────────── */
 const Home = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const id = location.hash.replace("#", "");
+    if (!id) return;
+    const t = window.setTimeout(() => {
+      document
+        .getElementById(id)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+    return () => window.clearTimeout(t);
+  }, [location.pathname, location.hash]);
+
   return (
-    <div className="min-h-screen bg-white font-sans">
-
-      {/* ══════════════════════════════════════════════
-          1. HERO SECTION
-          Soft purple gradient overlay — bright and welcoming
-      ══════════════════════════════════════════════ */}
-      <section
-        className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
-        style={{
-          backgroundImage: `url(${HERO_ROOM_IMAGE})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-
-        {/* Soft purple overlay for readability + subtle blur depth */}
+    <div className="min-h-screen bg-background text-foreground antialiased">
+      {/* Hero */}
+      <section className="relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center overflow-hidden pt-16">
         <div
-          className="absolute inset-0 backdrop-blur-[1px]"
-          style={{
-            background: 'linear-gradient(160deg, rgba(124, 58, 237, 0.6) 0%, rgba(124, 58, 237, 0.45) 100%)',
-          }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
         />
+        <div className="absolute inset-0 landing-mesh opacity-[0.92]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sidebar/55 via-sidebar/80 to-sidebar" />
 
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 sm:px-8 lg:px-12 max-w-5xl mx-auto">
-
-          {/* Tag badge */}
-          <div className="inline-flex items-center gap-2 bg-white/30 backdrop-blur-sm border border-white/40 text-white text-sm font-semibold px-6 py-2.5 rounded-full mb-10 shadow-xl">
-            <FaBuilding className="w-4 h-4 text-purple-200" />
-            Student Hostel Building — {HOSTEL_LOCATION}
-          </div>
-
-          {/* Main Title */}
-          <h1
-            className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 leading-tight tracking-tight drop-shadow-xl"
-            style={{ textShadow: '0 2px 24px rgba(0,0,0,0.30)' }}
-          >
-            <span className="block text-white text-3xl md:text-4xl lg:text-5xl font-semibold mb-2 opacity-95 tracking-normal">
-              Welcome to
-            </span>
-            <span
-              className="block font-black"
-              style={{
-                background: 'linear-gradient(90deg, #ffffff 0%, #e9d5ff 50%, #ddd6fe 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                textShadow: 'none',
-                filter: 'drop-shadow(0 2px 12px rgba(109,40,217,0.5))',
-              }}
-            >
-              Home_Treats
-            </span>
-            <span className="block text-white/90 text-2xl md:text-3xl lg:text-4xl font-semibold mt-3 tracking-wide">
-              Student Hostel
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p
-            className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
-            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.25)' }}
-          >
-            Your home away from home — providing{' '}
-            <span className="text-purple-200 font-semibold">safe, comfortable and affordable</span>{' '}
-            accommodation for students in the heart of Colombo.
-          </p>
-
-          {/* Stats Row */}
-          <div className="flex flex-wrap justify-center gap-4 mb-14">
-            {[
-              { label: 'Total Rooms', value: '50+' },
-              { label: 'Student Capacity', value: '120+' },
-              { label: 'Floors', value: '4' },
-              { label: 'Years Running', value: '8+' },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl px-7 py-3 text-center shadow-lg hover:bg-white/40 transition-all duration-300"
-              >
-                <div className="text-2xl font-extrabold text-white drop-shadow">{s.value}</div>
-                <div className="text-xs text-purple-100 mt-0.5 font-medium">{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-5 justify-center">
-            <Link
-              to="/rooms"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-purple-50 text-purple-700 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20 border border-purple-100"
-            >
-              View Available Rooms
-              <FaArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              to="/contact"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600/90 hover:bg-purple-700 border border-white/30 text-white rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-lg"
-            >
-              Book a Room
-              <FaArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center shadow-lg">
-            <div className="w-1 h-3 bg-white/80 rounded-full mt-2" />
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          2. ABOUT THE HOSTEL
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-[#f5f3ff]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-
-            {/* Text */}
-            <div>
-              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-6">
-                <FaHome className="w-4 h-4" />
-                About Our Hostel
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-7 leading-tight tracking-tight">
-                Your Home Away From{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                  Home
-                </span>
-              </h2>
-              <p className="text-gray-500 text-lg leading-relaxed mb-6 font-medium">
-                Home_Treats is a modern student hostel located in the heart of Colombo, Sri Lanka. We provide
-                a safe, comfortable and affordable living environment designed specifically for university
-                students who need a supportive home base while they focus on their studies.
-              </p>
-              <p className="text-gray-500 text-base leading-relaxed mb-8">
-                Our 4-floor building houses over 120 students across a range of room types — from private
-                singles to budget-friendly shared rooms. With dedicated study areas, round-the-clock security,
-                high-speed WiFi and a welcoming community atmosphere, Home_Treats is more than just a place
-                to sleep — it is where your student life thrives.
-              </p>
-
-              {/* Building Details */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { label: 'Building Name', value: 'Home_Treats Hostel' },
-                  { label: 'Total Rooms', value: '50+ Rooms' },
-                  { label: 'Student Capacity', value: '120+ Students' },
-                  { label: 'Location', value: 'Colombo, Sri Lanka' },
-                  { label: 'Floors', value: '4 Floors' },
-                  { label: 'Established', value: '2016' },
-                ].map((d) => (
-                  <div key={d.label} className="bg-white rounded-2xl p-4 border border-purple-500/10 shadow-md hover:shadow-lg transition-shadow duration-200">
-                    <div className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wide">{d.label}</div>
-                    <div className="text-gray-800 font-semibold">{d.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <FaMapMarkerAlt className="w-4 h-4 text-purple-600 shrink-0" />
-                No. 42, University Road, Colombo 07, Sri Lanka
-              </div>
-            </div>
-
-            {/* Image */}
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden border border-purple-500/20 shadow-2xl shadow-purple-500/10">
-                <img
-                  src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80"
-                  alt="Home_Treats Hostel Building"
-                  className="w-full h-[460px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent" />
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm border border-purple-500/20 rounded-xl px-4 py-3 shadow-md">
-                  <div className="flex items-center gap-2 text-purple-700 font-semibold text-sm">
-                    <FaStar className="w-4 h-4 text-yellow-500" />
-                    Rated #1 Student Hostel in the Area
-                  </div>
-                </div>
-              </div>
-              {/* Floating badge top-right */}
-              <div className="absolute -top-4 -right-4 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl p-4 shadow-xl shadow-purple-500/30">
-                <FaShieldAlt className="w-8 h-8 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          3. HOSTEL FACILITIES
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
-              What We Provide
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
-              Hostel{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                Facilities
-              </span>
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg font-medium">
-              Everything you need for a comfortable student life — all included within the hostel building.
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:py-20">
+          <div>
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-primary/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+              <FaBuilding className="h-4 w-4 text-info" />
+              Home Treats · {LOCATION}
             </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {facilities.map((f, i) => (
-              <div
-                key={i}
-                className="bg-[#f5f3ff] rounded-2xl border border-purple-500/10 p-8 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1"
-              >
-                <div className="w-16 h-16 bg-white border border-purple-500/20 rounded-2xl flex items-center justify-center mb-6 text-purple-600 shadow-md group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 group-hover:shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300">
-                  {f.icon}
-                </div>
-                <h3 className="text-gray-800 font-bold text-lg mb-2 tracking-wide">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed font-medium">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          4. WHY CHOOSE OUR HOSTEL
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-[#f5f3ff]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
-              <FaStar className="w-4 h-4" />
-              Why Students Choose Us
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
-              Why Choose{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                Home_Treats?
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
+              A calmer place to
+              <span className="mt-2 block bg-gradient-to-r from-white via-info to-secondary bg-clip-text text-transparent">
+                live and study.
               </span>
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg font-medium">
-              Hundreds of students have made Home_Treats their home — here is why they love it.
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/85">
+              Modern rooms, fair monthly rates, and facilities that actually
+              work — student accommodation designed for real routines, not
+              brochure photos.
             </p>
-          </div>
-
-          <div className="grid sm:grid-cols-3 gap-10">
-            {whyChoose.map((item, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-gray-200/60 p-9 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group text-center hover:-translate-y-2"
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/40 transition hover:bg-primary-hover"
               >
-                <div
-                  className={`w-20 h-20 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-xl shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300`}
-                >
-                  {item.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 tracking-wide">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed font-medium">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Trust stats bar */}
-          <div className="mt-14 bg-white rounded-2xl border border-purple-500/15 p-8 shadow-md">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                Book now
+                <FaArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/rooms"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-md transition hover:bg-white/15"
+              >
+                View all rooms
+              </Link>
+              <a
+                href="#gallery"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-7 py-3.5 text-base font-semibold text-info/90 underline-offset-4 hover:text-white hover:underline"
+              >
+                See gallery
+              </a>
+            </div>
+            <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { value: '120+', label: 'Students Currently Living' },
-                { value: '8+', label: 'Years of Operation' },
-                { value: '4.8★', label: 'Average Student Rating' },
-                { value: '50+', label: 'Rooms Available' },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div className="text-3xl font-extrabold text-purple-600 mb-1">{stat.value}</div>
-                  <div className="text-sm text-gray-500">{stat.label}</div>
+                { k: "Rooms", v: "50+" },
+                { k: "Beds", v: "120+" },
+                { k: "Rating", v: "4.8★" },
+                { k: "Since", v: "2016" },
+              ].map((row) => (
+                <div
+                  key={row.k}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-center backdrop-blur-sm"
+                >
+                  <dt className="text-[0.65rem] font-semibold uppercase tracking-wider text-white/55">
+                    {row.k}
+                  </dt>
+                  <dd className="mt-1 text-xl font-bold tabular-nums text-white">
+                    {row.v}
+                  </dd>
                 </div>
               ))}
+            </dl>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+            <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-primary/40 to-secondary/25 blur-2xl" />
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl">
+              <img
+                src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=960&q=80"
+                alt="Bright furnished bedroom at Home Treats"
+                className="aspect-[5/4] w-full object-cover sm:aspect-[4/3]"
+              />
+              <div className="flex items-center gap-3 border-t border-white/10 bg-sidebar/60 px-5 py-4">
+                <FaStar className="h-8 w-8 shrink-0 text-accent" />
+                <p className="text-sm leading-snug text-sidebar-foreground">
+                  <span className="font-semibold text-white">Top pick</span> for
+                  students who want quiet nights and reliable utilities in{" "}
+                  {LOCATION.split(",")[0]}.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="#rooms"
+          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-0.5 text-white/50 hover:text-white"
+        >
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em]">
+            Scroll
+          </span>
+          <FaChevronDown className="h-6 w-6 animate-bounce" />
+        </a>
+      </section>
+
+      {/* Room types — cards instead of tables */}
+      <section
+        id="rooms"
+        className="scroll-mt-24 border-b border-border bg-card py-16 sm:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+              Rooms
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Pick a layout that fits your budget
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Transparent highlights — no tiny table text. Confirm live
+              availability on the rooms page.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            {roomTypes.map((room) => (
+              <article
+                key={room.name}
+                className={`flex flex-col rounded-2xl border bg-muted/40 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${
+                  room.featured
+                    ? "border-primary/40 ring-2 ring-primary/20"
+                    : "border-border hover:border-primary/30"
+                }`}
+              >
+                {room.featured && (
+                  <span className="mb-3 w-fit rounded-full bg-surface-active px-3 py-1 text-xs font-semibold text-primary">
+                    Most booked
+                  </span>
+                )}
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-xl font-bold text-foreground">
+                    {room.name}
+                  </h3>
+                  <FaBed className="h-6 w-6 shrink-0 text-primary opacity-80" />
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {room.blurb}
+                </p>
+                <p className="mt-4 text-2xl font-bold text-foreground">
+                  {room.price}
+                  <span className="text-base font-normal text-muted-foreground">
+                    {room.period}
+                  </span>
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Capacity: {room.capacity}
+                </p>
+                <ul className="mt-5 flex flex-col gap-2 border-t border-border/80 pt-5">
+                  {room.highlights.map((h) => (
+                    <li
+                      key={h}
+                      className="flex items-center gap-2 text-sm text-foreground/90"
+                    >
+                      <FaCheckCircle className="h-4 w-4 shrink-0 text-success" />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/rooms"
+                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover"
+                >
+                  Check availability
+                  <FaArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About */}
+      <section
+        id="about"
+        className="scroll-mt-24 border-b border-border bg-background py-16 sm:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=900&q=80"
+                alt="Home Treats building"
+                className="aspect-[4/3] h-full w-full object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Why students choose{" "}
+                <span className="text-primary">Home Treats</span>
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                We run a tight ship: clear house rules, fast maintenance, and
+                staff on site. You get a furnished room without surprise fees
+                buried in a table footnote.
+              </p>
+              <ul className="mt-8 space-y-4">
+                {[
+                  "Walking distance to campus and local transit",
+                  "Monthly billing with digital payment options",
+                  "Common areas cleaned on a fixed schedule",
+                ].map((line) => (
+                  <li key={line} className="flex gap-3 text-foreground/90">
+                    <FaCheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    {line}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-8 flex items-start gap-2 text-sm text-muted-foreground">
+                <FaMapMarkerAlt className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                {ADDRESS}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          5. BUILDING GALLERY
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
-              Photo Gallery
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
-              Inside Our{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                Hostel Building
-              </span>
+      {/* Facilities */}
+      <section className="border-b border-border bg-card py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Facilities
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto font-medium">
-              Take a virtual tour of our facilities — from the exterior to every comfort inside.
+            <p className="mt-4 text-muted-foreground">
+              Everything we maintain in-house for residents.
             </p>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 auto-rows-[220px]">
-            {galleryImages.map((img, i) => (
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {facilities.map((f) => (
               <div
-                key={i}
-                className={`relative overflow-hidden rounded-2xl group cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300 ${img.span}`}
+                key={f.title}
+                className="group rounded-2xl border border-border bg-muted/50 p-6 transition hover:border-primary/30 hover:shadow-md"
+              >
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-card text-primary shadow-sm ring-1 ring-border transition group-hover:bg-primary group-hover:text-primary-foreground group-hover:ring-primary">
+                  {f.icon}
+                </div>
+                <h3 className="text-lg font-bold text-foreground">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section
+        id="gallery"
+        className="scroll-mt-24 border-b border-border bg-background py-16 sm:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Gallery
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Spaces you will actually use — kitchens, lounges, and fresh rooms.
+            </p>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {galleryImages.map((img, i) => (
+              <figure
+                key={img.label}
+                className={`group relative overflow-hidden rounded-2xl border border-border bg-muted shadow-sm ${
+                  i === 0
+                    ? "sm:col-span-2 sm:row-span-2 min-h-[240px] lg:min-h-[320px]"
+                    : "aspect-[4/3] min-h-[200px]"
+                }`}
               >
                 <img
                   src={img.url}
                   alt={img.label}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-4 left-4 text-white font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-2 drop-shadow-lg">
-                  <FaCheckCircle className="w-4 h-4 text-purple-300" />
-                  {img.label}
-                </div>
-              </div>
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-sidebar/90 to-transparent px-4 pb-4 pt-10">
+                  <span className="flex items-center gap-2 text-sm font-medium text-white">
+                    <FaCheckCircle className="h-4 w-4 text-info" />
+                    {img.label}
+                  </span>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          6. TESTIMONIALS
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-[#f5f3ff]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-600 text-sm font-medium px-4 py-2 rounded-full mb-4">
-              <FaHeart className="w-4 h-4" />
-              Student Reviews
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">
-              What Our Students{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                Say
-              </span>
+      {/* Reviews */}
+      <section
+        id="reviews"
+        className="scroll-mt-24 border-b border-border bg-card py-16 sm:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Reviews
             </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto font-medium">
-              Hear directly from students who call Home_Treats their home.
+            <p className="mt-4 text-muted-foreground">
+              Recent feedback from residents — stars, not asterisks.
             </p>
           </div>
-
-          <div className="grid sm:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-gray-200/60 p-8 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group hover:-translate-y-1 flex flex-col"
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {testimonials.map((t) => (
+              <blockquote
+                key={t.name}
+                className="flex h-full flex-col rounded-2xl border border-border bg-muted/50 p-6 shadow-sm"
               >
-                {/* Quote icon */}
-                <div className="mb-5">
-                  <FaQuoteLeft className="w-8 h-8 text-purple-200 group-hover:text-purple-300 transition-colors duration-300" />
-                </div>
-
-                {/* Stars */}
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: 5 }).map((_, si) => (
+                <FaQuoteLeft className="h-8 w-8 text-info" aria-hidden />
+                <div
+                  className="mt-3 flex gap-0.5"
+                  aria-label={`${t.rating} out of 5 stars`}
+                >
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <FaStar
-                      key={si}
-                      className={`w-4 h-4 ${si < t.rating ? 'text-yellow-400' : 'text-gray-200'}`}
+                      key={i}
+                      className={`h-4 w-4 ${i < t.rating ? "text-accent" : "text-border"}`}
                     />
                   ))}
                 </div>
-
-                {/* Review text */}
-                <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-6 font-medium">"{t.review}"</p>
-
-                {/* Student info */}
-                <div className="flex items-center gap-3 pt-4 border-t border-purple-500/10">
-                  <div className="w-11 h-11 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md shadow-purple-500/20">
-                    {t.avatar}
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/90">
+                  “{t.text}”
+                </p>
+                <footer className="mt-6 flex items-center gap-3 border-t border-border pt-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {t.initials}
                   </div>
                   <div>
-                    <div className="text-gray-900 font-semibold text-sm">{t.name}</div>
-                    <div className="text-gray-400 text-xs mt-0.5">{t.course}</div>
+                    <cite className="not-italic text-sm font-semibold text-foreground">
+                      {t.name}
+                    </cite>
+                    <p className="text-xs text-muted-foreground">{t.meta}</p>
                   </div>
-                </div>
-              </div>
+                </footer>
+              </blockquote>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          7. CALL TO ACTION
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative bg-gradient-to-br from-purple-600 via-purple-650 to-violet-700 rounded-3xl overflow-hidden shadow-2xl">
-            {/* Decorative blobs */}
-            <div className="absolute -top-16 -right-16 w-72 h-72 bg-white/5 rounded-full pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-52 h-52 bg-white/5 rounded-full pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10 px-8 md:px-16 py-20 md:py-24 text-center">
-              <div className="inline-flex items-center gap-2 bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-                <FaBed className="w-4 h-4" />
-                Rooms Available Now
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 drop-shadow-xl tracking-tight">
-                Ready to Find Your Room?
-              </h2>
-              <p className="text-purple-100 text-lg max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
-                Explore our available room types, check pricing and contact the hostel management to secure your spot today.
-              </p>
-
-              {/* Contact details */}
-              <div className="flex flex-wrap justify-center gap-5 mb-12">
-                {[
-                  { icon: <FaPhone className="w-4 h-4" />, text: '+94 11 234 5678' },
-                  { icon: <FaEnvelope className="w-4 h-4" />, text: 'info@hometreats.lk' },
-                  { icon: <FaMapMarkerAlt className="w-4 h-4" />, text: 'Colombo 07, Sri Lanka' },
-                ].map((c) => (
-                  <div
-                    key={c.text}
-                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 border border-white/20 text-white text-sm px-5 py-2.5 rounded-xl transition-all duration-200 backdrop-blur-sm shadow"
-                  >
-                    {c.icon}
-                    {c.text}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-5 justify-center">
-                <Link
-                  to="/rooms"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-purple-700 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-900/20 border border-purple-100"
-                >
-                  <FaBed className="w-5 h-5" />
-                  View Available Rooms
-                  <FaArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/20 hover:bg-white/30 border border-white/30 text-white rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow"
-                >
-                  <FaEnvelope className="w-5 h-5" />
-                  Send a Booking Request
-                </Link>
-              </div>
+      {/* CTA */}
+      <section className="bg-sidebar py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary-hover to-secondary px-6 py-12 text-center shadow-xl sm:px-12 sm:py-16">
+            <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-secondary/25 blur-3xl" />
+            <h2 className="relative text-2xl font-bold text-white sm:text-3xl">
+              Ready to move in?
+            </h2>
+            <p className="relative mx-auto mt-3 max-w-lg text-primary-foreground/90">
+              Message us for a walkthrough or hold a room while you finalize
+              travel.
+            </p>
+            <div className="relative mt-8 flex flex-wrap justify-center gap-3 text-sm text-white">
+              <span className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-sm">
+                <FaPhone className="h-4 w-4" />
+                +94 76 293 2003
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-sm">
+                <FaEnvelope className="h-4 w-4" />
+                info@gowsitreats.lk
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 backdrop-blur-sm">
+                <FaMapMarkerAlt className="h-4 w-4" />
+                {LOCATION}
+              </span>
+            </div>
+            <div className="relative mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-primary shadow-lg transition hover:bg-slate-100"
+              >
+                <FaHeart className="h-4 w-4" />
+                Contact & booking
+              </Link>
+              <Link
+                to="/rooms"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 px-8 py-3.5 font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                Browse rooms
+                <FaArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>
       </section>
-
     </div>
   );
 };

@@ -190,10 +190,10 @@ const ForgotPassword = () => {
 
             {/* Success Message */}
             {success && (
-              <div className="mb-6 p-4 bg-purple-50/80 backdrop-blur border border-purple-200 rounded-xl">
+              <div className="mb-6 p-4 bg-surface-active/80 backdrop-blur border border-primary/25 rounded-xl">
                 <div className="flex items-center space-x-2">
-                  <FaCheck className="w-5 h-5 text-purple-600" />
-                  <span className="text-purple-700 text-sm font-medium">
+                  <FaCheck className="w-5 h-5 text-primary" />
+                  <span className="text-primary text-sm font-medium">
                     Password reset successfully! You can now log in.
                   </span>
                 </div>
@@ -239,7 +239,7 @@ const ForgotPassword = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+                  className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
                 >
                   {isLoading ? (
                     <>
@@ -314,7 +314,7 @@ const ForgotPassword = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+                  className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
                 >
                   {isLoading ? (
                     <>
@@ -336,7 +336,7 @@ const ForgotPassword = () => {
               <div className="text-center">
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                  className="inline-flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
                 >
                   <span>Go to Login</span>
                   <FaArrowRight className="w-4 h-4" />

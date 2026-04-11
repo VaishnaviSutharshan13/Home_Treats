@@ -19,7 +19,7 @@ const statusClasses: Record<string, string> = {
 const priorityClasses: Record<string, string> = {
   High: 'bg-red-100 text-red-700',
   Medium: 'bg-orange-100 text-orange-700',
-  Low: 'bg-violet-100 text-violet-700',
+  Low: 'bg-secondary/15 text-primary',
 };
 
 const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, onReject }: AdminComplaintTableProps) => {
@@ -70,7 +70,7 @@ const AdminComplaintTable = ({ complaints, loadingId, onView, onStatusChange, on
                       value={complaint.status}
                       onChange={(e) => onStatusChange(complaint, e.target.value)}
                       disabled={complaint.status === 'Rejected'}
-                      className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-700 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-100"
+                      className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>

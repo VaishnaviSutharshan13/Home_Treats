@@ -90,9 +90,9 @@ interface BookingRequest {
 const getOccupancyColorClasses = (name: string) => {
   switch (name.toLowerCase()) {
     case 'occupied':
-      return { dot: 'bg-purple-600', bg: 'bg-purple-500/10', text: 'text-purple-600' };
+      return { dot: 'bg-primary', bg: 'bg-primary/10', text: 'text-primary' };
     case 'available':
-      return { dot: 'bg-purple-600', bg: 'bg-purple-500/10', text: 'text-purple-600' };
+      return { dot: 'bg-primary', bg: 'bg-primary/10', text: 'text-primary' };
     case 'maintenance':
       return { dot: 'bg-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-500' };
     default:
@@ -105,9 +105,9 @@ const getOccupancyColorClasses = (name: string) => {
 const RevenueTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#f5f3ff] rounded-xl border border-purple-500/20 px-4 py-3">
+    <div className="bg-surface-active/50 rounded-xl border border-primary/20 px-4 py-3">
       <p className="text-sm font-semibold text-gray-700 mb-1">{label}</p>
-      <p className="text-sm text-purple-600">
+      <p className="text-sm text-primary">
         Revenue: <span className="font-bold">LKR {payload[0].value.toLocaleString()}</span>
       </p>
       {payload[0].payload.count > 0 && (
@@ -121,7 +121,7 @@ const OccupancyTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const colors = getOccupancyColorClasses(payload[0].name || '');
   return (
-    <div className="bg-[#f5f3ff] rounded-xl border border-purple-500/20 px-4 py-3">
+    <div className="bg-surface-active/50 rounded-xl border border-primary/20 px-4 py-3">
       <div className="flex items-center gap-2">
         <div className={`w-3 h-3 rounded-full ${colors.dot}`} />
         <span className="text-sm font-medium text-gray-700">{payload[0].name}</span>
@@ -231,7 +231,7 @@ const Dashboard = () => {
       value: adminStats.students.total,
       subtitle: `${adminStats.students.active} active, ${adminStats.students.inactive} inactive`,
       icon: <FaUsers className="w-6 h-6" />,
-      iconBg: 'bg-purple-500',
+      iconBg: 'bg-primary',
       trend: adminStats.students.active > 0 ? 'up' : 'neutral',
       trendValue: `${((adminStats.students.active / Math.max(adminStats.students.total, 1)) * 100).toFixed(0)}% active`,
       link: '/admin/student-management',
@@ -241,7 +241,7 @@ const Dashboard = () => {
       value: adminStats.rooms.total,
       subtitle: `${adminStats.rooms.available} available`,
       icon: <FaBed className="w-6 h-6" />,
-      iconBg: 'bg-purple-500',
+      iconBg: 'bg-primary',
       trend: Number(adminStats.rooms.occupancyRate) > 75 ? 'up' : 'neutral',
       trendValue: `${adminStats.rooms.occupancyRate}% occupied`,
       link: '/admin/room-management',
@@ -261,7 +261,7 @@ const Dashboard = () => {
       value: formatLKR(adminStats.fees.totalRevenue),
       subtitle: `${adminStats.fees.collectionRate}% collected`,
       icon: <FaMoneyBillWave className="w-6 h-6" />,
-      iconBg: 'bg-violet-500',
+      iconBg: 'bg-secondary/100',
       trend: Number(adminStats.fees.collectionRate) > 50 ? 'up' : 'down',
       trendValue: `${formatLKR(adminStats.fees.pendingRevenue)} pending`,
       link: '/admin/fees-management',
@@ -275,7 +275,7 @@ const Dashboard = () => {
       {/* Main Content — offset by fixed sidebar on desktop */}
       <div className="lg:ml-64">
         {/* Sticky Header */}
-        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-purple-500/10 px-5 sm:px-7 lg:px-8 py-3.5">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-primary/10 px-5 sm:px-7 lg:px-8 py-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -309,7 +309,7 @@ const Dashboard = () => {
               <Link
                 key={idx}
                 to={card.link}
-                className={`group bg-white rounded-2xl border border-gray-200 p-5 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 ${
+                className={`group bg-white rounded-2xl border border-gray-200 p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 ${
                   idx === 0 ? 'delay-75' : idx === 1 ? 'delay-150' : idx === 2 ? 'delay-200' : 'delay-300'
                 } ${
                   chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -320,7 +320,7 @@ const Dashboard = () => {
                     {card.icon}
                   </div>
                   <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-                    card.trend === 'up' ? 'bg-purple-500/15 text-purple-600' :
+                    card.trend === 'up' ? 'bg-primary/15 text-primary' :
                     card.trend === 'down' ? 'bg-red-500/15 text-red-400' :
                     'bg-gray-100/60 text-gray-500'
                   }`}>
@@ -338,7 +338,7 @@ const Dashboard = () => {
 
           {/* --- ROW 2: Monthly Revenue Chart --- */}
           <div
-            className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-300 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -354,7 +354,7 @@ const Dashboard = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setRevenueYear(revenueYear - 1)}
-                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-purple-500/10 hover:border-purple-500/40 transition text-gray-500"
+                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-gray-500"
                 >
                   &larr;
                 </button>
@@ -362,7 +362,7 @@ const Dashboard = () => {
                 <button
                   onClick={() => setRevenueYear(revenueYear + 1)}
                   disabled={revenueYear >= new Date().getFullYear()}
-                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-purple-500/10 hover:border-purple-500/40 transition text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-primary/10 hover:border-primary/40 transition text-gray-500 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   &rarr;
                 </button>
@@ -411,7 +411,7 @@ const Dashboard = () => {
 
             {/* Room Occupancy Donut */}
             <div
-              className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-500 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -476,7 +476,7 @@ const Dashboard = () => {
 
             {/* Recent Students Widget */}
             <div
-              className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-500 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -489,7 +489,7 @@ const Dashboard = () => {
                 </div>
                 <Link
                   to="/admin/student-management"
-                  className="flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-600 transition"
+                  className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary transition"
                 >
                   View All <FaChevronRight className="w-3 h-3" />
                 </Link>
@@ -507,12 +507,12 @@ const Dashboard = () => {
                   {recentStudents.map((student) => (
                     <div
                       key={student._id}
-                      className={`flex items-center gap-4 p-3 rounded-xl hover:bg-purple-500/5 transition-all duration-300 ${
+                      className={`flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-all duration-300 ${
                         chartsLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
                       }`}
                     >
                       {/* Avatar */}
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-semibold text-sm shadow-sm">
                         {student.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
 
@@ -521,7 +521,7 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-gray-900 truncate">{student.name}</p>
                           <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
-                            student.status === 'Active' ? 'bg-purple-500/20 text-purple-600' : 'bg-gray-100 text-gray-500'
+                            student.status === 'Active' ? 'bg-primary/20 text-primary' : 'bg-gray-100 text-gray-500'
                           }`}>
                             {student.status}
                           </span>
@@ -542,7 +542,7 @@ const Dashboard = () => {
 
               <Link
                 to="/admin/student-management"
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-purple-600 bg-purple-500/10 rounded-xl hover:bg-purple-500/10 transition"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-primary bg-primary/10 rounded-xl hover:bg-primary/10 transition"
               >
                 <FaUsers className="w-4 h-4" />
                 View All Students
@@ -552,7 +552,7 @@ const Dashboard = () => {
 
           {/* --- ROW 4: Room Booking Requests --- */}
           <div
-            className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-700 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -568,7 +568,7 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                 {bookings.map((booking) => (
-                  <div key={booking._id} className="flex items-center justify-between p-3 bg-[#f5f3ff] rounded-xl border border-purple-500/10">
+                  <div key={booking._id} className="flex items-center justify-between p-3 bg-surface-active/50 rounded-xl border border-primary/10">
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{booking.studentName}</p>
                       <p className="text-xs text-gray-600">
@@ -583,7 +583,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                        booking.status === 'Confirmed' ? 'bg-purple-500/15 text-purple-600' : 'bg-red-50 text-red-400'
+                        booking.status === 'Confirmed' ? 'bg-primary/15 text-primary' : 'bg-red-50 text-red-400'
                       }`}>
                         {booking.status}
                       </span>
@@ -599,7 +599,7 @@ const Dashboard = () => {
                         <button
                           type="button"
                           onClick={() => handleBookingStatusUpdate(booking._id, 'Confirmed')}
-                          className="text-xs px-2 py-1 rounded-lg border border-purple-500/20 text-purple-600 hover:bg-purple-500/10 transition"
+                          className="text-xs px-2 py-1 rounded-lg border border-primary/20 text-primary hover:bg-primary/10 transition"
                         >
                           Reconfirm
                         </button>
@@ -616,7 +616,7 @@ const Dashboard = () => {
 
             {/* Complaint Status */}
             <div
-              className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -626,8 +626,8 @@ const Dashboard = () => {
               <div className="space-y-4">
                 {[
                   { label: 'Pending', count: adminStats.complaints.pending, color: 'bg-amber-500', bgLight: 'bg-amber-500/10' },
-                  { label: 'In Progress', count: adminStats.complaints.inProgress, color: 'bg-purple-500', bgLight: 'bg-purple-500/10' },
-                  { label: 'Resolved', count: adminStats.complaints.resolved, color: 'bg-purple-500', bgLight: 'bg-purple-500/10' },
+                  { label: 'In Progress', count: adminStats.complaints.inProgress, color: 'bg-primary', bgLight: 'bg-primary/10' },
+                  { label: 'Resolved', count: adminStats.complaints.resolved, color: 'bg-primary', bgLight: 'bg-primary/10' },
                 ].map((item) => {
                   const pct = adminStats.complaints.total > 0
                     ? ((item.count / adminStats.complaints.total) * 100).toFixed(0)
@@ -655,7 +655,7 @@ const Dashboard = () => {
               <div className="mt-5 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Resolution Rate</span>
-                  <span className="font-bold text-purple-600">{adminStats.complaints.resolutionRate}%</span>
+                  <span className="font-bold text-primary">{adminStats.complaints.resolutionRate}%</span>
                 </div>
               </div>
               <Link
@@ -669,7 +669,7 @@ const Dashboard = () => {
 
             {/* Fee Collection Overview */}
             <div
-              className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -703,7 +703,7 @@ const Dashboard = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Collected</span>
-                  <span className="text-sm font-semibold text-purple-600">{formatLKR(adminStats.fees.totalRevenue)}</span>
+                  <span className="text-sm font-semibold text-primary">{formatLKR(adminStats.fees.totalRevenue)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Pending</span>
@@ -718,7 +718,7 @@ const Dashboard = () => {
               </div>
               <Link
                 to="/admin/fees-management"
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-purple-600 bg-purple-500/10 rounded-xl hover:bg-purple-500/20 transition"
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-primary bg-primary/10 rounded-xl hover:bg-primary/20 transition"
               >
                 <FaMoneyBillWave className="w-4 h-4" />
                 Manage Fees
@@ -727,7 +727,7 @@ const Dashboard = () => {
 
             {/* Recent Activity */}
             <div
-              className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+              className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
                 'delay-700 '
               }${
                 chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -743,9 +743,9 @@ const Dashboard = () => {
                   {activities.slice(0, 8).map((activity, idx) => (
                     <div key={idx} className="flex items-start gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${
-                        activity.type === 'student' ? 'bg-purple-500/15 text-purple-600' :
+                        activity.type === 'student' ? 'bg-primary/15 text-primary' :
                         activity.type === 'complaint' ? 'bg-amber-500/15 text-amber-400' :
-                        'bg-purple-500/15 text-purple-600'
+                        'bg-primary/15 text-primary'
                       }`}>
                         {activity.type === 'student' ? <FaUserGraduate /> : activity.type === 'complaint' ? <FaExclamationTriangle /> : <FaMoneyBillWave />}
                       </div>
@@ -762,7 +762,7 @@ const Dashboard = () => {
 
           {/* --- ROW 5: Quick Actions --- */}
           <div
-            className={`bg-white rounded-2xl border border-purple-500/20 p-6 transition-all duration-500 ${
+            className={`bg-white rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
               'delay-1000 '
             }${
               chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -771,9 +771,9 @@ const Dashboard = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: 'Students', link: '/admin/student-management', icon: <FaUsers className="w-5 h-5" />, color: 'text-purple-600 bg-purple-500/10 hover:bg-purple-500/20 hover:shadow-md' },
-                { label: 'Rooms', link: '/admin/room-management', icon: <FaBed className="w-5 h-5" />, color: 'text-purple-600 bg-purple-500/10 hover:bg-purple-500/20 hover:shadow-md' },
-                { label: 'Fees', link: '/admin/fees-management', icon: <FaMoneyBillWave className="w-5 h-5" />, color: 'text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 hover:shadow-md' },
+                { label: 'Students', link: '/admin/student-management', icon: <FaUsers className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },
+                { label: 'Rooms', link: '/admin/room-management', icon: <FaBed className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },
+                { label: 'Fees', link: '/admin/fees-management', icon: <FaMoneyBillWave className="w-5 h-5" />, color: 'text-secondary bg-secondary/100/10 hover:bg-secondary/100/20 hover:shadow-md' },
                 { label: 'Complaints', link: '/admin/complaint-management', icon: <FaExclamationTriangle className="w-5 h-5" />, color: 'text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 hover:shadow-md' },
               ].map((action, idx) => (
                 <Link

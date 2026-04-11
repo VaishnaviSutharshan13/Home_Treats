@@ -132,11 +132,11 @@ const NotificationBell = () => {
 
   const getIconColor = (type: string) => {
     switch (type) {
-      case 'announcement': return 'bg-purple-100 text-purple-600';
-      case 'student': return 'bg-purple-100 text-purple-700';
+      case 'announcement': return 'bg-surface-active text-primary';
+      case 'student': return 'bg-surface-active text-primary';
       case 'complaint': return 'bg-amber-100 text-amber-600';
       case 'room':
-      case 'booking': return 'bg-indigo-100 text-indigo-600';
+      case 'booking': return 'bg-indigo-100 text-primary';
       case 'fee':
       case 'payment': return 'bg-emerald-100 text-emerald-600';
       default: return 'bg-gray-100 text-gray-600';
@@ -147,7 +147,7 @@ const NotificationBell = () => {
     if (priority === 'urgent') return 'bg-red-100 text-red-700';
     if (priority === 'important') return 'bg-yellow-100 text-yellow-700';
     if (priority === 'success') return 'bg-green-100 text-green-700';
-    return 'bg-purple-100 text-purple-700';
+    return 'bg-surface-active text-primary';
   };
 
   const timeAgo = (dateStr: string) => {
@@ -275,7 +275,7 @@ const NotificationBell = () => {
                     {notif.message}
                   </p>
                   <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-[11px] text-purple-600 font-medium">{notif.source}</span>
+                    <span className="text-[11px] text-primary font-medium">{notif.source}</span>
                     <p className="text-[11px] text-gray-400">{timeAgo(notif.createdAt)}</p>
                   </div>
                 </div>

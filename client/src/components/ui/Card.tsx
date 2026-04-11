@@ -1,8 +1,3 @@
-/**
- * Card Component
- * Reusable card with design system styling
- */
-
 import React from 'react';
 import { cn } from '../../styles/designSystem';
 
@@ -37,15 +32,15 @@ const Card: React.FC<CardProps> & {
     sm: 'p-4',
     md: 'p-6',
     lg: 'p-8',
-    xl: 'p-10'
+    xl: 'p-10',
   };
 
   return (
     <div
       className={cn(
-        'rounded-xl shadow-md bg-white/5 backdrop-blur-sm border border-purple-500/10',
+        'rounded-xl border border-border bg-card text-card-foreground shadow-md',
         paddingClasses[padding],
-        hoverable && 'hover:shadow-lg transition-all duration-300 hover:-translate-y-1',
+        hoverable && 'transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg',
         className
       )}
     >
@@ -55,27 +50,15 @@ const Card: React.FC<CardProps> & {
 };
 
 const CardHeader: React.FC<CardHeaderProps> = ({ children, className }) => {
-  return (
-    <div className={cn('mb-4', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('mb-4', className)}>{children}</div>;
 };
 
 const CardBody: React.FC<CardBodyProps> = ({ children, className }) => {
-  return (
-    <div className={cn('', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('', className)}>{children}</div>;
 };
 
 const CardFooter: React.FC<CardFooterProps> = ({ children, className }) => {
-  return (
-    <div className={cn('mt-4 pt-4 border-t border-purple-500/10', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('mt-4 border-t border-border pt-4', className)}>{children}</div>;
 };
 
 Card.Header = CardHeader;

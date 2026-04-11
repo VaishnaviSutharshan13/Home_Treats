@@ -10,6 +10,7 @@ interface Room {
   floor: string;
   capacity: number;
   occupied: number;
+  price: number;
   status: string;
 }
 
@@ -104,7 +105,7 @@ const RoomBooking = () => {
 
         <div className="p-6 space-y-6">
           {successMessage && (
-            <div className="bg-purple-500/10 border border-purple-500/30 text-purple-700 rounded-xl px-4 py-3 font-medium">
+            <div className="bg-primary/10 border border-primary/30 text-primary rounded-xl px-4 py-3 font-medium">
               {successMessage}
             </div>
           )}
@@ -117,7 +118,7 @@ const RoomBooking = () => {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <FaSpinner className="w-8 h-8 text-purple-600 animate-spin" />
+              <FaSpinner className="w-8 h-8 text-primary animate-spin" />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -126,15 +127,15 @@ const RoomBooking = () => {
                 const isFull = availableBeds <= 0 || room.status === 'Occupied';
 
                 return (
-                  <div key={room._id} className="bg-white rounded-2xl border border-purple-500/15 shadow-sm p-5">
+                  <div key={room._id} className="bg-white rounded-2xl border border-primary/15 shadow-sm p-5">
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Room {room.roomNumber}</h3>
                     <div className="space-y-1 text-sm text-gray-700 mb-4">
-                      <p><span className="font-semibold text-purple-600">Floor:</span> {room.floor}</p>
-                      <p><span className="font-semibold text-purple-600">Total Beds:</span> {room.capacity}</p>
-                      <p><span className="font-semibold text-purple-600">Available Beds:</span> {availableBeds}</p>
+                      <p><span className="font-semibold text-primary">Floor:</span> {room.floor}</p>
+                      <p><span className="font-semibold text-primary">Total Beds:</span> {room.capacity}</p>
+                      <p><span className="font-semibold text-primary">Available Beds:</span> {availableBeds}</p>
                       <p>
-                        <span className="font-semibold text-purple-600">Status:</span>{' '}
-                        <span className={isFull ? 'text-red-500 font-semibold' : 'text-purple-600 font-semibold'}>
+                        <span className="font-semibold text-primary">Status:</span>{' '}
+                        <span className={isFull ? 'text-red-500 font-semibold' : 'text-primary font-semibold'}>
                           {isFull ? 'Full' : 'Available'}
                         </span>
                       </p>
@@ -144,7 +145,7 @@ const RoomBooking = () => {
                       <button
                         type="button"
                         onClick={() => handleBookNow(room)}
-                        className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition"
+                        className="w-full py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition"
                       >
                         Book Now
                       </button>
@@ -164,15 +165,15 @@ const RoomBooking = () => {
           )}
 
           {selectedRoom && (
-            <div className="bg-white rounded-2xl border border-purple-500/20 shadow-sm p-6">
+            <div className="bg-white rounded-2xl border border-primary/20 shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Booking Confirmation</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6">
-                <p><span className="font-semibold text-purple-600">Student Name:</span> {user?.name}</p>
-                <p><span className="font-semibold text-purple-600">Email:</span> {user?.email}</p>
-                <p><span className="font-semibold text-purple-600">Selected Room Number:</span> {selectedRoom.roomNumber}</p>
-                <p><span className="font-semibold text-purple-600">Floor Number:</span> {selectedRoom.floor}</p>
-                <p><span className="font-semibold text-purple-600">Bed Availability:</span> {selectedRoom.capacity - selectedRoom.occupied}</p>
-                <p><span className="font-semibold text-purple-600">Monthly Rent:</span> LKR 5500</p>
+                <p><span className="font-semibold text-primary">Student Name:</span> {user?.name}</p>
+                <p><span className="font-semibold text-primary">Email:</span> {user?.email}</p>
+                <p><span className="font-semibold text-primary">Selected Room Number:</span> {selectedRoom.roomNumber}</p>
+                <p><span className="font-semibold text-primary">Floor Number:</span> {selectedRoom.floor}</p>
+                <p><span className="font-semibold text-primary">Bed Availability:</span> {selectedRoom.capacity - selectedRoom.occupied}</p>
+                <p><span className="font-semibold text-primary">Monthly Rent:</span> LKR {selectedRoom.price?.toLocaleString() || 0}</p>
               </div>
 
               <div className="flex gap-3">
@@ -180,7 +181,7 @@ const RoomBooking = () => {
                   type="button"
                   onClick={handleConfirmBooking}
                   disabled={confirming}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold transition disabled:opacity-60"
                 >
                   <FaCheckCircle className="w-4 h-4" />
                   {confirming ? 'Confirming...' : 'Confirm Booking'}

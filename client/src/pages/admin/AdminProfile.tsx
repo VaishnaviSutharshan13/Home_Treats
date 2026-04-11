@@ -206,11 +206,11 @@ const AdminProfile = () => {
     <div className="min-h-screen bg-gray-50">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="admin" />
       <div className="lg:ml-64 p-6 sm:p-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin <span className="text-purple-600">Profile</span></h1>
+        <h1 className="text-3xl font-bold text-gray-900">Admin <span className="text-primary">Profile</span></h1>
         <p className="text-gray-600 mt-1">Manage your account details and profile photo</p>
 
         {message && (
-          <div className={`mt-4 rounded-lg px-4 py-3 text-sm ${message.type === 'success' ? 'bg-purple-100 text-purple-800' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mt-4 rounded-lg px-4 py-3 text-sm ${message.type === 'success' ? 'bg-surface-active text-primary' : 'bg-red-100 text-red-700'}`}>
             {message.text}
           </div>
         )}
@@ -219,16 +219,16 @@ const AdminProfile = () => {
           <div className="mt-16 flex items-center justify-center text-gray-600"><FaSpinner className="animate-spin mr-2" />Loading profile...</div>
         ) : (
           <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
-              <div className="w-36 h-36 rounded-full mx-auto overflow-hidden border-4 border-purple-100 bg-purple-50 flex items-center justify-center">
+            <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
+              <div className="w-36 h-36 rounded-full mx-auto overflow-hidden border-4 border-primary/15 bg-surface-active flex items-center justify-center">
                 {avatar ? (
                   <img src={avatar} alt="Admin profile" className="w-full h-full object-cover" />
                 ) : (
-                  <FaUser className="text-4xl text-purple-400" />
+                  <FaUser className="text-4xl text-primary" />
                 )}
               </div>
 
-              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white cursor-pointer transition-colors">
+              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer transition-colors">
                 <FaCamera className="mr-2" />Choose Image
                 <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={handleImageChange} />
               </label>
@@ -236,33 +236,33 @@ const AdminProfile = () => {
               <button
                 onClick={handleSaveImage}
                 disabled={uploading || !selectedImageFile}
-                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-60"
+                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
               >
                 {uploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Image
               </button>
 
               <div className="mt-6 space-y-3 text-sm">
-                <p className="flex items-center text-gray-700"><FaIdBadge className="mr-2 text-purple-600" />{profile?.adminId || 'N/A'}</p>
-                <p className="flex items-center text-gray-700"><FaShieldAlt className="mr-2 text-purple-600" />{profile?.role || 'admin'}</p>
+                <p className="flex items-center text-gray-700"><FaIdBadge className="mr-2 text-primary" />{profile?.adminId || 'N/A'}</p>
+                <p className="flex items-center text-gray-700"><FaShieldAlt className="mr-2 text-primary" />{profile?.role || 'admin'}</p>
                 <p className="text-gray-500">Joined: {profile?.dateJoined ? new Date(profile.dateJoined).toLocaleDateString() : 'N/A'}</p>
               </div>
             </div>
 
             <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Personal Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Full Name</label>
-                    <input title="Full name" placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input title="Full name" placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Phone</label>
-                    <input title="Phone" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input title="Phone" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Gender</label>
-                    <select title="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <select title="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
                       <option value="">Select gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -271,12 +271,12 @@ const AdminProfile = () => {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm text-gray-600 mb-1">Address</label>
-                    <input title="Address" placeholder="Enter address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input title="Address" placeholder="Enter address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+              <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Account Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -289,21 +289,21 @@ const AdminProfile = () => {
                   </div>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">New Password</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Leave blank to keep current" className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Leave blank to keep current" className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Confirm Password</label>
-                    <input type="password" title="Confirm password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="password" title="Confirm password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                 </div>
 
-                <button onClick={saveProfile} disabled={saving} className="mt-5 inline-flex items-center px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-70 text-white">
+                <button onClick={saveProfile} disabled={saving} className="mt-5 inline-flex items-center px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-hover disabled:opacity-70 text-white">
                   {saving ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Changes
                 </button>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-purple-100 p-6 shadow-sm">
+            <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Change Hero Image</h2>
               <p className="text-sm text-gray-600 mb-4">Update the Home page hero background image shown to all users.</p>
 
@@ -316,7 +316,7 @@ const AdminProfile = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white cursor-pointer transition-colors">
+                <label className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer transition-colors">
                   <FaImage className="mr-2" />Choose Hero Image
                   <input
                     type="file"
@@ -329,7 +329,7 @@ const AdminProfile = () => {
                 <button
                   onClick={handleSaveHeroImage}
                   disabled={heroUploading || !selectedHeroFile}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 disabled:opacity-60"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
                 >
                   {heroUploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Update Hero Image
                 </button>

@@ -126,7 +126,7 @@ const BookingForm: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ── HERO SECTION ─────────────────────────── */}
-      <section className="w-full bg-gradient-to-br from-purple-800 via-purple-600 to-purple-500 relative py-14 sm:py-18">
+      <section className="w-full bg-gradient-to-br from-primary via-primary-hover to-secondary relative py-14 sm:py-18">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <Link
@@ -160,38 +160,38 @@ const BookingForm: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-                <MdMeetingRoom className="w-5 h-5 text-purple-600" />
+                <MdMeetingRoom className="w-5 h-5 text-primary" />
                 Room Details
               </h2>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500 text-sm flex items-center gap-2">
-                    <MdMeetingRoom className="w-4 h-4 text-purple-400" />
+                    <MdMeetingRoom className="w-4 h-4 text-primary" />
                     Room ID
                   </span>
                   <span className="font-semibold text-gray-900 text-sm">{roomData.roomNumber || roomData.roomId}</span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500 text-sm flex items-center gap-2">
-                    <FaBuilding className="w-4 h-4 text-purple-400" />
+                    <FaBuilding className="w-4 h-4 text-primary" />
                     Building
                   </span>
                   <span className="font-semibold text-gray-900 text-sm">{roomData.building}</span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-gray-100">
                   <span className="text-gray-500 text-sm flex items-center gap-2">
-                    <FaLayerGroup className="w-4 h-4 text-purple-400" />
+                    <FaLayerGroup className="w-4 h-4 text-primary" />
                     Floor
                   </span>
                   <span className="font-semibold text-gray-900 text-sm">{roomData.floor}</span>
                 </div>
                 <div className="flex items-center justify-between py-3">
                   <span className="text-gray-500 text-sm flex items-center gap-2">
-                    <FaMoneyBillWave className="w-4 h-4 text-purple-400" />
+                    <FaMoneyBillWave className="w-4 h-4 text-primary" />
                     Price
                   </span>
-                  <span className="font-bold text-purple-600 text-lg">
+                  <span className="font-bold text-primary text-lg">
                     Rs. {roomData.price?.toLocaleString()}
                     <span className="text-xs text-gray-400 font-normal ml-1">/month</span>
                   </span>
@@ -204,7 +204,7 @@ const BookingForm: React.FC = () => {
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
               <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <FaUser className="w-5 h-5 text-purple-600" />
+                <FaUser className="w-5 h-5 text-primary" />
                 Your Details
               </h2>
 
@@ -222,10 +222,10 @@ const BookingForm: React.FC = () => {
                       value={formData.fullName}
                       onChange={handleChange}
                       placeholder="Enter your full name"
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.fullName
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -247,10 +247,10 @@ const BookingForm: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@example.com"
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.email
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -272,10 +272,10 @@ const BookingForm: React.FC = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="07X XXX XXXX"
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.phone
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -297,10 +297,10 @@ const BookingForm: React.FC = () => {
                       value={formData.nic}
                       onChange={handleChange}
                       placeholder="Enter your NIC or ID number"
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.nic
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -322,10 +322,10 @@ const BookingForm: React.FC = () => {
                       value={formData.startDate}
                       onChange={handleChange}
                       min={today}
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.startDate
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -345,10 +345,10 @@ const BookingForm: React.FC = () => {
                       name="duration"
                       value={formData.duration}
                       onChange={handleChange}
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 appearance-none bg-white cursor-pointer ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 appearance-none bg-white cursor-pointer ${
                         formErrors.duration
                           ? "border-red-400 bg-red-50"
-                          : "border-gray-200 hover:border-purple-300"
+                          : "border-gray-200 hover:border-primary/30"
                       }`}
                     >
                       <option value="">Select duration</option>
@@ -377,7 +377,7 @@ const BookingForm: React.FC = () => {
                       onChange={handleChange}
                       placeholder="Any special requests or notes..."
                       rows={3}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-purple-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-none"
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-primary/30 text-gray-900 placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none"
                     />
                   </div>
                 </div>
@@ -388,7 +388,7 @@ const BookingForm: React.FC = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white rounded-xl font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white rounded-xl font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   Proceed to Payment
                   <FaArrowRight className="w-4 h-4" />

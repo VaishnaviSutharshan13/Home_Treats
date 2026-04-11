@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Modal from '../../components/ui/Modal';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { bookingService, roomService } from '../../services';
+import { useAuth } from '../../context/AuthContext';
 
-const ROOM_DETAILS = {
-  roomNumber: 'B-202',
-  floor: '2nd Floor',
-  totalBeds: 2,
-  availableBeds: 2,
-  status: 'Available',
-};
+interface RoomOption {
+  _id: string;
+  roomNumber: string;
+  floor: string;
+  capacity: number;
+  occupied: number;
+  status: string;
+}
 
 const DURATION_OPTIONS = [
   { label: '3 months', value: '3_months' },
@@ -21,19 +24,45 @@ const DURATION_OPTIONS = [
 ];
 
 const RoomBookingFormPage: React.FC = () => {
+  const { user } = useAuth();
   const [form, setForm] = useState({
-    fullName: '',
-    studentId: '',
-    email: '',
-    phone: '',
+    fullName: user?.name || '',
+    studentId: user?.studentId || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
     checkIn: '',
     duration: '',
     notes: '',
   });
   const [errors, setErrors] = useState<any>({});
+  const [loadingRoom, setLoadingRoom] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchAvailableRoom = async () => {
+      try {
+        const res = await roomService.getAll();
+        const allRooms: RoomOption[] = (res?.data || res || []) as RoomOption[];
+        const room = allRooms.find((r) => r.status !== 'Maintenance' && r.occupied < r.capacity) || null;
+        setSelectedRoom(room);
+      } catch (error) {
+        setErrorMessage('Failed to load available room details.');
+      } finally {
+        setLoadingRoom(false);
+      }
+    };
+
+    fetchAvailableRoom();
+  }, []);
+
+  const availableBeds = useMemo(() => {
+    if (!selectedRoom) return 0;
+    return Math.max(selectedRoom.capacity - selectedRoom.occupied, 0);
+  }, [selectedRoom]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -51,18 +80,42 @@ const RoomBookingFormPage: React.FC = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validation = validate();
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
       return;
     }
+    if (!selectedRoom) {
+      setErrorMessage('No room is currently available for booking.');
+      return;
+    }
+
     setSubmitting(true);
-    setTimeout(() => {
+    setErrorMessage('');
+
+    try {
+      const response = await bookingService.confirm({
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        selectedFloor: selectedRoom.floor,
+        roomId: selectedRoom._id,
+      });
+
+      if (!response?.success) {
+        setErrorMessage(response?.message || 'Booking failed. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
       setSubmitting(false);
       setSuccess(true);
-    }, 1200);
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message || 'Booking failed. Please try again.');
+      setSubmitting(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -71,25 +124,38 @@ const RoomBookingFormPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-purple-50 to-white py-10 px-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-active via-background to-card py-10 px-2">
       <div className="w-full max-w-lg">
+        {errorMessage && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {errorMessage}
+          </div>
+        )}
+
         {/* Room Details Card */}
-        <Card className="mb-8 bg-gradient-to-r from-purple-500/10 to-purple-300/10 border-purple-400/20">
+        <Card className="mb-8 bg-gradient-to-r from-primary/10 to-primary/10 border-primary/20">
           <Card.Header>
-            <h2 className="text-xl font-bold text-purple-800 mb-1">Room {ROOM_DETAILS.roomNumber}</h2>
+            <h2 className="text-xl font-bold text-primary mb-1">
+              Room {selectedRoom?.roomNumber || '-'}
+            </h2>
             <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-              <span><span className="font-semibold text-purple-600">Floor:</span> {ROOM_DETAILS.floor}</span>
-              <span><span className="font-semibold text-purple-600">Total Beds:</span> {ROOM_DETAILS.totalBeds}</span>
-              <span><span className="font-semibold text-purple-600">Available Beds:</span> {ROOM_DETAILS.availableBeds}</span>
-              <span><span className="font-semibold text-purple-600">Status:</span> <span className="font-semibold text-green-600">{ROOM_DETAILS.status}</span></span>
+              <span><span className="font-semibold text-primary">Floor:</span> {selectedRoom?.floor || '-'}</span>
+              <span><span className="font-semibold text-primary">Total Beds:</span> {selectedRoom?.capacity || '-'}</span>
+              <span><span className="font-semibold text-primary">Available Beds:</span> {loadingRoom ? 'Loading...' : availableBeds}</span>
+              <span>
+                <span className="font-semibold text-primary">Status:</span>{' '}
+                <span className="font-semibold text-green-600">
+                  {loadingRoom ? 'Loading...' : availableBeds > 0 ? 'Available' : 'Full'}
+                </span>
+              </span>
             </div>
           </Card.Header>
         </Card>
 
         {/* Booking Form Card */}
-        <Card className="bg-white/80 border-purple-400/10">
+        <Card className="bg-white/80 border-primary/10">
           <Card.Header>
-            <h3 className="text-lg font-semibold text-purple-700 mb-2">Room Booking Form</h3>
+            <h3 className="text-lg font-semibold text-primary mb-2">Room Booking Form</h3>
           </Card.Header>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -106,7 +172,6 @@ const RoomBookingFormPage: React.FC = () => {
               name="studentId"
               value={form.studentId}
               onChange={handleChange}
-              error={errors.studentId}
               placeholder="e.g. STU123456"
               autoComplete="off"
             />
@@ -144,7 +209,7 @@ const RoomBookingFormPage: React.FC = () => {
                 name="duration"
                 value={form.duration}
                 onChange={handleChange}
-                className={`rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none w-full ${errors.duration ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                className={`rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none w-full ${errors.duration ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
               >
                 <option value="">Select duration</option>
                 {DURATION_OPTIONS.map(opt => (
@@ -160,7 +225,7 @@ const RoomBookingFormPage: React.FC = () => {
                 value={form.notes}
                 onChange={handleChange}
                 rows={3}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none w-full"
+                className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none w-full"
                 placeholder="Any special requests or notes..."
               />
             </div>
@@ -170,6 +235,7 @@ const RoomBookingFormPage: React.FC = () => {
                 size="lg"
                 className="w-full"
                 loading={submitting}
+                disabled={loadingRoom || !selectedRoom || availableBeds <= 0}
               >
                 Confirm Booking
               </Button>

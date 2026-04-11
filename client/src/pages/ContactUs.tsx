@@ -49,10 +49,10 @@ const ContactUs = () => {
 
   const socialLinks = [
     { icon: <FaFacebook className="w-5 h-5" />, href: '#', label: 'Facebook', color: 'hover:bg-blue-600' },
-    { icon: <FaTwitter className="w-5 h-5" />, href: '#', label: 'Twitter', color: 'hover:bg-sky-500' },
-    { icon: <FaInstagram className="w-5 h-5" />, href: '#', label: 'Instagram', color: 'hover:bg-pink-600' },
+    { icon: <FaTwitter className="w-5 h-5" />, href: '#', label: 'Twitter', color: 'hover:bg-primary' },
+    { icon: <FaInstagram className="w-5 h-5" />, href: '#', label: 'Instagram', color: 'hover:bg-secondary' },
     { icon: <FaLinkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn', color: 'hover:bg-blue-700' },
-    { icon: <FaWhatsapp className="w-5 h-5" />, href: '#', label: 'WhatsApp', color: 'hover:bg-purple-600' },
+    { icon: <FaWhatsapp className="w-5 h-5" />, href: '#', label: 'WhatsApp', color: 'hover:bg-primary' },
     { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube', color: 'hover:bg-red-600' },
   ];
 
@@ -67,11 +67,11 @@ const ContactUs = () => {
               "url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1920')",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-[#0f172a]/80 to-purple-900/60" />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-[#0f172a]/80 to-primary/60" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-slide-up">
-            Get in <span className="text-purple-600">Touch</span>
+            Get in <span className="text-primary">Touch</span>
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.15s' }}>
             Have questions about our hostel? We'd love to hear from you.
@@ -161,8 +161,8 @@ const ContactUs = () => {
 
               {/* Status Messages */}
               {submitStatus === 'success' && (
-                <div className="mt-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                  <p className="text-purple-600 font-medium flex items-center gap-2">
+                <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                  <p className="text-primary font-medium flex items-center gap-2">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -186,8 +186,8 @@ const ContactUs = () => {
               <div className="space-y-6">
                 {/* Address */}
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FaMapMarkerAlt className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FaMapMarkerAlt className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-1">Address</h3>
@@ -201,8 +201,8 @@ const ContactUs = () => {
 
                 {/* Phone */}
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FaPhone className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FaPhone className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-1">Phone</h3>
@@ -216,15 +216,15 @@ const ContactUs = () => {
 
                 {/* Email */}
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FaEnvelope className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FaEnvelope className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white mb-1">Email</h3>
                     <p className="text-gray-500">
-                      General: <a href="mailto:sivananthangowsikan2003@gmail.com" className="hover:text-purple-600 transition-colors">sivananthangowsikan2003@gmail.com</a><br />
-                      Support: <a href="mailto:support@hometreats.lk" className="hover:text-purple-600 transition-colors">support@hometreats.lk</a><br />
-                      Bookings: <a href="mailto:gowsileo@gmail.com" className="hover:text-purple-600 transition-colors">gowsileo@gmail.com</a>
+                      General: <a href="mailto:sivananthangowsikan2003@gmail.com" className="hover:text-primary transition-colors">sivananthangowsikan2003@gmail.com</a><br />
+                      Support: <a href="mailto:support@hometreats.lk" className="hover:text-primary transition-colors">support@hometreats.lk</a><br />
+                      Bookings: <a href="mailto:gowsileo@gmail.com" className="hover:text-primary transition-colors">gowsileo@gmail.com</a>
                     </p>
                   </div>
                 </div>
@@ -234,7 +234,7 @@ const ContactUs = () => {
             </div>
 
             {/* Google Map */}
-            <div className="card overflow-hidden p-0 border border-purple-500/10">
+            <div className="card overflow-hidden p-0 border border-primary/10">
               <iframe
                 title="Home_Treats Location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3932.0!2d80.0255!3d9.6695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3afe53fd7be66aa5%3A0x79e8119de581cf80!2sNallur%20Kandaswamy%20Temple!5e0!3m2!1sen!2slk!4v1700000000000!5m2!1sen!2slk"
@@ -258,7 +258,7 @@ const ContactUs = () => {
                     key={i}
                     href={link.href}
                     aria-label={link.label}
-                    className={`w-12 h-12 bg-purple-50 border border-purple-500/10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white ${link.color} transition-all duration-300 hover:shadow-lg hover:scale-110`}
+                    className={`w-12 h-12 bg-surface-active border border-primary/10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white ${link.color} transition-all duration-300 hover:shadow-lg hover:scale-110`}
                   >
                     {link.icon}
                   </a>

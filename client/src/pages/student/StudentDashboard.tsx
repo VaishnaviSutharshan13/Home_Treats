@@ -97,6 +97,12 @@ const StudentDashboard = () => {
   const resolvedComplaints = Array.isArray(complaints)
     ? complaints.filter((c) => ['resolved', 'closed'].includes(normalizeStatus(c.status)))
     : [];
+  const userInitials = (user?.name || 'Student')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('');
 
   const complaintDerivedNotifications = [
     ...resolvedComplaints.slice(0, 3).map((c) => ({
@@ -149,9 +155,9 @@ const StudentDashboard = () => {
     {
       title: 'Monthly Fees',
       value: `LKR ${totalPendingAmount.toLocaleString()}`,
-      icon: <FaDollarSign className="w-8 h-8 text-purple-600" />,
+      icon: <FaDollarSign className="w-8 h-8 text-primary" />,
       detail: `${pendingFees.length} pending payment(s)`,
-      bgColor: 'bg-purple-50',
+      bgColor: 'bg-surface-active',
     },
     {
       title: 'My Complaints',
@@ -162,10 +168,10 @@ const StudentDashboard = () => {
     },
     {
       title: 'Profile Status',
-      value: 'Active',
-      icon: <FaUser className="w-8 h-8 text-purple-600" />,
-      detail: 'Verified student',
-      bgColor: 'bg-purple-50',
+      value: user?.status === 'Inactive' ? 'Inactive' : 'Active',
+      icon: <FaUser className="w-8 h-8 text-primary" />,
+      detail: user?.approvalStatus || 'Student account',
+      bgColor: 'bg-surface-active',
     },
   ];
 
@@ -235,28 +241,28 @@ const StudentDashboard = () => {
           </div>
 
           {booking && (
-            <div className="mb-8 bg-white rounded-xl shadow-lg border border-purple-500/20 p-6">
+            <div className="mb-8 bg-white rounded-xl shadow-lg border border-primary/20 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-[#f5f3ff] rounded-xl p-4 border border-purple-500/15">
+                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
                   <p className="text-xs text-gray-500">Booked Room Number</p>
-                  <p className="text-base font-bold text-purple-600 mt-1">{booking.roomNumber}</p>
+                  <p className="text-base font-bold text-primary mt-1">{booking.roomNumber}</p>
                 </div>
-                <div className="bg-[#f5f3ff] rounded-xl p-4 border border-purple-500/15">
+                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
                   <p className="text-xs text-gray-500">Floor Number</p>
-                  <p className="text-base font-bold text-purple-600 mt-1">{booking.selectedFloor}</p>
+                  <p className="text-base font-bold text-primary mt-1">{booking.selectedFloor}</p>
                 </div>
-                <div className="bg-[#f5f3ff] rounded-xl p-4 border border-purple-500/15">
+                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
                   <p className="text-xs text-gray-500">Bed Number</p>
-                  <p className="text-base font-bold text-purple-600 mt-1">Bed {booking.bedNumber}</p>
+                  <p className="text-base font-bold text-primary mt-1">Bed {booking.bedNumber}</p>
                 </div>
-                <div className="bg-[#f5f3ff] rounded-xl p-4 border border-purple-500/15">
+                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
                   <p className="text-xs text-gray-500">Monthly Rent</p>
-                  <p className="text-base font-bold text-purple-600 mt-1">LKR {booking.monthlyRent}</p>
+                  <p className="text-base font-bold text-primary mt-1">LKR {booking.monthlyRent}</p>
                 </div>
-                <div className="bg-[#f5f3ff] rounded-xl p-4 border border-purple-500/15">
+                <div className="bg-surface-active/50 rounded-xl p-4 border border-primary/15">
                   <p className="text-xs text-gray-500">Booking Status</p>
-                  <p className="text-base font-bold text-purple-600 mt-1">{booking.status}</p>
+                  <p className="text-base font-bold text-primary mt-1">{booking.status}</p>
                 </div>
               </div>
             </div>
@@ -296,12 +302,12 @@ const StudentDashboard = () => {
                     <div
                       key={idx}
                       className={`flex items-start space-x-3 p-3 rounded-lg ${
-                        notification.color === 'green' ? 'bg-purple-50' : 'bg-orange-50'
+                        notification.color === 'green' ? 'bg-surface-active' : 'bg-orange-50'
                       }`}
                     >
                       <div
                         className={`w-2 h-2 rounded-full mt-2 ${
-                          notification.color === 'green' ? 'bg-purple-600' : 'bg-orange-600'
+                          notification.color === 'green' ? 'bg-primary' : 'bg-orange-600'
                         }`}
                       ></div>
                       <div>
@@ -333,10 +339,10 @@ const StudentDashboard = () => {
                 </Link>
                 <Link
                   to="/student/my-fees"
-                  className="block w-full text-left p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200"
+                  className="block w-full text-left p-4 bg-surface-active hover:bg-surface-active rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
-                    <FaDollarSign className="w-5 h-5 text-purple-600" />
+                    <FaDollarSign className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">My Fees</p>
                       <p className="text-xs text-gray-500">View fees &amp; payment history</p>
@@ -345,10 +351,10 @@ const StudentDashboard = () => {
                 </Link>
                 <Link
                   to="/student/profile"
-                  className="block w-full text-left p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200"
+                  className="block w-full text-left p-4 bg-surface-active hover:bg-surface-active rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
-                    <FaUser className="w-5 h-5 text-purple-600" />
+                    <FaUser className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">Profile</p>
                       <p className="text-xs text-gray-500">View &amp; edit personal information</p>
