@@ -3,7 +3,8 @@
  * Modern split layout with contact form, Google Map, social media, and Sri Lankan info
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import {
   FaMapMarkerAlt,
   FaPhone,
@@ -18,11 +19,24 @@ import {
 } from 'react-icons/fa';
 
 const ContactUs = () => {
+  const { user, isAuthenticated } = useAuth();
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: user?.name || '',
+    email: user?.email || '',
     message: '',
   });
+
+  // Keep synced if user data loads late
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email
+      }));
+    }
+  }, [user]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -38,7 +52,7 @@ const ContactUs = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', message: '' });
+      setFormData(prev => ({ ...prev, message: '' }));
     } catch {
       setSubmitStatus('error');
     } finally {
@@ -48,16 +62,16 @@ const ContactUs = () => {
   };
 
   const socialLinks = [
-    { icon: <FaFacebook className="w-5 h-5" />, href: '#', label: 'Facebook', color: 'hover:bg-blue-600' },
+    { icon: <FaFacebook className="w-5 h-5" />, href: '#', label: 'Facebook', color: 'hover:bg-primary/10 text-primary0' },
     { icon: <FaTwitter className="w-5 h-5" />, href: '#', label: 'Twitter', color: 'hover:bg-primary' },
     { icon: <FaInstagram className="w-5 h-5" />, href: '#', label: 'Instagram', color: 'hover:bg-secondary' },
-    { icon: <FaLinkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn', color: 'hover:bg-blue-700' },
+    { icon: <FaLinkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn', color: 'hover:bg-primary/10 text-primary0' },
     { icon: <FaWhatsapp className="w-5 h-5" />, href: '#', label: 'WhatsApp', color: 'hover:bg-primary' },
-    { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube', color: 'hover:bg-red-600' },
+    { icon: <FaYoutube className="w-5 h-5" />, href: '#', label: 'YouTube', color: 'hover:bg-error/10 border border-error/200' },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative py-20 md:py-28 overflow-hidden">
         <div
@@ -84,46 +98,50 @@ const ContactUs = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Side - Contact Form */}
           <div className="animate-fade-in">
-            <div className="card">
+            <div className="bg-card border border-border rounded-2xl p-8 shadow-sm h-full">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Send us a Message</h2>
-                <p className="text-gray-500">Fill out the form below and we'll get back to you soon.</p>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Send us a Message</h2>
+                <p className="text-muted-foreground">Fill out the form below and we'll get back to you soon.</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name */}
-                <div>
-                  <label htmlFor="name" className="form-label">Your Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="form-input"
-                    placeholder="John Doe"
-                  />
-                </div>
+                {!isAuthenticated && (
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-semibold text-foreground mb-1">Your Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                )}
 
                 {/* Email */}
-                <div>
-                  <label htmlFor="email" className="form-label">Email Address</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="form-input"
-                    placeholder="john@example.com"
-                  />
-                </div>
+                {!isAuthenticated && (
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-foreground mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                )}
 
                 {/* Message */}
                 <div>
-                  <label htmlFor="message" className="form-label">Your Message</label>
+                  <label htmlFor="message" className="block text-sm font-semibold text-foreground mb-1">Your Message</label>
                   <textarea
                     id="message"
                     name="message"
@@ -131,7 +149,7 @@ const ContactUs = () => {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="form-textarea"
+                    className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                     placeholder="Tell us how we can help you..."
                   />
                 </div>
@@ -140,7 +158,7 @@ const ContactUs = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn btn-primary w-full flex items-center justify-center gap-2"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-hover transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 text-white font-bold rounded-xl text-sm"
                 >
                   {isSubmitting ? (
                     <>
@@ -171,8 +189,8 @@ const ContactUs = () => {
                 </div>
               )}
               {submitStatus === 'error' && (
-                <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-red-400 font-medium">Failed to send message. Please try again.</p>
+                <div className="mt-4 p-4 bg-error/10 border border-error/200/10 border border-red-500/20 rounded-lg">
+                  <p className="text-error font-medium">Failed to send message. Please try again.</p>
                 </div>
               )}
             </div>
@@ -181,8 +199,8 @@ const ContactUs = () => {
           {/* Right Side - Contact Info + Map + Social */}
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             {/* Contact Information Card */}
-            <div className="card">
-              <h2 className="text-2xl font-bold text-white mb-6">Contact Information</h2>
+            <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Contact Information</h2>
               <div className="space-y-6">
                 {/* Address */}
                 <div className="flex items-start space-x-4">
@@ -190,8 +208,8 @@ const ContactUs = () => {
                     <FaMapMarkerAlt className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">Address</h3>
-                    <p className="text-gray-500">
+                    <h3 className="font-semibold text-foreground mb-1">Address</h3>
+                    <p className="text-muted-foreground">
                       No.11, Nallur<br />
                       Jaffna, 40000<br />
                       Sri Lanka
@@ -205,8 +223,8 @@ const ContactUs = () => {
                     <FaPhone className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">Phone</h3>
-                    <p className="text-gray-500">
+                    <h3 className="font-semibold text-foreground mb-1">Phone</h3>
+                    <p className="text-muted-foreground">
                       Main: +94 76 293 2003<br />
                       Mobile: +94 76 185 3629<br />
                       Emergency: +94 77 55 65147
@@ -220,8 +238,8 @@ const ContactUs = () => {
                     <FaEnvelope className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white mb-1">Email</h3>
-                    <p className="text-gray-500">
+                    <h3 className="font-semibold text-foreground mb-1">Email</h3>
+                    <p className="text-muted-foreground">
                       General: <a href="mailto:sivananthangowsikan2003@gmail.com" className="hover:text-primary transition-colors">sivananthangowsikan2003@gmail.com</a><br />
                       Support: <a href="mailto:support@hometreats.lk" className="hover:text-primary transition-colors">support@hometreats.lk</a><br />
                       Bookings: <a href="mailto:gowsileo@gmail.com" className="hover:text-primary transition-colors">gowsileo@gmail.com</a>
@@ -234,7 +252,7 @@ const ContactUs = () => {
             </div>
 
             {/* Google Map */}
-            <div className="card overflow-hidden p-0 border border-primary/10">
+            <div className="bg-card rounded-2xl overflow-hidden p-0 border border-border shadow-sm">
               <iframe
                 title="Home_Treats Location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3932.0!2d80.0255!3d9.6695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3afe53fd7be66aa5%3A0x79e8119de581cf80!2sNallur%20Kandaswamy%20Temple!5e0!3m2!1sen!2slk!4v1700000000000!5m2!1sen!2slk"
@@ -249,16 +267,16 @@ const ContactUs = () => {
             </div>
 
             {/* Social Media */}
-            <div className="card">
-              <h2 className="text-2xl font-bold text-white mb-4">Follow Us</h2>
-              <p className="text-gray-500 mb-6">Stay connected through our social media channels</p>
+            <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Follow Us</h2>
+              <p className="text-muted-foreground mb-6">Stay connected through our social media channels</p>
               <div className="flex flex-wrap gap-3">
                 {socialLinks.map((link, i) => (
                   <a
                     key={i}
                     href={link.href}
                     aria-label={link.label}
-                    className={`w-12 h-12 bg-surface-active border border-primary/10 rounded-xl flex items-center justify-center text-gray-500 hover:text-white ${link.color} transition-all duration-300 hover:shadow-lg hover:scale-110`}
+                    className={`w-12 h-12 bg-surface-active border border-primary/10 rounded-xl flex items-center justify-center text-muted-foreground hover:text-white ${link.color} transition-all duration-300 hover:shadow-lg hover:scale-110`}
                   >
                     {link.icon}
                   </a>

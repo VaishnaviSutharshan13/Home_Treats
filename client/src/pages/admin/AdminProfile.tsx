@@ -203,23 +203,23 @@ const AdminProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="admin" />
       <div className="lg:ml-64 p-6 sm:p-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin <span className="text-primary">Profile</span></h1>
-        <p className="text-gray-600 mt-1">Manage your account details and profile photo</p>
+        <h1 className="text-3xl font-bold text-foreground">Admin <span className="text-primary">Profile</span></h1>
+        <p className="text-muted-foreground mt-1">Manage your account details and profile photo</p>
 
         {message && (
-          <div className={`mt-4 rounded-lg px-4 py-3 text-sm ${message.type === 'success' ? 'bg-surface-active text-primary' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mt-4 rounded-lg px-4 py-3 text-sm ${message.type === 'success' ? 'bg-surface-active text-primary' : 'bg-error/20 border border-error/30 text-error'}`}>
             {message.text}
           </div>
         )}
 
         {loading ? (
-          <div className="mt-16 flex items-center justify-center text-gray-600"><FaSpinner className="animate-spin mr-2" />Loading profile...</div>
+          <div className="mt-16 flex items-center justify-center text-muted-foreground"><FaSpinner className="animate-spin mr-2" />Loading profile...</div>
         ) : (
           <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
+            <div className="bg-card rounded-2xl border border-primary/15 p-6 shadow-sm">
               <div className="w-36 h-36 rounded-full mx-auto overflow-hidden border-4 border-primary/15 bg-surface-active flex items-center justify-center">
                 {avatar ? (
                   <img src={avatar} alt="Admin profile" className="w-full h-full object-cover" />
@@ -228,41 +228,41 @@ const AdminProfile = () => {
                 )}
               </div>
 
-              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer transition-colors">
+              <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 cursor-pointer transition-colors">
                 <FaCamera className="mr-2" />Choose Image
-                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={handleImageChange} />
+                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" onChange={handleImageChange} />
               </label>
 
               <button
                 onClick={handleSaveImage}
                 disabled={uploading || !selectedImageFile}
-                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-white border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
+                className="mt-3 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-card border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
               >
                 {uploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Save Image
               </button>
 
               <div className="mt-6 space-y-3 text-sm">
-                <p className="flex items-center text-gray-700"><FaIdBadge className="mr-2 text-primary" />{profile?.adminId || 'N/A'}</p>
-                <p className="flex items-center text-gray-700"><FaShieldAlt className="mr-2 text-primary" />{profile?.role || 'admin'}</p>
-                <p className="text-gray-500">Joined: {profile?.dateJoined ? new Date(profile.dateJoined).toLocaleDateString() : 'N/A'}</p>
+                <p className="flex items-center text-foreground/90"><FaIdBadge className="mr-2 text-primary" />{profile?.adminId || 'N/A'}</p>
+                <p className="flex items-center text-foreground/90"><FaShieldAlt className="mr-2 text-primary" />{profile?.role || 'admin'}</p>
+                <p className="text-muted-foreground">Joined: {profile?.dateJoined ? new Date(profile.dateJoined).toLocaleDateString() : 'N/A'}</p>
               </div>
             </div>
 
             <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Personal Details</h2>
+              <div className="bg-card rounded-2xl border border-primary/15 p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Personal Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Full Name</label>
-                    <input title="Full name" placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="block text-sm text-muted-foreground mb-1">Full Name</label>
+                    <input title="Full name" placeholder="Enter full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Phone</label>
-                    <input title="Phone" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="block text-sm text-muted-foreground mb-1">Phone</label>
+                    <input title="Phone" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Gender</label>
-                    <select title="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <label className="block text-sm text-muted-foreground mb-1">Gender</label>
+                    <select title="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30">
                       <option value="">Select gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -270,30 +270,30 @@ const AdminProfile = () => {
                     </select>
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm text-gray-600 mb-1">Address</label>
-                    <input title="Address" placeholder="Enter address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="block text-sm text-muted-foreground mb-1">Address</label>
+                    <input title="Address" placeholder="Enter address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Account Details</h2>
+              <div className="bg-card rounded-2xl border border-primary/15 p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-foreground mb-4">Account Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Email (Read-only)</label>
-                    <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600"><FaEnvelope className="mr-2" />{profile?.email}</div>
+                    <label className="block text-sm text-muted-foreground mb-1">Email (Read-only)</label>
+                    <div className="flex items-center border border-border rounded-lg px-3 py-2 bg-muted text-muted-foreground"><FaEnvelope className="mr-2" />{profile?.email}</div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Role (Read-only)</label>
-                    <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-gray-100 text-gray-600"><FaShieldAlt className="mr-2" />{profile?.role || 'admin'}</div>
+                    <label className="block text-sm text-muted-foreground mb-1">Role (Read-only)</label>
+                    <div className="flex items-center border border-border rounded-lg px-3 py-2 bg-muted text-muted-foreground"><FaShieldAlt className="mr-2" />{profile?.role || 'admin'}</div>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">New Password</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Leave blank to keep current" className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="block text-sm text-muted-foreground mb-1">New Password</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Leave blank to keep current" className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Confirm Password</label>
-                    <input type="password" title="Confirm password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <label className="block text-sm text-muted-foreground mb-1">Confirm Password</label>
+                    <input type="password" title="Confirm password" placeholder="Re-enter new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" />
                   </div>
                 </div>
 
@@ -303,11 +303,11 @@ const AdminProfile = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-primary/15 p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Change Hero Image</h2>
-              <p className="text-sm text-gray-600 mb-4">Update the Home page hero background image shown to all users.</p>
+            <div className="bg-card rounded-2xl border border-primary/15 p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Change Hero Image</h2>
+              <p className="text-sm text-muted-foreground mb-4">Update the Home page hero background image shown to all users.</p>
 
-              <div className="w-full h-44 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center mb-4">
+              <div className="w-full h-44 rounded-xl overflow-hidden border border-border bg-muted flex items-center justify-center mb-4">
                 {resolvedHeroImage ? (
                   <img src={resolvedHeroImage} alt="Current hero background" className="w-full h-full object-cover" />
                 ) : (
@@ -316,12 +316,12 @@ const AdminProfile = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white cursor-pointer transition-colors">
+                <label className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 cursor-pointer transition-colors">
                   <FaImage className="mr-2" />Choose Hero Image
                   <input
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                    className="hidden"
+                    className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                     onChange={handleHeroImageChange}
                   />
                 </label>
@@ -329,7 +329,7 @@ const AdminProfile = () => {
                 <button
                   onClick={handleSaveHeroImage}
                   disabled={heroUploading || !selectedHeroFile}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-card border border-primary/25 text-primary hover:bg-surface-active disabled:opacity-60"
                 >
                   {heroUploading ? <FaSpinner className="animate-spin mr-2" /> : <FaSave className="mr-2" />}Update Hero Image
                 </button>

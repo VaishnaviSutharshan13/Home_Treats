@@ -238,6 +238,31 @@ export const payFee = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// GET fees for the logged-in student (used by Profile, etc.)
+export const getMyFees = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user?.id).select('studentId role');
+    if (!user || user.role !== 'student') {
+      return res.status(403).json({ success: false, message: 'Students only.' });
+    }
+    if (!user.studentId?.trim()) {
+      return res.json({ success: true, count: 0, data: [] });
+    }
+    const fees = await Fee.find({ studentId: user.studentId.trim() }).sort({ createdAt: -1 });
+    return res.json({
+      success: true,
+      count: fees.length,
+      data: fees,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching your fees',
+      error: error.message,
+    });
+  }
+};
+
 // GET fees by student (self-access: students can only view their own)
 export const getFeesByStudent = async (req: AuthRequest, res: Response) => {
   try {

@@ -23,8 +23,8 @@ const ComplaintList = ({
   if (!complaints.length) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-14 text-center shadow-sm">
-        <p className="text-base font-semibold text-gray-700">{emptyMessage}</p>
-        <p className="mt-1 text-sm text-gray-500">Try changing your filters or submit a new complaint.</p>
+        <p className="text-base font-semibold text-foreground/90">{emptyMessage}</p>
+        <p className="mt-1 text-sm text-muted-foreground">Try changing your filters or submit a new complaint.</p>
         {onCreateClick && (
           <button
             onClick={onCreateClick}

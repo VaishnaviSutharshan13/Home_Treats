@@ -74,7 +74,7 @@ const MyRoom = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       <div className="lg:ml-64">
-        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full">
+        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground/90">My Room</h1>
@@ -125,7 +125,7 @@ const MyRoom = () => {
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     room.status === 'Available' ? 'bg-surface-active text-primary' :
                     room.status === 'Occupied' ? 'bg-info/10 text-info' :
-                    'bg-yellow-100 text-yellow-800'
+                    'bg-warning/20 border border-warning/30 text-warning'
                   }`}>
                     {room.status}
                   </span>
@@ -147,7 +147,7 @@ const MyRoom = () => {
                     <p className="text-muted-foreground text-sm">Occupancy</p>
                   </div>
                   <p className="text-xl font-bold text-foreground/90 mt-1">{room.occupied} / {room.capacity}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="w-full bg-muted/70 rounded-full h-2 mt-2">
                     <div
                       className="bg-info/10 h-2 rounded-full"
                       style={{ width: `${(room.occupied / room.capacity) * 100}%` }}

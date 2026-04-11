@@ -110,7 +110,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex pt-16">
+    <div className="min-h-[calc(100vh-4rem)] flex">
       {/* Left Side - Hostel Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <div 
@@ -165,10 +165,10 @@ const Login = () => {
 
             {/* Error Alert */}
             {loginError && (
-              <div className="mb-6 p-4 bg-red-500/10 backdrop-blur border border-red-500/20 rounded-xl">
+              <div className="mb-6 p-4 bg-error/10 border border-error/200/10 backdrop-blur border border-red-500/20 rounded-xl">
                 <div className="flex items-center space-x-2">
-                  <FaExclamationTriangle className="w-5 h-5 text-red-400" />
-                  <span className="text-red-400 text-sm font-medium">{loginError}</span>
+                  <FaExclamationTriangle className="w-5 h-5 text-error" />
+                  <span className="text-error text-sm font-medium">{loginError}</span>
                 </div>
               </div>
             )}

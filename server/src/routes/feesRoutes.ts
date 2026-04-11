@@ -8,12 +8,13 @@ import {
   deleteFee,
   payFee,
   getFeesByStudent,
+  getMyFees,
   getRevenueReport,
   getMonthlyReport,
   getReceipt,
   getUnpaidStudents,
 } from '../controllers/feesController';
-import { authMiddleware, adminOnly, approvedStudentOrAdmin } from '../middleware/auth';
+import { authMiddleware, adminOnly, approvedStudentOnly, approvedStudentOrAdmin } from '../middleware/auth';
 
 const router = Router();
 
@@ -30,6 +31,7 @@ router.get('/', authMiddleware, adminOnly, getAllFees);
 router.get('/revenue', authMiddleware, adminOnly, getRevenueReport);
 router.get('/unpaid', authMiddleware, adminOnly, getUnpaidStudents);
 router.get('/report/:year/:month', authMiddleware, adminOnly, getMonthlyReport);
+router.get('/my-fees', authMiddleware, approvedStudentOnly, getMyFees);
 router.get('/student/:studentId', authMiddleware, approvedStudentOrAdmin, getFeesByStudent);
 router.get('/:id/receipt', authMiddleware, getReceipt);
 router.get('/:id', authMiddleware, getFeeById);

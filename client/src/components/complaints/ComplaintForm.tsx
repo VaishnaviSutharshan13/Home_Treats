@@ -25,8 +25,8 @@ const categories = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Hous
 const priorities = ['Low', 'Medium', 'High'];
 
 const inputClass =
-  'h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25';
-const labelClass = 'mb-2 block text-sm font-semibold text-gray-700';
+  'h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25';
+const labelClass = 'mb-2 block text-sm font-semibold text-foreground/90';
 
 const ComplaintForm = ({
   values,
@@ -59,7 +59,7 @@ const ComplaintForm = ({
               required
               placeholder="Student ID or name"
             />
-            {errors.student && <p className="mt-1 text-xs font-medium text-red-600">{errors.student}</p>}
+            {errors.student && <p className="mt-1 text-xs font-medium text-error">{errors.student}</p>}
           </div>
           <div>
             <label className={labelClass} htmlFor="complaint-room">
@@ -73,7 +73,7 @@ const ComplaintForm = ({
               required
               placeholder="Room number"
             />
-            {errors.room && <p className="mt-1 text-xs font-medium text-red-600">{errors.room}</p>}
+            {errors.room && <p className="mt-1 text-xs font-medium text-error">{errors.room}</p>}
           </div>
         </div>
       )}
@@ -91,7 +91,7 @@ const ComplaintForm = ({
           maxLength={120}
           placeholder="Briefly describe the issue"
         />
-        {errors.title && <p className="mt-1 text-xs font-medium text-red-600">{errors.title}</p>}
+        {errors.title && <p className="mt-1 text-xs font-medium text-error">{errors.title}</p>}
       </div>
 
       <div>
@@ -102,7 +102,7 @@ const ComplaintForm = ({
           id="complaint-description"
           value={values.description}
           onChange={(e) => update('description', e.target.value)}
-          className={`min-h-[120px] w-full rounded-xl border bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:ring-2 ${
+          className={`min-h-[120px] w-full rounded-xl border bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:ring-2 ${
             errors.description
               ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
               : 'border-gray-200 focus:border-primary focus:ring-primary/25'
@@ -111,7 +111,7 @@ const ComplaintForm = ({
           maxLength={1200}
           placeholder="Share enough detail so the maintenance team can act quickly"
         />
-        {errors.description && <p className="mt-1 text-xs font-medium text-red-600">{errors.description}</p>}
+        {errors.description && <p className="mt-1 text-xs font-medium text-error">{errors.description}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -131,7 +131,7 @@ const ComplaintForm = ({
               </option>
             ))}
           </select>
-          {errors.category && <p className="mt-1 text-xs font-medium text-red-600">{errors.category}</p>}
+          {errors.category && <p className="mt-1 text-xs font-medium text-error">{errors.category}</p>}
         </div>
         <div>
           <label className={labelClass} htmlFor="complaint-priority">
@@ -149,7 +149,7 @@ const ComplaintForm = ({
               </option>
             ))}
           </select>
-          {errors.priority && <p className="mt-1 text-xs font-medium text-red-600">{errors.priority}</p>}
+          {errors.priority && <p className="mt-1 text-xs font-medium text-error">{errors.priority}</p>}
         </div>
       </div>
 
@@ -158,7 +158,7 @@ const ComplaintForm = ({
           <button
             type="button"
             onClick={onCancel}
-            className="h-11 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            className="h-11 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-foreground/90 transition hover:bg-muted"
           >
             Cancel
           </button>

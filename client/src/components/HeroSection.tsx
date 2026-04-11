@@ -32,8 +32,8 @@ const HeroSection = () => {
       <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-gray-800 mb-6">
-            <FaStar className="w-4 h-4 text-yellow-500" />
+          <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-foreground/90 mb-6">
+            <FaStar className="w-4 h-4 text-warning" />
             <span>Rated 4.8/5 by 2000+ Students</span>
           </div>
           
@@ -56,7 +56,7 @@ const HeroSection = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Destination */}
                 <div className="relative">
-                  <FaMapMarkerAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <FaMapMarkerAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Destination or Hostel"
@@ -68,7 +68,7 @@ const HeroSection = () => {
                 
                 {/* Check In */}
                 <div className="relative">
-                  <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <input
                     type="date"
                     placeholder="Check In"
@@ -80,7 +80,7 @@ const HeroSection = () => {
                 
                 {/* Check Out */}
                 <div className="relative">
-                  <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <FaCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <input
                     type="date"
                     placeholder="Check Out"
@@ -92,7 +92,7 @@ const HeroSection = () => {
                 
                 {/* Guests */}
                 <div className="relative">
-                  <FaUsers className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <FaUsers className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <select
                     value={searchData.guests}
                     onChange={(e) => handleInputChange('guests', e.target.value)}
@@ -118,21 +118,21 @@ const HeroSection = () => {
             
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-              <div className="text-center p-3 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-blue-600">500+</div>
-                <div className="text-sm text-gray-600">Rooms Available</div>
+              <div className="text-center p-3 bg-muted rounded-xl">
+                <div className="text-2xl font-bold text-primary">500+</div>
+                <div className="text-sm text-muted-foreground">Rooms Available</div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-xl">
+              <div className="text-center p-3 bg-muted rounded-xl">
                 <div className="text-2xl font-bold text-primary">2000+</div>
-                <div className="text-sm text-gray-600">Happy Students</div>
+                <div className="text-sm text-muted-foreground">Happy Students</div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-xl">
+              <div className="text-center p-3 bg-muted rounded-xl">
                 <div className="text-2xl font-bold text-primary">50+</div>
-                <div className="text-sm text-gray-600">Facilities</div>
+                <div className="text-sm text-muted-foreground">Facilities</div>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-orange-600">4.8★</div>
-                <div className="text-sm text-gray-600">Average Rating</div>
+              <div className="text-center p-3 bg-muted rounded-xl">
+                <div className="text-2xl font-bold text-warning">4.8★</div>
+                <div className="text-sm text-muted-foreground">Average Rating</div>
               </div>
             </div>
           </div>
