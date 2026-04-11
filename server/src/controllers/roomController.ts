@@ -8,8 +8,72 @@ import { AuthRequest } from '../middleware/auth';
 // ─── Seed sample rooms (runs once on startup if DB is empty) ───
 export const seedRooms = async () => {
   try {
+    const fourthFloorSamples = [
+      {
+        name: 'Nallur Skyline Single',
+        roomNumber: 'A-401',
+        block: 'Block A',
+        floor: '4th Floor',
+        capacity: 1,
+        type: 'Single Room',
+        price: 11500,
+        description: 'Quiet top-floor single room with excellent ventilation and a dedicated study corner. Ideal for students preparing for exams who need a distraction-free environment.',
+        image: 'https://images.unsplash.com/photo-1616594039964-2d4bf13db0f3?w=800',
+        facilities: ['WiFi', 'Study Table', 'Wardrobe', 'AC'],
+        location: 'Jaffna, Sri Lanka',
+      },
+      {
+        name: 'Jaffna City View Double',
+        roomNumber: 'B-402',
+        block: 'Block B',
+        floor: '4th Floor',
+        capacity: 2,
+        type: 'Double Room',
+        price: 8200,
+        description: 'Comfortable double room on the fourth floor with city-facing windows, two beds, and individual study tables. A balanced option for comfort and affordability.',
+        image: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800',
+        facilities: ['WiFi', 'Study Table', 'Wardrobe', 'Common Area'],
+        location: 'Jaffna, Sri Lanka',
+      },
+      {
+        name: 'Peninsula Heights Dorm',
+        roomNumber: 'D-404',
+        block: 'Block D',
+        floor: '4th Floor',
+        capacity: 4,
+        type: 'Dormitory',
+        price: 5000,
+        description: 'A spacious fourth-floor dormitory with four beds, personal lockers, and access to a shared common area. Perfect for students who prefer a social hostel experience.',
+        image: 'https://images.unsplash.com/photo-1598928636135-ab763dbb1a9a?w=800',
+        facilities: ['WiFi', 'Lockers', 'Common Area', 'Study Table'],
+        location: 'Jaffna, Sri Lanka',
+      },
+    ];
+
     const count = await Room.countDocuments();
-    if (count > 0) return;
+    if (count > 0) {
+      const fourthFloorCount = await Room.countDocuments({ floor: '4th Floor' });
+
+      if (fourthFloorCount === 0) {
+        const roomNumbers = fourthFloorSamples.map((room) => room.roomNumber);
+        const existingRooms = await Room.find(
+          { roomNumber: { $in: roomNumbers } },
+          { roomNumber: 1, _id: 0 }
+        ).lean();
+
+        const existingRoomNumbers = new Set(existingRooms.map((room) => room.roomNumber));
+        const roomsToInsert = fourthFloorSamples.filter(
+          (room) => !existingRoomNumbers.has(room.roomNumber)
+        );
+
+        if (roomsToInsert.length > 0) {
+          await Room.insertMany(roomsToInsert);
+          console.log(`✅ Added ${roomsToInsert.length} 4th floor sample rooms`);
+        }
+      }
+
+      return;
+    }
 
     const sampleRooms = [
       {
@@ -168,6 +232,7 @@ export const seedRooms = async () => {
         facilities: ['WiFi', 'Study Table', 'Wardrobe', 'AC', 'Private Bathroom'],
         location: 'Jaffna, Sri Lanka',
       },
+      ...fourthFloorSamples,
     ];
 
     // Mark some rooms as occupied / maintenance for variety
@@ -179,7 +244,7 @@ export const seedRooms = async () => {
     });
 
     await Room.insertMany(roomDocs);
-    console.log('✅ 12 sample rooms seeded (Jaffna, Sri Lanka)');
+    console.log(`✅ ${roomDocs.length} sample rooms seeded (Jaffna, Sri Lanka)`);
   } catch (error) {
     console.error('❌ Room seeding error:', error);
   }
