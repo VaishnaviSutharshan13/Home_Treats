@@ -210,7 +210,7 @@ const MyFees = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Paid': return 'bg-purple-100 text-purple-800';
+      case 'Paid': return 'bg-surface-active text-primary';
       case 'Pending': return 'bg-yellow-100 text-yellow-800';
       case 'Overdue': return 'bg-red-100 text-red-800';
       case 'Partial': return 'bg-blue-100 text-blue-800';
@@ -220,7 +220,7 @@ const MyFees = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Paid': return <FaCheckCircle className="text-purple-600" />;
+      case 'Paid': return <FaCheckCircle className="text-primary" />;
       case 'Pending': return <FaClock className="text-yellow-600" />;
       case 'Overdue': return <FaTimesCircle className="text-red-600" />;
       default: return <FaClock className="text-gray-600" />;
@@ -249,12 +249,12 @@ const MyFees = () => {
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <FaSpinner className="animate-spin text-4xl text-indigo-600" />
+              <FaSpinner className="animate-spin text-4xl text-primary" />
             </div>
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-red-600 mb-4">{error}</p>
-              <button onClick={fetchFees} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm">Retry</button>
+              <button onClick={fetchFees} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-700 shadow-sm">Retry</button>
             </div>
           ) : (
             <div className="space-y-6">
@@ -262,12 +262,12 @@ const MyFees = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <FaCheckCircle className="text-purple-600" />
+                    <div className="w-10 h-10 bg-surface-active rounded-lg flex items-center justify-center">
+                      <FaCheckCircle className="text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Total Paid</p>
-                      <p className="text-xl font-bold text-purple-600">{formatLKR(totalPaid)}</p>
+                      <p className="text-xl font-bold text-primary">{formatLKR(totalPaid)}</p>
                     </div>
                   </div>
                 </div>
@@ -405,7 +405,7 @@ const MyFees = () => {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
               <div className="text-center mb-6">
-                <FaReceipt className="w-10 h-10 text-purple-600 mx-auto mb-2" />
+                <FaReceipt className="w-10 h-10 text-primary mx-auto mb-2" />
                 <h3 className="text-xl font-bold text-gray-800">Payment Receipt</h3>
                 <p className="text-sm text-gray-500">{receipt.receiptNo}</p>
               </div>
@@ -424,7 +424,7 @@ const MyFees = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Amount</span>
-                  <span className="font-bold text-purple-600">{receipt.currency} {receipt.amount.toLocaleString()}</span>
+                  <span className="font-bold text-primary">{receipt.currency} {receipt.amount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Payment Date</span>
@@ -455,7 +455,7 @@ const MyFees = () => {
         <div className="mt-8 bg-white/85 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-800">Payment History</h2>
-            {paymentsLoading && <FaSpinner className="animate-spin text-violet-600" />}
+            {paymentsLoading && <FaSpinner className="animate-spin text-secondary" />}
           </div>
 
           {paymentsLoading ? (
@@ -477,7 +477,7 @@ const MyFees = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {payments.map((payment) => (
-                    <tr key={payment._id} className="hover:bg-violet-50/40">
+                    <tr key={payment._id} className="hover:bg-secondary/10/40">
                       <td className="px-4 py-3 text-sm font-medium text-gray-800">{payment.transactionId}</td>
                       <td className="px-4 py-3 text-sm text-gray-700">{payment.bankName}</td>
                       <td className="px-4 py-3 text-sm text-gray-800">LKR {Number(payment.amount || 0).toLocaleString()}</td>
@@ -487,7 +487,7 @@ const MyFees = () => {
                           href={formatSlipUrl(payment.slipUrl)}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-violet-700 hover:text-violet-900 underline"
+                          className="text-primary hover:text-primary-hover underline"
                         >
                           View Slip
                         </a>
@@ -535,7 +535,7 @@ const MyFees = () => {
                 <select
                   value={form.bankName}
                   onChange={(e) => setForm((prev) => ({ ...prev, bankName: e.target.value as PaymentForm['bankName'] }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/25"
                 >
                   <option value="">Select bank</option>
                   <option value="BOC">Bank of Ceylon (BOC)</option>
@@ -551,7 +551,7 @@ const MyFees = () => {
                   value={form.accountHolder}
                   onChange={(e) => setForm((prev) => ({ ...prev, accountHolder: e.target.value }))}
                   placeholder="Enter account holder name"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/25"
                 />
                 {errors.accountHolder && <p className="text-red-600 text-xs mt-1">{errors.accountHolder}</p>}
               </div>
@@ -563,7 +563,7 @@ const MyFees = () => {
                   value={form.transactionId}
                   onChange={(e) => setForm((prev) => ({ ...prev, transactionId: e.target.value }))}
                   placeholder="e.g., TXN-2026-12345"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/25"
                 />
                 {errors.transactionId && <p className="text-red-600 text-xs mt-1">{errors.transactionId}</p>}
               </div>
@@ -577,7 +577,7 @@ const MyFees = () => {
                     max={new Date().toISOString().split('T')[0]}
                     value={form.paymentDate}
                     onChange={(e) => setForm((prev) => ({ ...prev, paymentDate: e.target.value }))}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/25"
                   />
                 </div>
                 {errors.paymentDate && <p className="text-red-600 text-xs mt-1">{errors.paymentDate}</p>}
@@ -592,7 +592,7 @@ const MyFees = () => {
                   value={form.amount}
                   onChange={(e) => setForm((prev) => ({ ...prev, amount: e.target.value }))}
                   placeholder={`Max LKR ${getDueAmount(selectedFee).toLocaleString()}`}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary/25"
                 />
                 {errors.amount && <p className="text-red-600 text-xs mt-1">{errors.amount}</p>}
               </div>
@@ -612,7 +612,7 @@ const MyFees = () => {
                     onFilePicked(dropped);
                   }}
                   className={`rounded-2xl border-2 border-dashed p-6 text-center transition ${
-                    dragActive ? 'border-violet-500 bg-violet-50' : 'border-gray-300 bg-gray-50'
+                    dragActive ? 'border-primary bg-secondary/10' : 'border-border bg-muted'
                   }`}
                 >
                   <input
@@ -623,7 +623,7 @@ const MyFees = () => {
                     onChange={(e) => onFilePicked(e.target.files?.[0] || null)}
                   />
                   <label htmlFor="slip-upload" className="cursor-pointer block">
-                    <FaCloudUploadAlt className="mx-auto text-3xl text-violet-600 mb-2" />
+                    <FaCloudUploadAlt className="mx-auto text-3xl text-secondary mb-2" />
                     <p className="text-sm font-medium text-gray-700">Drop your file here, or click to browse</p>
                     <p className="text-xs text-gray-500 mt-1">{acceptedFileInfo}</p>
                     {form.slip?.type === 'application/pdf' && <FaFilePdf className="mx-auto mt-3 text-red-500" />}
@@ -645,7 +645,7 @@ const MyFees = () => {
                 <button
                   type="submit"
                   disabled={submitDisabled}
-                  className="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-secondary via-primary to-accent shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <span className="inline-flex items-center gap-2">

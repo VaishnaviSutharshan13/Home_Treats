@@ -197,7 +197,7 @@ const StudentManagement = () => {
             </Link>
             <h1 className="text-2xl font-bold">Student Management</h1>
           </div>
-          <button onClick={() => setShowModal(true)} className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <button onClick={() => setShowModal(true)} className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2">
             <FaPlus /> Add
           </button>
         </div>
@@ -224,7 +224,7 @@ const StudentManagement = () => {
           <div className="flex justify-center py-10"><FaSpinner className="animate-spin" /></div>
         ) : (
           <table className="w-full bg-white rounded-xl overflow-hidden">
-            <thead className="bg-purple-100">
+            <thead className="bg-surface-active">
               <tr>
                 <th className="p-3 text-left">Name</th>
                 <th>Email</th>
@@ -270,7 +270,7 @@ const StudentManagement = () => {
 
               <div className="flex justify-end gap-2">
                 <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" disabled={submitting} className="bg-purple-600 text-white px-4 py-2 rounded">
+                <button type="submit" disabled={submitting} className="bg-primary text-white px-4 py-2 rounded">
                   {submitting ? 'Saving...' : 'Save'}
                 </button>
               </div>

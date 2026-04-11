@@ -42,7 +42,7 @@ const badgeByStatus: Record<string, string> = {
 const badgeByPriority: Record<string, string> = {
   High: 'bg-red-100 text-red-700',
   Medium: 'bg-orange-100 text-orange-700',
-  Low: 'bg-violet-100 text-violet-700',
+  Low: 'bg-secondary/15 text-primary',
 };
 
 const canStudentEdit = (complaintStatus: string) => complaintStatus === 'Pending';
@@ -94,7 +94,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
       <div className="mt-4 border-t border-gray-100 pt-4">
         <button
           onClick={() => onToggleComments(complaint._id)}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 transition hover:text-purple-700"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary"
         >
           <FaComment className="text-xs" />
           {expanded ? 'Hide comments' : 'Show comments'} ({complaint.comments?.length || 0})

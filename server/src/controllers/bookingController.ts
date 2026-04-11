@@ -6,8 +6,6 @@ import Student from '../models/Student';
 import { AuthRequest } from '../middleware/auth';
 import { createNotification } from './notificationController';
 
-const MONTHLY_RENT = 5500;
-
 const floorMap: Record<string, string> = {
   'floor 1': '1st Floor',
   'first floor': '1st Floor',
@@ -134,9 +132,9 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       roomId: availableRoom._id,
       roomNumber: availableRoom.roomNumber,
       bedNumber,
-      roomCapacity: 4,
-      bedsPerRoom: 4,
-      monthlyRent: MONTHLY_RENT,
+      roomCapacity: availableRoom.capacity,
+      bedsPerRoom: availableRoom.capacity,
+      monthlyRent: availableRoom.price,
       hostelName: 'Home_Treats Student Hostel',
       location: 'No.11, Nallur, Jaffna, 40000, Sri Lanka',
       status: 'Confirmed',

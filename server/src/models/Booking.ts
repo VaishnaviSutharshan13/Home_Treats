@@ -70,17 +70,14 @@ const BookingSchema: Schema = new Schema(
     roomCapacity: {
       type: Number,
       required: true,
-      default: 4,
     },
     bedsPerRoom: {
       type: Number,
       required: true,
-      default: 4,
     },
     monthlyRent: {
       type: Number,
       required: true,
-      default: 5500,
     },
     hostelName: {
       type: String,

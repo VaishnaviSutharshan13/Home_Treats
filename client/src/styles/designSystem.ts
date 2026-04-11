@@ -1,6 +1,6 @@
 /**
- * Global Design System Configuration
- * Modern Hostel Booking UI Theme - Black & Green Premium
+ * Shared `cn()` helper and legacy layout string fragments.
+ * Authoritative colors: see `globals.css` (:root / .dark + @theme inline).
  */
 
 export const designSystem = {
@@ -155,10 +155,10 @@ export const designSystem = {
 
   // Cards
   card: {
-    base: 'rounded-xl shadow-md bg-white/5 backdrop-blur-sm border border-purple-500/10',
+    base: 'rounded-xl shadow-md bg-white/5 backdrop-blur-sm border border-primary/10',
     padding: 'p-6',
-    hover: 'hover:shadow-lg hover:border-purple-500/20 transition-all duration-300',
-    border: 'border border-purple-500/10',
+    hover: 'hover:shadow-lg hover:border-primary/20 transition-all duration-300',
+    border: 'border border-primary/10',
   },
 
   // Buttons
@@ -171,19 +171,19 @@ export const designSystem = {
       xl: 'px-8 py-4 text-lg',
     },
     primary: {
-      base: 'bg-purple-500 text-white hover:bg-purple-600 focus:ring-purple-500 shadow-sm shadow-purple-500/20',
-      hover: 'hover:shadow-md hover:shadow-purple-500/30 hover:scale-105 transform',
+      base: 'bg-primary text-white hover:bg-primary focus:ring-primary shadow-sm shadow-primary/20',
+      hover: 'hover:shadow-md hover:shadow-primary/30 hover:scale-105 transform',
     },
     secondary: {
-      base: 'bg-white/5 backdrop-blur-sm text-white border border-purple-500/20 hover:bg-purple-500/10 focus:ring-purple-500',
-      hover: 'hover:shadow-md hover:border-purple-500/30',
+      base: 'bg-white/5 backdrop-blur-sm text-white border border-primary/20 hover:bg-primary/10 focus:ring-primary',
+      hover: 'hover:shadow-md hover:border-primary/30',
     },
     outline: {
-      base: 'border border-purple-500/50 text-purple-400 hover:bg-purple-500/10 focus:ring-purple-500',
-      hover: 'hover:border-purple-400 hover:text-purple-300',
+      base: 'border border-primary/50 text-primary hover:bg-primary/10 focus:ring-primary',
+      hover: 'hover:border-primary hover:text-info',
     },
     ghost: {
-      base: 'text-gray-400 hover:text-white hover:bg-white/5 focus:ring-purple-500',
+      base: 'text-gray-400 hover:text-white hover:bg-white/5 focus:ring-primary',
       hover: 'hover:shadow-sm',
     },
     danger: {
@@ -196,7 +196,7 @@ export const designSystem = {
   form: {
     input: {
       base: 'rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 shadow-sm transition-all duration-200',
-      focus: 'focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none',
+      focus: 'focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none',
       hover: 'hover:border-white/20',
       error: 'border-red-500 focus:border-red-500 focus:ring-red-500',
     },
@@ -205,19 +205,19 @@ export const designSystem = {
     },
     select: {
       base: 'rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300 shadow-sm transition-all duration-200',
-      focus: 'focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none',
+      focus: 'focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none',
       hover: 'hover:border-white/20',
     },
     textarea: {
       base: 'rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 shadow-sm transition-all duration-200',
-      focus: 'focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none',
+      focus: 'focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none',
       hover: 'hover:border-white/20',
     },
     checkbox: {
-      base: 'h-4 w-4 rounded border-white/10 text-purple-500 focus:ring-purple-500 bg-white/5',
+      base: 'h-4 w-4 rounded border-white/10 text-primary focus:ring-primary bg-white/5',
     },
     radio: {
-      base: 'h-4 w-4 border-white/10 text-purple-500 focus:ring-purple-500 bg-white/5',
+      base: 'h-4 w-4 border-white/10 text-primary focus:ring-primary bg-white/5',
     },
   },
 
@@ -237,11 +237,11 @@ export const designSystem = {
 
   // Navigation
   nav: {
-    base: 'bg-[#0f172a]/90 backdrop-blur-md shadow-sm border-b border-purple-500/10',
+    base: 'bg-[#0f172a]/90 backdrop-blur-md shadow-sm border-b border-primary/10',
     container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
     link: {
       base: 'text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200',
-      active: 'text-purple-400 bg-purple-500/10',
+      active: 'text-primary bg-primary/10',
     },
   },
 

@@ -33,7 +33,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onViewDetails }) => {
         <div className="absolute top-4 right-4">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
             room.available 
-              ? 'bg-purple-500/90 text-white' 
+              ? 'bg-primary/90 text-white' 
               : 'bg-red-500/90 text-white'
           }`}>
             {room.available ? 'Available' : 'Occupied'}
@@ -85,7 +85,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onViewDetails }) => {
         {/* Action Button */}
         <button 
           onClick={() => onViewDetails?.(room)}
-          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+          className="w-full bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-white py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
         >
           <span>View Details</span>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

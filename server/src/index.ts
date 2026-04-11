@@ -7,8 +7,6 @@ import path from 'path';
 
 // Config
 import connectDB from './config/database';
-import { seedUsers } from './controllers/authController';
-import { seedRooms } from './controllers/roomController';
 
 // Middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -30,10 +28,9 @@ import settingsRoutes from './routes/settingsRoutes';
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB and seed default users
+// Connect to MongoDB
 connectDB().then(() => {
-  seedUsers();
-  seedRooms();
+  return;
 });
 
 const app = express();

@@ -239,7 +239,7 @@ const MyComplaints = () => {
             </div>
             <button
               onClick={openCreateModal}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:from-purple-700 hover:to-pink-600"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-5 text-sm font-semibold text-white shadow-sm transition hover:from-primary-hover hover:to-accent"
             >
               <FaPlus />
               New Complaint
@@ -286,7 +286,7 @@ const MyComplaints = () => {
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                  className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
                   placeholder="Search by title, description, or category"
                 />
               </div>
@@ -294,7 +294,7 @@ const MyComplaints = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                className="h-12 rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
               >
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
@@ -314,7 +314,7 @@ const MyComplaints = () => {
 
           {loading ? (
             <div className="rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">
-              <FaSpinner className="mx-auto mb-3 animate-spin text-2xl text-purple-600" />
+              <FaSpinner className="mx-auto mb-3 animate-spin text-2xl text-primary" />
               <p className="text-sm text-gray-500">Loading complaints...</p>
             </div>
           ) : error ? (
@@ -322,7 +322,7 @@ const MyComplaints = () => {
               <p className="text-sm font-semibold text-red-600">{error}</p>
               <button
                 onClick={fetchComplaints}
-                className="mt-4 h-11 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-5 text-sm font-semibold text-white"
+                className="mt-4 h-11 rounded-xl bg-gradient-to-r from-primary to-accent px-5 text-sm font-semibold text-white"
               >
                 Retry
               </button>

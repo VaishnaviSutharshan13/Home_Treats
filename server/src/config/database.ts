@@ -11,7 +11,15 @@ const connectDB = async (): Promise<void> => {
     // Reconcile legacy fee.transactionId index to prevent duplicate key on null values.
     try {
       const feesCollection = mongoose.connection.collection('fees');
-      const indexes = await feesCollection.indexes();
+      let indexes: Awaited<ReturnType<typeof feesCollection.indexes>> = [];
+      try {
+        indexes = await feesCollection.indexes();
+      } catch (listErr: unknown) {
+        // Collection not created yet — listIndexes fails with NamespaceNotFound (26).
+        const code = (listErr as { code?: number; codeName?: string })?.code;
+        const codeName = (listErr as { codeName?: string })?.codeName;
+        if (code !== 26 && codeName !== 'NamespaceNotFound') throw listErr;
+      }
       const hasLegacyTxIndex = indexes.some((idx) => idx.name === 'transactionId_1');
 
       if (hasLegacyTxIndex) {

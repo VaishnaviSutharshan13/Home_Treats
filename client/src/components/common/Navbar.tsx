@@ -1,235 +1,279 @@
-/**
- * Modern Navbar Component
- * Clean, professional design with sticky positioning and responsive mobile menu
- */
-
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaBed, FaInfoCircle, FaEnvelope, FaSignInAlt, FaBars, FaTimes, FaSignOutAlt, FaTachometerAlt } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
+import { useEffect, useState } from "react";
+import {
+  FaBars,
+  FaBed,
+  FaHome,
+  FaMoon,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaSun,
+  FaTachometerAlt,
+  FaTimes,
+} from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const Navbar = () => {
+  const { toggle, resolved } = useTheme();
   const { isAuthenticated, isAdmin, isStudent, user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const apiRoot = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+  const apiRoot = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+  ).replace(/\/api\/?$/, "");
   const avatarUrl = user?.profileImage
-    ? user.profileImage.startsWith('http://') || user.profileImage.startsWith('https://')
+    ? user.profileImage.startsWith("http://") ||
+      user.profileImage.startsWith("https://")
       ? user.profileImage
       : `${apiRoot}${user.profileImage}`
-    : '';
-  const profileLink = isAdmin ? '/admin/profile' : '/student/profile';
+    : "";
+  const profileLink = isAdmin ? "/admin/profile" : "/student/profile";
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const handleLogout = () => {
     logout();
-    navigate('/');
-    setIsMobileMenuOpen(false);
+    navigate("/");
+    setMobileOpen(false);
   };
 
-  // Public navigation items
-  const publicNavItems = [
-    { name: 'Home', href: '/', icon: <FaHome className="w-4 h-4" /> },
-    { name: 'Rooms', href: '/rooms', icon: <FaBed className="w-4 h-4" /> },
-    { name: 'About', href: '/about', icon: <FaInfoCircle className="w-4 h-4" /> },
-    { name: 'Contact', href: '/contact', icon: <FaEnvelope className="w-4 h-4" /> },
-  ];
-
-  // Dashboard link based on role
   const dashboardLink = isAdmin
-    ? { name: 'Dashboard', href: '/admin/dashboard', icon: <FaTachometerAlt className="w-4 h-4" /> }
+    ? {
+        name: "Dashboard",
+        href: "/admin/dashboard",
+        icon: <FaTachometerAlt className="h-4 w-4" />,
+      }
     : isStudent
-    ? { name: 'Dashboard', href: '/student/dashboard', icon: <FaTachometerAlt className="w-4 h-4" /> }
-    : null;
+      ? {
+          name: "Dashboard",
+          href: "/student/dashboard",
+          icon: <FaTachometerAlt className="h-4 w-4" />,
+        }
+      : null;
 
-  // Build nav items: public + dashboard if authenticated
-  const navItems = dashboardLink
-    ? [...publicNavItems, dashboardLink]
-    : publicNavItems;
+  const linkBase =
+    "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200";
+  const linkIdle =
+    "text-muted-foreground hover:bg-surface-hover hover:text-primary";
+  const linkActive = "bg-surface-active text-foreground";
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-      isScrolled 
-        ? 'shadow-md shadow-gray-200/60 border-b border-gray-200' 
-        : 'border-b border-gray-100'
-    }`}
+    <nav
+      className={`fixed inset-x-0 top-0 z-50 isolate border-b border-border bg-navbar/95 backdrop-blur-md transition-shadow duration-300 ${
+        scrolled
+          ? "shadow-md shadow-foreground/10"
+          : "shadow-sm shadow-foreground/5"
+      }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo - Left Side */}
-          <div className="flex items-center">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-3 group transition-all duration-300"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-md shadow-purple-200 group-hover:shadow-purple-300 transition-all duration-300">
-                <FaBed className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold text-gray-900">Home<span className="text-purple-600">_Treats</span></span>
-                <p className="text-xs text-gray-500">Premium Living</p>
-              </div>
-            </Link>
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-3"
+          onClick={() => setMobileOpen(false)}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary shadow-md shadow-primary/25">
+            <FaBed className="h-5 w-5 text-white" />
           </div>
+          <div className="leading-tight">
+            <span className="text-lg font-bold tracking-tight text-foreground">
+              Gowsi Treats
+            </span>
+            <p className="text-[0.65rem] font-medium uppercase tracking-wider text-muted-foreground">
+              Student stays
+            </p>
+          </div>
+        </Link>
 
-          {/* Navigation - Center (Desktop) */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
+        <div className="hidden items-center gap-0.5 md:flex">
+          <Link
+            to="/"
+            className={`${linkBase} ${location.pathname === "/" ? linkActive : linkIdle}`}
+          >
+            <FaHome className="h-4 w-4" />
+            Home
+          </Link>
+          <Link
+            to="/rooms"
+            className={`${linkBase} ${location.pathname === "/rooms" ? linkActive : linkIdle}`}
+          >
+            <FaBed className="h-4 w-4" />
+            Rooms
+          </Link>
+          {dashboardLink && (
+            <Link
+              to={dashboardLink.href}
+              className={`${linkBase} ${location.pathname === dashboardLink.href ? linkActive : linkIdle}`}
+            >
+              {dashboardLink.icon}
+              {dashboardLink.name}
+            </Link>
+          )}
+        </div>
+
+        <div className="hidden items-center gap-2 md:flex">
+          <button
+            type="button"
+            onClick={toggle}
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label={
+              resolved === "dark"
+                ? "Switch to light mode"
+                : "Switch to dark mode"
+            }
+          >
+            {resolved === "dark" ? (
+              <FaSun className="h-4 w-4" />
+            ) : (
+              <FaMoon className="h-4 w-4" />
+            )}
+          </button>
+          <Link
+            to="/contact"
+            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30 transition hover:bg-primary-hover"
+          >
+            Book now
+          </Link>
+          {isAuthenticated ? (
+            <>
               <Link
-                key={item.name}
-                to={item.href}
-                className={`relative flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  location.pathname === item.href
-                    ? 'text-purple-700 bg-purple-50'
-                    : 'text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff]'
-                }`}
+                to={profileLink}
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-muted"
+                title="Profile"
               >
-                {item.icon}
-                <span>{item.name}</span>
-                {location.pathname === item.href && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-purple-600 rounded-full"></span>
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    className="h-8 w-8 rounded-full border border-border object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-active text-xs font-bold text-primary">
+                    {(user?.name || "U").charAt(0).toUpperCase()}
+                  </div>
                 )}
               </Link>
-            ))}
-          </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-error/10 hover:text-error"
+              >
+                <FaSignOutAlt className="h-4 w-4" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover hover:text-primary"
+            >
+              <FaSignInAlt className="h-4 w-4" />
+              Login
+            </Link>
+          )}
+        </div>
 
-          {/* Right Side - Auth & Actions */}
-          <div className="flex items-center space-x-4">
+        <button
+          type="button"
+          onClick={() => setMobileOpen((o) => !o)}
+          className="rounded-lg p-2 text-muted-foreground hover:bg-muted md:hidden"
+          aria-expanded={mobileOpen}
+          aria-label="Menu"
+        >
+          {mobileOpen ? (
+            <FaTimes className="h-5 w-5" />
+          ) : (
+            <FaBars className="h-5 w-5" />
+          )}
+        </button>
+      </div>
+
+      {mobileOpen && (
+        <div className="border-t border-border bg-navbar px-4 py-3 md:hidden">
+          <div className="flex flex-col gap-1">
+            <Link
+              to="/"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
+              onClick={() => setMobileOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/rooms"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
+              onClick={() => setMobileOpen(false)}
+            >
+              Rooms
+            </Link>
+            {dashboardLink && (
+              <Link
+                to={dashboardLink.href}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover"
+                onClick={() => setMobileOpen(false)}
+              >
+                {dashboardLink.name}
+              </Link>
+            )}
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  toggle();
+                  setMobileOpen(false);
+                }}
+                className="flex flex-1 items-center justify-center rounded-xl border border-border py-3 text-sm font-medium text-muted-foreground"
+              >
+                {resolved === "dark" ? (
+                  <FaSun className="h-4 w-4" />
+                ) : (
+                  <FaMoon className="h-4 w-4" />
+                )}
+              </button>
+              <Link
+                to="/contact"
+                className="flex-[2] rounded-xl bg-primary py-3 text-center text-sm font-semibold text-primary-foreground"
+                onClick={() => setMobileOpen(false)}
+              >
+                Book now
+              </Link>
+            </div>
             {isAuthenticated ? (
-              <div className="hidden md:flex items-center space-x-3">
+              <div className="mt-2 flex flex-col gap-1 border-t border-border pt-3">
                 <Link
                   to={profileLink}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[#f5f3ff] transition-colors"
-                  title="Profile"
+                  className="rounded-lg px-3 py-2 text-sm hover:bg-muted"
+                  onClick={() => setMobileOpen(false)}
                 >
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-purple-200" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center text-xs font-semibold">
-                      {(user?.name || 'U').charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <span className="text-sm text-gray-700">Profile</span>
+                  Profile
                 </Link>
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg transition-all duration-200 hover:bg-red-50"
+                  className="rounded-lg px-3 py-2 text-left text-sm text-error hover:bg-error/10"
                 >
-                  <FaSignOutAlt className="w-4 h-4" />
-                  <span>Logout</span>
+                  Logout
                 </button>
               </div>
             ) : (
-              <div className="hidden md:flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-purple-600 rounded-lg transition-all duration-200 hover:bg-[#f5f3ff]"
-                >
-                  <FaSignInAlt className="w-4 h-4" />
-                  <span>Login</span>
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-md hover:shadow-purple-200"
-                >
-                  Get Started
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="mt-2 rounded-lg px-3 py-2 text-sm hover:bg-muted"
+                onClick={() => setMobileOpen(false)}
+              >
+                Login
+              </Link>
             )}
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff] transition-all duration-200"
-            >
-              {isMobileMenuOpen ? (
-                <FaTimes className="w-5 h-5" />
-              ) : (
-                <FaBars className="w-5 h-5" />
-              )}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
-                    location.pathname === item.href
-                      ? 'text-purple-700 bg-purple-50'
-                      : 'text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff]'
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.name}</span>
-                </Link>
-              ))}
-            </div>
-            
-            <div className="pt-4 pb-3 border-t border-gray-200">
-              {isAuthenticated ? (
-                <div className="space-y-2 px-2">
-                  <Link
-                    to={profileLink}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff] rounded-lg transition-all duration-200"
-                  >
-                    <span>Profile</span>
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="Profile" className="w-7 h-7 rounded-full object-cover border border-purple-200" />
-                    ) : (
-                      <span className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center text-xs font-semibold">
-                        {(user?.name || 'U').charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
-                  >
-                    <FaSignOutAlt className="w-5 h-5" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2 px-2">
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center space-x-3 w-full px-3 py-2 text-base font-medium text-gray-600 hover:text-purple-700 hover:bg-[#f5f3ff] rounded-lg transition-all duration-200"
-                  >
-                    <FaSignInAlt className="w-5 h-5" />
-                    <span>Login</span>
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block w-full text-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-300"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </nav>
   );
 };

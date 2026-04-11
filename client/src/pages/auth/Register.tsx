@@ -177,18 +177,18 @@ const Register = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-[url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200')]"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/85 to-purple-700/75" />
+        <div className="absolute inset-0 bg-gradient-to-br from-sidebar/90 to-primary-hover/75" />
         <div className="relative z-10 p-14 flex flex-col justify-between text-white">
           <div>
             <h1 className="text-4xl font-bold leading-tight">Student Registration Portal</h1>
-            <p className="mt-4 text-purple-100 text-lg">Create your hostel account and submit it for admin approval.</p>
+            <p className="mt-4 text-sidebar-foreground/90 text-lg">Create your hostel account and submit it for admin approval.</p>
           </div>
-          <div className="space-y-3 text-sm text-purple-100">
+          <div className="space-y-3 text-sm text-sidebar-foreground/90">
             <p>1. Complete your profile with student details.</p>
             <p>2. Admin reviews and approves registration.</p>
             <p>3. Approved accounts can access student dashboard.</p>
           </div>
-          <Link to="/" className="inline-flex items-center gap-2 text-purple-200 hover:text-white">
+          <Link to="/" className="inline-flex items-center gap-2 text-info hover:text-white">
             <FaHome />
             <span>Back to Home</span>
           </Link>
@@ -196,9 +196,9 @@ const Register = () => {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-10">
-        <div className="w-full max-w-2xl bg-white rounded-2xl border border-purple-200 shadow-xl p-7">
+        <div className="w-full max-w-2xl bg-white rounded-2xl border border-primary/25 shadow-xl p-7">
           <div className="mb-6 text-center">
-            <div className="w-14 h-14 rounded-2xl mx-auto bg-purple-600 text-white flex items-center justify-center mb-3">
+            <div className="w-14 h-14 rounded-2xl mx-auto bg-primary text-white flex items-center justify-center mb-3">
               <FaUserPlus className="w-6 h-6" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Register as Student</h2>
@@ -206,7 +206,7 @@ const Register = () => {
           </div>
 
           {successMessage && (
-            <div className="mb-5 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-purple-800 text-sm flex items-start gap-2">
+            <div className="mb-5 rounded-xl border border-primary/25 bg-surface-active px-4 py-3 text-primary text-sm flex items-start gap-2">
               <FaCheckCircle className="mt-0.5" />
               <span>{successMessage}</span>
             </div>
@@ -271,7 +271,7 @@ const Register = () => {
                   title="Gender"
                   value={formData.gender}
                   onChange={(e) => setField('gender', e.target.value)}
-                  className="w-full px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -322,7 +322,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white font-semibold inline-flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3 rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-60 text-white font-semibold inline-flex items-center justify-center gap-2"
             >
               {loading ? 'Submitting...' : 'Submit Registration'}
               {!loading && <FaArrowRight className="w-4 h-4" />}
@@ -331,7 +331,7 @@ const Register = () => {
 
           <p className="mt-5 text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-purple-700 hover:text-purple-900">
+            <Link to="/login" className="font-semibold text-primary hover:text-primary-hover">
               Sign in
             </Link>
           </p>
@@ -383,7 +383,7 @@ const Input = ({
       onKeyDown={onKeyDown}
       onPaste={onPaste}
       placeholder={placeholder}
-      className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 ${hasError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-purple-500 focus:border-purple-500'}`}
+      className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 ${hasError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-primary focus:border-primary'}`}
     />
   </div>
 );
@@ -405,7 +405,7 @@ const PasswordInput = ({
       onChange={(e) => onChange(e.target.value)}
       type={show ? 'text' : 'password'}
       placeholder="Enter password"
-      className="w-full pl-3 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+      className="w-full pl-3 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary"
     />
     <button
       type="button"
