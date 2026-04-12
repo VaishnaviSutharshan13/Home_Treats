@@ -20,13 +20,20 @@ const router = Router();
 const validateStudent = [
   body('name').notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
-  body('phone').notEmpty().withMessage('Phone is required'),
-  body('studentId').notEmpty().withMessage('Student ID is required'),
+  body('phone').matches(/^\d{10}$/).withMessage('Phone must be 10 digits'),
+  body('studentId')
+    .matches(/^[A-Za-z]{2}\d{8}$/)
+    .withMessage('Student ID must start with 2 letters followed by 8 digits'),
   body('university').notEmpty().withMessage('University / College is required'),
   body('gender').isIn(['Male', 'Female', 'Other']).withMessage('Gender must be Male, Female, or Other'),
   body('address').notEmpty().withMessage('Address is required'),
-  body('emergencyContact').notEmpty().withMessage('Emergency contact is required'),
-  body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('emergencyContact').matches(/^\d{10}$/).withMessage('Emergency contact must be 10 digits'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password is required')
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage('Passwords do not match'),
   body('status').optional().isIn(['Pending', 'Approved', 'Rejected', 'Inactive']).withMessage('Status must be Pending, Approved, Rejected, or Inactive'),
 ];
 
