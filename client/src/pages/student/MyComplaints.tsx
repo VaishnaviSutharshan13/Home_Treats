@@ -349,22 +349,22 @@ const MyComplaints = () => {
 
       {showFormModal && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 px-4"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4 p-4 sm:p-6 shadow-2xl animate-fade-in"
           onClick={closeModal}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-card p-6 shadow-lg sm:p-8"
+            className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-card border border-border p-6 sm:p-8 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-muted-foreground"
+              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
               aria-label="Close complaint form"
             >
               <FaTimes className="h-4 w-4" />
             </button>
 
-            <h2 className="mb-6 pr-12 text-xl font-bold text-foreground">
+            <h2 className="mb-6 pr-12 text-xl font-bold tracking-tight text-foreground">
               {editingComplaint ? 'Edit Complaint' : 'Create Complaint'}
             </h2>
             <ComplaintForm
@@ -382,16 +382,16 @@ const MyComplaints = () => {
       )}
 
       {confirmDeleteId && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-foreground">Delete Complaint</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4 shadow-2xl animate-fade-in">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl">
+            <h3 className="text-xl font-bold text-foreground">Delete Complaint</h3>
+            <p className="mt-3 text-sm text-muted-foreground">
               Are you sure you want to delete this complaint? This action cannot be undone.
             </p>
-            <div className="mt-5 flex justify-end gap-3">
+            <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setConfirmDeleteId(null)}
-                className="h-11 rounded-xl border border-border px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted/70"
+                className="h-11 rounded-xl border border-border px-5 text-sm font-semibold text-foreground/90 transition hover:bg-muted"
               >
                 Cancel
               </button>
@@ -401,7 +401,7 @@ const MyComplaints = () => {
                   setConfirmDeleteId(null);
                   if (id) await handleDelete(id);
                 }}
-                className="h-11 rounded-xl bg-error text-error-foreground hover:bg-error/90 transition-all"
+                className="h-11 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error hover:text-white px-5 text-sm font-semibold transition-all"
               >
                 Delete
               </button>

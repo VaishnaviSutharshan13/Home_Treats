@@ -1,9 +1,32 @@
-import { Request, Response } from 'express';
-import Room from '../models/Room';
-import User from '../models/User';
-import { createNotification } from './notificationController';
-import { logAdminAction } from './adminLogController';
-import { AuthRequest } from '../middleware/auth';
+import { Request, Response } from "express";
+import { AuthRequest } from "../middleware/auth";
+import Room from "../models/Room";
+import User from "../models/User";
+import { logAdminAction } from "./adminLogController";
+import { createNotification } from "./notificationController";
+
+const findRoomByIdentifier = async (identifier: string) => {
+  const trimmedIdentifier = String(identifier || "").trim();
+  if (!trimmedIdentifier) return null;
+
+  const objectIdCandidate = /^[a-fA-F0-9]{24}$/.test(trimmedIdentifier)
+    ? trimmedIdentifier
+    : null;
+
+  const rawRoom = await Room.collection.findOne({
+    $or: [
+      { _id: trimmedIdentifier as any },
+      ...(objectIdCandidate ? [{ _id: objectIdCandidate as any }] : []),
+      { roomNumber: trimmedIdentifier },
+    ],
+  });
+
+  if (!rawRoom) return null;
+  return {
+    room: rawRoom as Record<string, any>,
+    filter: { _id: rawRoom._id },
+  };
+};
 
 // GET all rooms
 export const getAllRooms = async (req: Request, res: Response) => {
@@ -17,7 +40,7 @@ export const getAllRooms = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching rooms',
+      message: "Error fetching rooms",
       error: error.message,
     });
   }
@@ -30,14 +53,14 @@ export const getRoomById = async (req: Request, res: Response) => {
     if (!room) {
       return res.status(404).json({
         success: false,
-        message: 'Room not found',
+        message: "Room not found",
       });
     }
     res.json({ success: true, data: room });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching room',
+      message: "Error fetching room",
       error: error.message,
     });
   }
@@ -49,8 +72,12 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
     const body = { ...req.body };
 
     // Parse facilities if sent as JSON string (FormData sends strings)
-    if (typeof body.facilities === 'string') {
-      try { body.facilities = JSON.parse(body.facilities); } catch { body.facilities = []; }
+    if (typeof body.facilities === "string") {
+      try {
+        body.facilities = JSON.parse(body.facilities);
+      } catch {
+        body.facilities = [];
+      }
     }
     // Parse numeric fields that come as strings from FormData
     if (body.capacity) body.capacity = Number(body.capacity);
@@ -64,23 +91,30 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
 
     const room = new Room({
       ...body,
-      status: 'Available',
+      status: "Available",
     });
     const savedRoom = await room.save();
 
     if (req.user) {
-      await logAdminAction(req.user.email, String(req.user.id), 'Added a room', 'room', String(savedRoom._id), savedRoom.name);
+      await logAdminAction(
+        req.user.email,
+        String(req.user.id),
+        "Added a room",
+        "room",
+        String(savedRoom._id),
+        savedRoom.name,
+      );
     }
 
     res.status(201).json({
       success: true,
-      message: 'Room created successfully',
+      message: "Room created successfully",
       data: savedRoom,
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error creating room',
+      message: "Error creating room",
       error: error.message,
     });
   }
@@ -93,8 +127,12 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
     const body = { ...req.body };
 
     // Parse facilities if sent as JSON string
-    if (typeof body.facilities === 'string') {
-      try { body.facilities = JSON.parse(body.facilities); } catch { body.facilities = []; }
+    if (typeof body.facilities === "string") {
+      try {
+        body.facilities = JSON.parse(body.facilities);
+      } catch {
+        body.facilities = [];
+      }
     }
     // Parse numeric fields
     if (body.capacity) body.capacity = Number(body.capacity);
@@ -106,15 +144,14 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
       body.image = `/uploads/rooms/${(req as any).file.filename}`;
     }
 
-    const room = await Room.findByIdAndUpdate(
-      req.params.id,
-      body,
-      { new: true, runValidators: true }
-    );
+    const room = await Room.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+      runValidators: true,
+    });
     if (!room) {
       return res.status(404).json({
         success: false,
-        message: 'Room not found',
+        message: "Room not found",
       });
     }
 
@@ -122,48 +159,55 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
       const statusChanged = previousRoom.status !== room.status;
       const roomChanged = previousRoom.roomNumber !== room.roomNumber;
 
-      if (statusChanged && room.status === 'Maintenance') {
+      if (statusChanged && room.status === "Maintenance") {
         await createNotification(
-          'Room No Longer Available',
+          "Room No Longer Available",
           `Room ${room.roomNumber} is now under maintenance and temporarily unavailable.`,
-          'room',
+          "room",
           {
-            source: 'Room Management',
-            recipientType: 'all_students',
+            source: "Room Management",
+            recipientType: "all_students",
             relatedModuleId: String(room._id),
-            priority: 'important',
-          }
+            priority: "important",
+          },
         );
       }
 
       if (roomChanged || statusChanged) {
         await createNotification(
-          'Room Update',
-          `Room ${previousRoom.roomNumber} has been updated${roomChanged ? ` to ${room.roomNumber}` : ''}. Current status: ${room.status}.`,
-          'room',
+          "Room Update",
+          `Room ${previousRoom.roomNumber} has been updated${roomChanged ? ` to ${room.roomNumber}` : ""}. Current status: ${room.status}.`,
+          "room",
           {
-            source: 'Room Management',
-            recipientType: 'all_students',
+            source: "Room Management",
+            recipientType: "all_students",
             relatedModuleId: String(room._id),
-            priority: 'normal',
-          }
+            priority: "normal",
+          },
         );
       }
     }
 
     if (req.user) {
-      await logAdminAction(req.user.email, String(req.user.id), 'Updated room information', 'room', String(req.params.id), room.name);
+      await logAdminAction(
+        req.user.email,
+        String(req.user.id),
+        "Updated room information",
+        "room",
+        String(req.params.id),
+        room.name,
+      );
     }
 
     res.json({
       success: true,
-      message: 'Room updated successfully',
+      message: "Room updated successfully",
       data: room,
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error updating room',
+      message: "Error updating room",
       error: error.message,
     });
   }
@@ -176,33 +220,40 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
     if (!room) {
       return res.status(404).json({
         success: false,
-        message: 'Room not found',
+        message: "Room not found",
       });
     }
     if (req.user) {
-      await logAdminAction(req.user.email, String(req.user.id), 'Deleted a room', 'room', String(req.params.id), room.name);
+      await logAdminAction(
+        req.user.email,
+        String(req.user.id),
+        "Deleted a room",
+        "room",
+        String(req.params.id),
+        room.name,
+      );
     }
 
     await createNotification(
-      'Room No Longer Available',
+      "Room No Longer Available",
       `Room ${room.roomNumber} has been deactivated and is no longer available for booking.`,
-      'room',
+      "room",
       {
-        source: 'Room Management',
-        recipientType: 'all_students',
+        source: "Room Management",
+        recipientType: "all_students",
         relatedModuleId: String(room._id),
-        priority: 'important',
-      }
+        priority: "important",
+      },
     );
 
     res.json({
       success: true,
-      message: 'Room deleted successfully',
+      message: "Room deleted successfully",
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting room',
+      message: "Error deleting room",
       error: error.message,
     });
   }
@@ -211,10 +262,18 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
 // ALLOCATE room to student
 export const allocateRoom = async (req: AuthRequest, res: Response) => {
   try {
-    const room = await Room.findById(req.params.id);
-    if (!room) {
-      return res.status(404).json({ success: false, message: 'Room not found' });
+    const roomIdentifier = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const resolved = await findRoomByIdentifier(roomIdentifier);
+    if (!resolved) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Room not found" });
     }
+
+    const { room, filter } = resolved;
+    const currentStudents = Array.isArray(room.students) ? room.students : [];
 
     // Prevent overbooking
     if (room.occupied >= room.capacity) {
@@ -224,87 +283,152 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    if (room.status === 'Maintenance') {
-      return res.status(400).json({ success: false, message: 'Room is under maintenance' });
+    if (room.status === "Maintenance") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Room is under maintenance" });
     }
 
-    room.students.push(req.body.studentId);
-    room.occupied = room.students.length;
-    room.status = room.occupied >= room.capacity ? 'Occupied' : 'Available';
+    const nextStudents = currentStudents.includes(req.body.studentId)
+      ? currentStudents
+      : [...currentStudents, req.body.studentId];
+    const nextOccupied = nextStudents.length;
+    const nextStatus = nextOccupied >= room.capacity ? "Occupied" : "Available";
 
-    await room.save();
+    await Room.collection.updateOne(filter, {
+      $set: {
+        students: nextStudents,
+        occupied: nextOccupied,
+        status: nextStatus,
+      },
+    });
 
-    const studentUser = await User.findOne({ role: 'student', studentId: req.body.studentId }).select('_id name studentId');
+    const updatedRoom = await Room.collection.findOne(filter);
+
+    const studentUser = await User.findOne({
+      role: "student",
+      studentId: req.body.studentId,
+    }).select("_id name studentId");
 
     if (studentUser) {
       await createNotification(
-        'Room Assigned',
+        "Room Assigned",
         `You have been assigned to Room ${room.roomNumber}.`,
-        'room',
+        "room",
         {
-          source: 'Room Management',
+          source: "Room Management",
           recipientUserId: String(studentUser._id),
           relatedModuleId: String(room._id),
-          priority: 'success',
-        }
+          priority: "success",
+        },
       );
     }
 
     // Notification + Admin Log
-    await createNotification('Room Assignment Completed', `Room ${room.roomNumber} allocated to Student ID ${req.body.studentId}`, 'room', {
-      source: 'Room Management',
-      recipientType: 'all_admins',
-      relatedModuleId: String(room._id),
-      priority: 'success',
-    });
-    if (req.user) {
-      await logAdminAction(req.user.email, String(req.user.id), 'Allocated room to student', 'room', String(req.params.id), `Room ${room.roomNumber} → ${req.body.studentId}`);
-    }
-
-    res.json({ success: true, message: 'Room allocated successfully', data: room });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error allocating room', error: error.message });
-  }
-};
-
-// VACATE room
-export const vacateRoom = async (req: Request, res: Response) => {
-  try {
-    const room = await Room.findById(req.params.id);
-    if (!room) {
-      return res.status(404).json({
-        success: false,
-        message: 'Room not found',
-      });
-    }
-
-    room.students = [];
-    room.occupied = 0;
-    room.status = 'Available';
-
-    await room.save();
-
     await createNotification(
-      'Room Available',
-      `Room ${room.roomNumber} is now available for booking.`,
-      'room',
+      "Room Assignment Completed",
+      `Room ${room.roomNumber} allocated to Student ID ${req.body.studentId}`,
+      "room",
       {
-        source: 'Room Management',
-        recipientType: 'all_students',
+        source: "Room Management",
+        recipientType: "all_admins",
         relatedModuleId: String(room._id),
-        priority: 'normal',
-      }
+        priority: "success",
+      },
     );
+    if (req.user) {
+      await logAdminAction(
+        req.user.email,
+        String(req.user.id),
+        "Allocated room to student",
+        "room",
+        String(req.params.id),
+        `Room ${room.roomNumber} → ${req.body.studentId}`,
+      );
+    }
 
     res.json({
       success: true,
-      message: 'Room vacated successfully',
-      data: room,
+      message: "Room allocated successfully",
+      data: updatedRoom || {
+        ...room,
+        students: nextStudents,
+        occupied: nextOccupied,
+        status: nextStatus,
+      },
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Error vacating room',
+      message: "Error allocating room",
+      error: error.message,
+    });
+  }
+};
+
+// VACATE room
+export const vacateRoom = async (req: AuthRequest, res: Response) => {
+  try {
+    const roomIdentifier = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const resolved = await findRoomByIdentifier(roomIdentifier);
+    if (!resolved) {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found",
+      });
+    }
+
+    const { room, filter } = resolved;
+
+    await Room.collection.updateOne(filter, {
+      $set: {
+        students: [],
+        occupied: 0,
+        status: "Available",
+      },
+    });
+
+    const updatedRoom = await Room.collection.findOne(filter);
+
+    await createNotification(
+      "Room Available",
+      `Room ${room.roomNumber} is now available for booking.`,
+      "room",
+      {
+        source: "Room Management",
+        recipientType: "all_students",
+        relatedModuleId: String(room._id),
+        priority: "normal",
+      },
+    );
+
+    if (req.user) {
+      await logAdminAction(
+        req.user.email,
+        String(req.user.id),
+        "Vacated room",
+        "room",
+        String(room._id),
+        `Room ${room.roomNumber}`,
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "Room vacated successfully",
+      data: updatedRoom || {
+        ...room,
+        students: [],
+        occupied: 0,
+        status: "Available",
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Error vacating room",
       error: error.message,
     });
   }

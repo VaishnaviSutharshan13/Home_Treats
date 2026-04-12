@@ -351,7 +351,7 @@ const MyFees = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} userRole="student" />
 
       <div className="lg:ml-64 flex-1 min-w-0">
-        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
+        <header className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-16 z-10 w-full bg-navbar/95 backdrop-blur">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground/90">My Fees</h1>

@@ -25,7 +25,7 @@ const categories = ['Maintenance', 'IT Support', 'Plumbing', 'Electrical', 'Hous
 const priorities = ['Low', 'Medium', 'High'];
 
 const inputClass =
-  'h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25';
+  'h-12 w-full rounded-xl border border-border bg-card/50 px-4 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25 placeholder:text-muted-foreground/60';
 const labelClass = 'mb-2 block text-sm font-semibold text-foreground/90';
 
 const ComplaintForm = ({
@@ -55,7 +55,7 @@ const ComplaintForm = ({
               id="complaint-student"
               value={values.student || ''}
               onChange={(e) => update('student', e.target.value)}
-              className={`${inputClass} ${errors.student ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''}`}
+              className={`${inputClass} ${errors.student ? 'border-error focus:border-error focus:ring-error/20' : ''}`}
               required
               placeholder="Student ID or name"
             />
@@ -69,7 +69,7 @@ const ComplaintForm = ({
               id="complaint-room"
               value={values.room || ''}
               onChange={(e) => update('room', e.target.value)}
-              className={`${inputClass} ${errors.room ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''}`}
+              className={`${inputClass} ${errors.room ? 'border-error focus:border-error focus:ring-error/20' : ''}`}
               required
               placeholder="Room number"
             />
@@ -86,7 +86,7 @@ const ComplaintForm = ({
           id="complaint-title"
           value={values.title}
           onChange={(e) => update('title', e.target.value)}
-          className={`${inputClass} ${errors.title ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''}`}
+          className={`${inputClass} ${errors.title ? 'border-error focus:border-error focus:ring-error/20' : ''}`}
           required
           maxLength={120}
           placeholder="Briefly describe the issue"
@@ -102,10 +102,10 @@ const ComplaintForm = ({
           id="complaint-description"
           value={values.description}
           onChange={(e) => update('description', e.target.value)}
-          className={`min-h-[120px] w-full rounded-xl border bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:ring-2 ${
+          className={`min-h-[120px] w-full rounded-xl border bg-card/50 px-4 py-3 text-sm text-foreground outline-none transition focus:ring-2 placeholder:text-muted-foreground/60 ${
             errors.description
-              ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
-              : 'border-gray-200 focus:border-primary focus:ring-primary/25'
+              ? 'border-error focus:border-error focus:ring-error/20'
+              : 'border-border focus:border-primary focus:ring-primary/25'
           }`}
           required
           maxLength={1200}
@@ -123,7 +123,7 @@ const ComplaintForm = ({
             id="complaint-category"
             value={values.category}
             onChange={(e) => update('category', e.target.value)}
-            className={`${inputClass} ${errors.category ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''}`}
+            className={`${inputClass} ${errors.category ? 'border-error focus:border-error focus:ring-error/20' : ''}`}
           >
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -141,7 +141,7 @@ const ComplaintForm = ({
             id="complaint-priority"
             value={values.priority}
             onChange={(e) => update('priority', e.target.value)}
-            className={`${inputClass} ${errors.priority ? 'border-red-400 focus:border-red-400 focus:ring-red-100' : ''}`}
+            className={`${inputClass} ${errors.priority ? 'border-error focus:border-error focus:ring-error/20' : ''}`}
           >
             {priorities.map((priority) => (
               <option key={priority} value={priority}>
@@ -158,7 +158,7 @@ const ComplaintForm = ({
           <button
             type="button"
             onClick={onCancel}
-            className="h-11 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-foreground/90 transition hover:bg-muted"
+            className="h-11 rounded-xl border border-border bg-card px-5 text-sm font-semibold text-foreground/90 transition hover:bg-muted"
           >
             Cancel
           </button>

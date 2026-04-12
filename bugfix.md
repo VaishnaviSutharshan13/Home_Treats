@@ -1,0 +1,2 @@
+in Room Management, send room update can the recepient should all student or the admin can select individual student to send the update. Currently, the update is sent to all students in the room.
+admin profile is not working properly, when the admin tries to naviagate to the profile page, it shows an error. This issue needs to be fixed to allow the admin to view and edit their profile information without any errors.

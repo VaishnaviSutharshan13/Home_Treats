@@ -467,6 +467,7 @@ export const bookingService = {
     phone: string;
     selectedFloor: string;
     roomId?: string;
+    roomNumber?: string;
   }) => {
     const response = await api.post("/bookings/confirm", payload);
     return response.data;

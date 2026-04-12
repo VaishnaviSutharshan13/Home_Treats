@@ -52,7 +52,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
   const priorityClass = badgeByPriority[complaint.priority] || 'bg-muted text-foreground/90';
 
   return (
-    <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <article className="rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md hover:border-primary/40">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-foreground">
@@ -67,7 +67,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4 text-sm">
+      <div className="grid grid-cols-2 gap-4 border-t border-border mt-4 pt-4 text-sm">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Category</p>
           <p className="mt-1 text-foreground/90">{complaint.category}</p>
@@ -91,7 +91,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
         )}
       </div>
 
-      <div className="mt-4 border-t border-gray-100 pt-4">
+      <div className="mt-4 border-t border-border pt-4">
         <button
           onClick={() => onToggleComments(complaint._id)}
           className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary"
@@ -120,12 +120,12 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
       </div>
 
       {(onEdit || onDelete) && (
-        <div className="mt-5 flex items-center gap-2 border-t border-gray-100 pt-4">
+        <div className="mt-5 flex items-center gap-2 border-t border-border pt-4">
           {onEdit && (
             <button
               onClick={() => onEdit(complaint)}
               disabled={!canStudentEdit(complaint.status)}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-border hover:border-primary/40 px-4 text-sm font-semibold text-foreground/90 transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaEdit className="text-xs" />
               Edit
@@ -135,7 +135,7 @@ const ComplaintCard = ({ complaint, expanded, onToggleComments, onEdit, onDelete
             <button
               onClick={() => onDelete(complaint._id)}
               disabled={!canStudentEdit(complaint.status)}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-200 px-4 text-sm font-semibold text-error transition hover:bg-error/10 border border-error/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-error/20 px-4 text-sm font-semibold text-error transition hover:bg-error/10 hover:border-error/40 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaTrash className="text-xs" />
               Delete
