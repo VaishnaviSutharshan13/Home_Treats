@@ -294,7 +294,7 @@ const FeesManagement = () => {
       </div>
 
       {/* ── PAGE HEADER ────────────────────────── */}
-      <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
+      <div className="bg-navbar shadow-sm border-b border-border sticky top-16 z-10 w-full bg-navbar/95 backdrop-blur">
         <div className="w-full px-6 sm:px-8 lg:px-10 py-6">
 
           {/* Breadcrumb */}

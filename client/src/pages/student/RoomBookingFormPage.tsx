@@ -46,7 +46,11 @@ const RoomBookingFormPage: React.FC = () => {
     const fetchAvailableRoom = async () => {
       try {
         const res = await roomService.getAll();
-        const allRooms: RoomOption[] = (res?.data || res || []) as RoomOption[];
+        const allRooms: RoomOption[] = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
         const room = allRooms.find((r) => r.status !== 'Maintenance' && r.occupied < r.capacity) || null;
         setSelectedRoom(room);
       } catch (error) {
@@ -101,7 +105,11 @@ const RoomBookingFormPage: React.FC = () => {
         email: form.email,
         phone: form.phone,
         selectedFloor: selectedRoom.floor,
-        roomId: selectedRoom._id,
+        roomId:
+          selectedRoom._id != null && selectedRoom._id !== ''
+            ? String(selectedRoom._id)
+            : undefined,
+        roomNumber: selectedRoom.roomNumber,
       });
 
       if (!response?.success) {

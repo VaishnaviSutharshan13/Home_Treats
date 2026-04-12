@@ -93,7 +93,11 @@ const RoomBooking = () => {
         email: user.email,
         phone: user.phone || '',
         selectedFloor: selectedRoom.floor,
-        roomId: selectedRoom._id,
+        roomId:
+          selectedRoom._id != null && selectedRoom._id !== ''
+            ? String(selectedRoom._id)
+            : undefined,
+        roomNumber: selectedRoom.roomNumber,
       });
 
       if (!response.success) {
@@ -127,7 +131,7 @@ const RoomBooking = () => {
       />
 
       <div className="lg:ml-64">
-        <div className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
+        <div className="bg-navbar shadow-sm border-b border-border px-6 py-4 sticky top-16 z-10 w-full bg-navbar/95 backdrop-blur">
           <h1 className="text-2xl font-bold text-foreground">Room Booking</h1>
           <p className="text-muted-foreground text-sm mt-1">Configure your search and confirm your room booking.</p>
         </div>

@@ -20,6 +20,7 @@ router.post(
     body('phone').notEmpty().withMessage('Phone number is required'),
     body('selectedFloor').notEmpty().withMessage('Selected floor is required'),
     body('roomId').optional().isString().withMessage('Room id must be a string'),
+    body('roomNumber').optional().isString().withMessage('Room number must be a string'),
   ],
   confirmBooking
 );

@@ -230,7 +230,7 @@ const AdminProfile = () => {
 
               <label className="mt-5 inline-flex items-center justify-center w-full px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover text-primary-foreground transform hover:scale-[1.02] hover:shadow-primary/20 transition-all duration-300 cursor-pointer transition-colors">
                 <FaCamera className="mr-2" />Choose Image
-                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30" onChange={handleImageChange} />
+                <input type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" className="hidden" onChange={handleImageChange} />
               </label>
 
               <button
@@ -321,7 +321,7 @@ const AdminProfile = () => {
                   <input
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                    className=" bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                    className="hidden"
                     onChange={handleHeroImageChange}
                   />
                 </label>

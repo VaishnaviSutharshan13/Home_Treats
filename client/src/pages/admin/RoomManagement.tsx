@@ -392,7 +392,7 @@ const RoomManagement = () => {
       </div>
 
       {/* ── Header ──────────────────────────────────────── */}
-      <div className="bg-navbar shadow-sm border-b border-border sticky top-0 z-10 w-full bg-navbar/95 backdrop-blur">
+      <div className="bg-navbar shadow-sm border-b border-border sticky top-16 z-10 w-full bg-navbar/95 backdrop-blur">
         <div className="w-full px-6 sm:px-8 lg:px-10 py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">

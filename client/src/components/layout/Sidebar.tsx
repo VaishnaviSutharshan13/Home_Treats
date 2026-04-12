@@ -1,6 +1,5 @@
 import {
   FaBed,
-  FaCheck,
   FaComments,
   FaDollarSign,
   FaExclamationTriangle,
@@ -37,11 +36,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
       title: "Students",
       icon: <FaUsers className="h-5 w-5" />,
       href: "/admin/student-management",
-    },
-    {
-      title: "Approvals",
-      icon: <FaCheck className="h-5 w-5" />,
-      href: "/admin/approvals",
     },
     {
       title: "Rooms",
@@ -116,14 +110,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-x-0 bottom-0 top-16 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={onToggle}
           aria-hidden
         />
       )}
 
       <div
-        className={`fixed left-0 top-0 z-40 flex h-screen w-64 transform flex-col border-r border-border bg-sidebar shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 transform flex-col border-r border-border bg-sidebar shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
