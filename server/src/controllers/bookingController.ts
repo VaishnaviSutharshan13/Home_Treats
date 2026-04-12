@@ -1,10 +1,13 @@
 import { Response } from 'express';
+import mongoose from 'mongoose';
 import Booking from '../models/Booking';
 import Room from '../models/Room';
 import User from '../models/User';
 import Student from '../models/Student';
 import { AuthRequest } from '../middleware/auth';
 import { createNotification } from './notificationController';
+
+const CANONICAL_FLOORS = new Set(['1st Floor', '2nd Floor', '3rd Floor', '4th Floor']);
 
 const floorMap: Record<string, string> = {
   'floor 1': '1st Floor',
@@ -22,8 +25,41 @@ const floorMap: Record<string, string> = {
 };
 
 const normalizeFloor = (value: string): string | null => {
-  const normalized = value.toLowerCase().trim();
+  const v = String(value || '').trim();
+  if (CANONICAL_FLOORS.has(v)) return v;
+  const normalized = v.toLowerCase();
   return floorMap[normalized] || null;
+};
+
+/** Accept only real Mongo ObjectIds; ignore "undefined", empty, invalid strings. */
+const parseRoomObjectId = (input: unknown): string | null => {
+  if (input == null) return null;
+  const s = typeof input === 'string' ? input.trim() : String(input).trim();
+  if (!s || s === 'undefined' || s === 'null') return null;
+  if (!mongoose.isValidObjectId(s)) return null;
+  return s;
+};
+
+const asNonNegInt = (value: unknown, fallback = 0): number => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.floor(n));
+};
+
+/**
+ * Seed data may store Room `_id` as a string in MongoDB while the client sends a 24-char hex id.
+ * `Room.findById` / `save()` then use ObjectId and match 0 documents → DocumentNotFoundError on save.
+ */
+const findRoomByIdFlexible = async (idStr: string): Promise<InstanceType<typeof Room> | null> => {
+  try {
+    const oid = new mongoose.Types.ObjectId(idStr);
+    const raw = await Room.collection.findOne({
+      $or: [{ _id: idStr }, { _id: oid }],
+    } as Record<string, unknown>);
+    return raw ? Room.hydrate(raw as never) : null;
+  } catch {
+    return null;
+  }
 };
 
 export const confirmBooking = async (req: AuthRequest, res: Response) => {
@@ -32,12 +68,17 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    const { fullName, email, phone, selectedFloor, roomId } = req.body as {
+    if (!mongoose.isValidObjectId(req.user.id)) {
+      return res.status(401).json({ success: false, message: 'Invalid session. Please log in again.' });
+    }
+
+    const { fullName, email, phone, selectedFloor, roomId, roomNumber } = req.body as {
       fullName: string;
       email: string;
       phone: string;
       selectedFloor: string;
       roomId?: string;
+      roomNumber?: string;
     };
 
     if (!fullName || !email || !phone || !selectedFloor) {
@@ -70,39 +111,73 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ success: false, message: 'Only students can book rooms' });
     }
 
-    if (user.approvalStatus !== 'Approved') {
+    const approved =
+      user.approvalStatus === 'Approved' || user.status === 'Approved';
+    if (!approved) {
       return res.status(403).json({
         success: false,
         message: 'Only approved students can book rooms. Please contact admin.',
       });
     }
 
-    let availableRoom = null as any;
+    let availableRoom = null as InstanceType<typeof Room> | null;
 
-    if (roomId) {
-      availableRoom = await Room.findById(roomId);
-      if (!availableRoom) {
-        return res.status(404).json({ success: false, message: 'Selected room not found' });
-      }
+    const idStr = parseRoomObjectId(roomId);
+    const roomNo =
+      typeof roomNumber === 'string' ? roomNumber.trim() : '';
 
+    if (idStr) {
+      availableRoom = await findRoomByIdFlexible(idStr);
+    }
+
+    if (!availableRoom && roomNo) {
+      availableRoom = await Room.findOne({
+        roomNumber: roomNo,
+        floor,
+        status: { $ne: 'Maintenance' },
+      });
+    }
+
+    if (availableRoom) {
       if (availableRoom.floor !== floor) {
-        return res.status(400).json({ success: false, message: 'Selected room does not belong to selected floor' });
+        return res.status(400).json({
+          success: false,
+          message: 'Selected room does not belong to selected floor',
+        });
       }
 
       if (availableRoom.status === 'Maintenance') {
-        return res.status(400).json({ success: false, message: 'Selected room is under maintenance' });
+        return res.status(400).json({
+          success: false,
+          message: 'Selected room is under maintenance',
+        });
       }
 
-      if (availableRoom.occupied >= availableRoom.capacity) {
+      const occ = asNonNegInt(availableRoom.occupied);
+      const cap = asNonNegInt(availableRoom.capacity);
+      if (cap < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'Room configuration is invalid. Please contact admin.',
+        });
+      }
+      if (occ >= cap) {
         return res.status(409).json({ success: false, message: 'Selected room is full' });
       }
+    } else if (idStr || roomNo) {
+      return res.status(404).json({ success: false, message: 'Selected room not found' });
     } else {
       const roomsOnFloor = await Room.find({
         floor,
         status: { $ne: 'Maintenance' },
       }).sort({ roomNumber: 1 });
 
-      availableRoom = roomsOnFloor.find((room) => room.occupied < room.capacity);
+      availableRoom =
+        roomsOnFloor.find((r) => {
+          const o = asNonNegInt(r.occupied);
+          const c = asNonNegInt(r.capacity);
+          return c >= 1 && o < c;
+        }) || null;
     }
 
     if (!availableRoom) {
@@ -112,15 +187,43 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const bedNumber = availableRoom.occupied + 1;
+    const occupiedBefore = asNonNegInt(availableRoom.occupied);
+    const capacity = asNonNegInt(availableRoom.capacity);
+    if (capacity < 1 || occupiedBefore > capacity) {
+      return res.status(400).json({
+        success: false,
+        message: 'Room configuration is invalid. Please contact admin.',
+      });
+    }
+    if (occupiedBefore >= capacity) {
+      return res.status(409).json({ success: false, message: 'Selected room is full' });
+    }
 
-    availableRoom.occupied = bedNumber;
-    availableRoom.students = [
+    const bedNumber = occupiedBefore + 1;
+    const monthlyRent = Number(availableRoom.price);
+    const rent = Number.isFinite(monthlyRent) ? monthlyRent : 0;
+
+    const nextStudents = [
       ...(availableRoom.students || []),
       user?.studentId || String(req.user.id),
     ];
-    availableRoom.status = availableRoom.occupied >= availableRoom.capacity ? 'Occupied' : 'Available';
-    await availableRoom.save();
+    const nextStatus = bedNumber >= capacity ? 'Occupied' : 'Available';
+
+    const roomKey = { roomNumber: availableRoom.roomNumber };
+    const roomUpdate = await Room.updateOne(roomKey, {
+      $set: {
+        occupied: bedNumber,
+        status: nextStatus,
+        students: nextStudents,
+      },
+    });
+
+    if (roomUpdate.matchedCount !== 1) {
+      return res.status(500).json({
+        success: false,
+        message: 'Could not update the room for this booking. Please try again or contact support.',
+      });
+    }
 
     const booking = await Booking.create({
       userId: req.user.id,
@@ -132,9 +235,9 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       roomId: availableRoom._id,
       roomNumber: availableRoom.roomNumber,
       bedNumber,
-      roomCapacity: availableRoom.capacity,
-      bedsPerRoom: availableRoom.capacity,
-      monthlyRent: availableRoom.price,
+      roomCapacity: capacity,
+      bedsPerRoom: capacity,
+      monthlyRent: rent,
       hostelName: 'Home_Treats Student Hostel',
       location: 'No.11, Nallur, Jaffna, 40000, Sri Lanka',
       status: 'Confirmed',
@@ -253,14 +356,23 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
     }
 
     if (status === 'Cancelled' && booking.status === 'Confirmed') {
-      const room = await Room.findById(booking.roomId);
+      const roomIdHex = booking.roomId ? String(booking.roomId) : '';
+      let room =
+        (roomIdHex && mongoose.isValidObjectId(roomIdHex)
+          ? await findRoomByIdFlexible(roomIdHex)
+          : null) || (await Room.findOne({ roomNumber: booking.roomNumber }));
+
       if (room) {
-        room.occupied = Math.max(0, room.occupied - 1);
-        room.students = (room.students || []).filter((s) => s !== (booking.studentId || String(booking.userId)));
-        if (room.status !== 'Maintenance') {
-          room.status = 'Available';
-        }
-        await room.save();
+        const occ = Math.max(0, asNonNegInt(room.occupied) - 1);
+        const students = (room.students || []).filter(
+          (s) => s !== (booking.studentId || String(booking.userId))
+        );
+        const nextStatus =
+          room.status === 'Maintenance' ? 'Maintenance' : 'Available';
+        await Room.updateOne(
+          { roomNumber: room.roomNumber },
+          { $set: { occupied: occ, students, status: nextStatus } }
+        );
       }
 
       const user = await User.findById(booking.userId);

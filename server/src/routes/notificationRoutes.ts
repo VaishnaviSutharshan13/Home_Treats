@@ -27,7 +27,8 @@ router.get('/', authMiddleware, getNotifications);
 router.get('/unread-count', authMiddleware, getUnreadCount);
 router.put('/mark-all-read', authMiddleware, markAllAsRead);
 router.put('/:id/read', authMiddleware, markAsRead);
-router.delete('/:id', authMiddleware, hideNotification);
+// Static path must be registered before `/:id` or Express treats "clear" as an id.
 router.delete('/clear', authMiddleware, clearAll);
+router.delete('/:id', authMiddleware, hideNotification);
 
 export default router;
