@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
-import { studentService } from "../../services";
+import { roomService, studentService } from "../../services";
 
 type StudentStatus = "Pending" | "Approved" | "Rejected" | "Inactive";
 
@@ -47,13 +47,22 @@ interface StudentForm {
   address: string;
   emergencyContact: string;
   password: string;
+  confirmPassword: string;
   roomNumber: string;
   course: string;
   status: StudentStatus;
 }
 
 type StudentFormErrors = Partial<
-  Record<"email" | "phone" | "emergencyContact", string>
+  Record<
+    | "studentId"
+    | "email"
+    | "phone"
+    | "password"
+    | "confirmPassword"
+    | "emergencyContact",
+    string
+  >
 >;
 
 const emptyForm: StudentForm = {
@@ -66,14 +75,18 @@ const emptyForm: StudentForm = {
   address: "",
   emergencyContact: "",
   password: "",
+  confirmPassword: "",
   roomNumber: "",
   course: "Computer Science",
   status: "Pending",
 };
 
 const TEN_DIGIT_REGEX = /^\d{10}$/;
+const STUDENT_ID_REGEX = /^[A-Z]{2}\d{8}$/;
 const sanitizePhone = (value: string) => value.replace(/\D/g, "").slice(0, 10);
 const isEmailFormatValid = (value: string) => /^\S+@\S+\.\S+$/.test(value);
+const isStrongPassword = (value: string) => value.length >= 6;
+const normalizeStudentId = (value: string) => value.trim().toUpperCase();
 
 const statusBadgeClass: Record<StudentStatus, string> = {
   Pending: "bg-warning/20 border border-warning/30 text-warning",
@@ -116,6 +129,7 @@ const StudentManagement = () => {
   const [viewing, setViewing] = useState<StudentRow | null>(null);
   const [form, setForm] = useState<StudentForm>(emptyForm);
   const [formErrors, setFormErrors] = useState<StudentFormErrors>({});
+  const [roomOptions, setRoomOptions] = useState<string[]>([]);
 
   const canToggleActivity =
     !editing || editing.status === "Approved" || editing.status === "Inactive";
@@ -145,6 +159,31 @@ const StudentManagement = () => {
   }, []);
 
   useEffect(() => {
+    const loadRooms = async () => {
+      try {
+        const res = await roomService.getAll();
+        const rooms: Array<{ roomNumber?: string }> = Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+            ? res
+            : [];
+        const options: string[] = Array.from(
+          new Set(
+            rooms
+              .map((room) => String(room.roomNumber || "").trim())
+              .filter(Boolean),
+          ),
+        ).sort((left, right) => left.localeCompare(right));
+        setRoomOptions(options);
+      } catch {
+        setRoomOptions([]);
+      }
+    };
+
+    loadRooms();
+  }, []);
+
+  useEffect(() => {
     const t = setTimeout(fetchStudents, 300);
     return () => clearTimeout(t);
   }, [search, statusFilter]);
@@ -171,7 +210,7 @@ const StudentManagement = () => {
     setForm({
       ...emptyForm,
       name: student.name,
-      studentId: student.studentId,
+      studentId: normalizeStudentId(student.studentId),
       university: student.university || "",
       email: student.email,
       phone: sanitizePhone(student.phone || ""),
@@ -198,11 +237,20 @@ const StudentManagement = () => {
       return true;
     }
     const errors: StudentFormErrors = {};
+    if (!STUDENT_ID_REGEX.test(normalizeStudentId(form.studentId))) {
+      errors.studentId = "Student ID must start with 2 letters followed by 8 digits";
+    }
     if (!isEmailFormatValid(form.email)) errors.email = "Invalid email";
     if (!TEN_DIGIT_REGEX.test(form.phone))
       errors.phone = "Phone must be 10 digits";
     if (!TEN_DIGIT_REGEX.test(form.emergencyContact))
       errors.emergencyContact = "Emergency must be 10 digits";
+    if (!isStrongPassword(form.password)) {
+      errors.password = "Password must be at least 6 characters";
+    }
+    if (form.password !== form.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -222,6 +270,8 @@ const StudentManagement = () => {
       } else {
         await studentService.create({
           ...form,
+          studentId: normalizeStudentId(form.studentId),
+          email: form.email.trim().toLowerCase(),
           phone: sanitizePhone(form.phone),
           emergencyContact: sanitizePhone(form.emergencyContact),
         });
@@ -543,9 +593,17 @@ const StudentManagement = () => {
                         })
                       }
                       required
+                      pattern="[A-Za-z]{2}[0-9]{8}"
+                      title="Student ID must start with 2 letters followed by 8 digits"
                       className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                     />
                   </div>
+
+                  {formErrors.studentId && (
+                    <p className="text-error text-xs mt-1">
+                      {formErrors.studentId}
+                    </p>
+                  )}
 
                   <input
                     placeholder="University / College"
@@ -616,6 +674,43 @@ const StudentManagement = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={(e) =>
+                          setForm({ ...form, password: e.target.value })
+                        }
+                        required
+                        className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                      />
+                      {formErrors.password && (
+                        <p className="text-error text-xs mt-1">
+                          {formErrors.password}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={form.confirmPassword}
+                        onChange={(e) =>
+                          setForm({ ...form, confirmPassword: e.target.value })
+                        }
+                        required
+                        className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                      />
+                      {formErrors.confirmPassword && (
+                        <p className="text-error text-xs mt-1">
+                          {formErrors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <select
                       value={form.gender}
                       onChange={(e) =>
@@ -650,15 +745,6 @@ const StudentManagement = () => {
                     className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                   />
 
-                  <input
-                    type="password"
-                    placeholder="Temporary Password"
-                    value={form.password}
-                    onChange={(e) =>
-                      setForm({ ...form, password: e.target.value })
-                    }
-                    className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
-                  />
                 </>
               ) : (
                 <>
@@ -671,34 +757,78 @@ const StudentManagement = () => {
                     </p>
                   </div>
 
-                  <input
-                    placeholder="Room Number"
-                    value={form.roomNumber}
-                    onChange={(e) =>
-                      setForm({ ...form, roomNumber: e.target.value })
-                    }
-                    className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
-                  />
+                  <div>
+                    <select
+                      value={form.roomNumber}
+                      onChange={(e) =>
+                        setForm({ ...form, roomNumber: e.target.value })
+                      }
+                      className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                    >
+                      <option value="">Select Room</option>
+                      {roomOptions.map((roomNumber: string) => (
+                        <option key={roomNumber} value={roomNumber}>
+                          Room {roomNumber}
+                        </option>
+                      ))}
+                    </select>
+                    {!roomOptions.length && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        No rooms available right now.
+                      </p>
+                    )}
+                  </div>
                 </>
               )}
 
-              <select
-                value={form.status}
-                onChange={(e) =>
-                  setForm({ ...form, status: e.target.value as StudentStatus })
-                }
-                disabled={Boolean(editing) && !canToggleActivity}
-                className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30 appearance-none"
-              >
-                {!editing && <option>Pending</option>}
-                <option>Approved</option>
-                <option>Inactive</option>
-              </select>
-              {editing && !canToggleActivity && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Pending/Rejected students can be approved or rejected from the
-                  action buttons in this page.
-                </p>
+              {editing ? (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                    Account Status
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, status: "Approved" })}
+                      disabled={!canToggleActivity}
+                      className={`rounded-xl px-3 py-2.5 border transition-colors ${
+                        form.status === "Approved"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted/30 border-border text-foreground hover:border-primary/30"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      Active
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, status: "Inactive" })}
+                      disabled={!canToggleActivity}
+                      className={`rounded-xl px-3 py-2.5 border transition-colors ${
+                        form.status === "Inactive"
+                          ? "bg-error text-white border-error"
+                          : "bg-muted/30 border-border text-foreground hover:border-error/30"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      Inactive
+                    </button>
+                  </div>
+                  {!canToggleActivity && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Pending/Rejected students can be approved or rejected from the
+                      action buttons in this page.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({ ...form, status: e.target.value as StudentStatus })
+                  }
+                  className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30 appearance-none"
+                >
+                  <option>Pending</option>
+                </select>
               )}
 
               <div className="flex justify-end gap-3 pt-4">
