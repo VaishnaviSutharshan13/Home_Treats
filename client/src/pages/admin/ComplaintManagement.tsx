@@ -112,16 +112,21 @@ const ComplaintManagement = () => {
   // ── Filter ─────────────────────
   const filtered = useMemo(() => {
     return complaints.filter((c) => {
+      const title = String(c.title || "").toLowerCase();
+      const student = String(c.student || "").toLowerCase();
+      const description = String(c.description || "").toLowerCase();
+      const searchValue = search.toLowerCase();
+
       const matchesSearch =
-        c.title.toLowerCase().includes(search.toLowerCase()) ||
-        c.student.toLowerCase().includes(search.toLowerCase()) ||
-        c.description.toLowerCase().includes(search.toLowerCase());
+        title.includes(searchValue) ||
+        student.includes(searchValue) ||
+        description.includes(searchValue);
 
       return (
         matchesSearch &&
-        (category === "All" || c.category === category) &&
-        (status === "All" || c.status === status) &&
-        (priority === "All" || c.priority === priority)
+        (category === "All" || String(c.category || "") === category) &&
+        (status === "All" || String(c.status || "") === status) &&
+        (priority === "All" || String(c.priority || "") === priority)
       );
     });
   }, [complaints, search, category, status, priority]);

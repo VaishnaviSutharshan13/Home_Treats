@@ -278,6 +278,7 @@ export const createStudent = async (req: AuthRequest, res: Response) => {
       name,
       email,
       password,
+      confirmPassword,
       phone,
       studentId,
       university,
@@ -288,6 +289,13 @@ export const createStudent = async (req: AuthRequest, res: Response) => {
       roomNumber,
       status,
     } = req.body;
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Passwords do not match",
+      });
+    }
 
     const normalizedEmail = String(email || "")
       .toLowerCase()
@@ -313,9 +321,9 @@ export const createStudent = async (req: AuthRequest, res: Response) => {
     const student = await User.create({
       name,
       email: normalizedEmail,
-      password: password || "Student@123",
+      password,
       role: "student",
-      phone,
+      phone: String(phone || "").trim(),
       studentId: normalizedStudentId,
       university,
       gender,
