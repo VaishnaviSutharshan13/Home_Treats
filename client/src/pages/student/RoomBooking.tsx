@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FaCheckCircle, FaSpinner, FaTimes, FaSearch, FaUserFriends, FaWifi, FaBook, FaFan, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheckCircle, FaSpinner, FaTimes, FaUserFriends, FaWifi, FaBook, FaFan, FaExclamationTriangle } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { bookingService, roomService } from '../../services';
-import { marketingAvailability, toFloorId } from '../../utils/roomView';
+import { marketingAvailability } from '../../utils/roomView';
 import type { ApiRoom } from '../../utils/roomView';
 
 const availabilityColors: { [key: string]: string } = {

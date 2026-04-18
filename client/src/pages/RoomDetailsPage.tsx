@@ -49,7 +49,7 @@ const facilityIcons: Record<string, React.ReactNode> = {
 
 const FacilityBadge: React.FC<FacilityBadgeProps> = ({ name }) => (
   <div className="flex items-center gap-3 bg-surface-active border border-primary/15 rounded-xl px-4 py-3 hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
-    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-200">
+    <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-primary shadow-sm group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
       {facilityIcons[name] || <FaCheckCircle />}
     </div>
     <span className="text-foreground/90 font-medium text-sm">{name}</span>
@@ -57,7 +57,7 @@ const FacilityBadge: React.FC<FacilityBadgeProps> = ({ name }) => (
 );
 
 const InfoCard: React.FC<InfoCardProps> = ({ icon, title, time, day, note, accentColor }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+  <div className="bg-card rounded-2xl border border-border shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
     <div className="flex items-center gap-3 mb-4">
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${accentColor} text-white shadow-md`}>{icon}</div>
       <h3 className="text-lg font-bold text-foreground">{title}</h3>
@@ -174,7 +174,7 @@ const RoomDetailsPage: React.FC = () => {
               <span className="flex items-center gap-2">
                 <FaBed className="w-4 h-4" /> {floor.totalRooms} Rooms
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 border border-primary/200/90 text-white">{floor.availableRooms} Available</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 border border-primary/40 text-white">{floor.availableRooms} Available</span>
             </div>
           </div>
         </div>
@@ -183,12 +183,12 @@ const RoomDetailsPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <div className="bg-card border border-border rounded-2xl shadow-md p-6 md:p-8">
               <h2 className="text-xl font-bold text-foreground mb-3">About This Floor</h2>
               <p className="text-muted-foreground leading-relaxed">{floor.description}</p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <div className="bg-card border border-border rounded-2xl shadow-md p-6 md:p-8">
               <h2 className="text-xl font-bold text-foreground mb-5">Facilities & Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {floor.facilities.map((facility) => (
@@ -200,14 +200,14 @@ const RoomDetailsPage: React.FC = () => {
             <div>
               <h2 className="text-xl font-bold text-foreground mb-5">Check-in & Check-out Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoCard icon={<FaCalendarCheck className="w-5 h-5" />} title="Check-in" time={floor.checkIn.time} day={floor.checkIn.day} note={floor.checkIn.note} accentColor="bg-primary/10 border border-primary/200" />
-                <InfoCard icon={<FaCalendarTimes className="w-5 h-5" />} title="Check-out" time={floor.checkOut.time} day={floor.checkOut.day} note={floor.checkOut.note} accentColor="bg-error/10 border border-error/200" />
+                <InfoCard icon={<FaCalendarCheck className="w-5 h-5" />} title="Check-in" time={floor.checkIn.time} day={floor.checkIn.day} note={floor.checkIn.note} accentColor="bg-primary text-primary-foreground" />
+                <InfoCard icon={<FaCalendarTimes className="w-5 h-5" />} title="Check-out" time={floor.checkOut.time} day={floor.checkOut.day} note={floor.checkOut.note} accentColor="bg-error text-white" />
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg sticky top-24 p-6 md:p-8 border border-gray-100">
+            <div className="bg-card rounded-2xl shadow-lg sticky top-24 p-6 md:p-8 border border-border">
               <div className="text-center mb-6">
                 <div className="text-sm text-muted-foreground mb-1">Monthly Price Range</div>
                 <div className="text-4xl font-bold text-primary">Rs. {floor.priceMin.toLocaleString()} - {floor.priceMax.toLocaleString()}</div>
@@ -215,9 +215,9 @@ const RoomDetailsPage: React.FC = () => {
               </div>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Total Rooms</span><span className="font-medium text-foreground">{floor.totalRooms}</span></div>
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Available Rooms</span><span className="font-medium text-foreground">{floor.availableRooms}</span></div>
-                <div className="flex justify-between py-3 border-b border-gray-100"><span className="text-muted-foreground">Status</span><span className="font-medium text-primary flex items-center gap-1.5"><FaCheckCircle className="w-4 h-4" />Live from DB</span></div>
+                <div className="flex justify-between py-3 border-b border-border"><span className="text-muted-foreground">Total Rooms</span><span className="font-medium text-foreground">{floor.totalRooms}</span></div>
+                <div className="flex justify-between py-3 border-b border-border"><span className="text-muted-foreground">Available Rooms</span><span className="font-medium text-foreground">{floor.availableRooms}</span></div>
+                <div className="flex justify-between py-3 border-b border-border"><span className="text-muted-foreground">Status</span><span className="font-medium text-primary flex items-center gap-1.5"><FaCheckCircle className="w-4 h-4" />Live from DB</span></div>
                 <div className="flex justify-between py-3"><span className="text-muted-foreground">Location</span><span className="font-medium text-foreground flex items-center gap-1.5"><FaMapMarkerAlt className="w-3.5 h-3.5 text-error" />{floor.location}</span></div>
               </div>
 
