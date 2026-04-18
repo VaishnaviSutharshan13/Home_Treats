@@ -94,7 +94,6 @@ const FeesManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterFeeType, setFilterFeeType] = useState('All');
-  const [filterSemester, setFilterSemester] = useState('All');
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -137,16 +136,13 @@ const FeesManagement = () => {
   };
   useEffect(() => { fetchFees(); }, []);
 
-  const semesters = [...new Set(fees.map(f => f.semester).filter(Boolean))];
-
   const filteredFees = fees.filter(fee => {
     const matchesSearch = fee.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           fee.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           fee.room.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus   = filterStatus   === 'All' || fee.status  === filterStatus;
     const matchesFeeType  = filterFeeType  === 'All' || fee.feeType === filterFeeType;
-    const matchesSemester = filterSemester === 'All' || fee.semester === filterSemester;
-    return matchesSearch && matchesStatus && matchesFeeType && matchesSemester;
+    return matchesSearch && matchesStatus && matchesFeeType;
   });
 
   /* ─── Handlers ────────────────────────────────── */
@@ -485,24 +481,9 @@ const FeesManagement = () => {
               <FaChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
             </div>
 
-            {/* Semester */}
-            <div className="relative">
-              <select
-                title="Filter by semester"
-                aria-label="Filter by semester"
-                value={filterSemester}
-                onChange={e => setFilterSemester(e.target.value)}
-                className="rounded-xl py-2 pl-4 pr-10 appearance-none bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
-              >
-                <option value="All">All Semesters</option>
-                {semesters.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <FaChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
-            </div>
-
             {/* Clear */}
             <button
-              onClick={() => { setSearchTerm(''); setFilterStatus('All'); setFilterFeeType('All'); setFilterSemester('All'); }}
+              onClick={() => { setSearchTerm(''); setFilterStatus('All'); setFilterFeeType('All'); }}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-error/10 border border-error/30 border border-border hover:border-error/30 text-muted-foreground hover:text-error rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap"
             >
               <FaXmark className="w-3.5 h-3.5" />

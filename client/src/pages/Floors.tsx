@@ -82,7 +82,7 @@ const Floors = () => {
     <div className="min-h-screen bg-muted pb-10">
       <section className="w-full relative overflow-hidden flex flex-col items-center justify-center text-center py-28 sm:py-24">
         <img src={FALLBACK_IMAGE} alt="Hostel room hero" className="absolute inset-0 w-full h-full object-cover scale-110 blur-[2px]" loading="eager" />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(37,99,235,0.75),rgba(88,28,135,0.7),rgba(15,23,42,0.85))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(37,99,235,0.78),rgba(37,99,235,0.68),rgba(15,23,42,0.88))]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.24),transparent_38%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.14),transparent_35%)] pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl mx-auto px-4">
@@ -102,7 +102,7 @@ const Floors = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch justify-items-center">
             {floors.map((floor) => (
-              <div key={floor.id} className="group w-full h-full max-w-sm bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden flex flex-col">
+              <div key={floor.id} className="group w-full h-full max-w-sm bg-card border border-border rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden flex flex-col">
                 <div className="relative aspect-video overflow-hidden">
                   <img
                     src={imageErrors[floor.id] ? FALLBACK_IMAGE : floor.image}
@@ -116,16 +116,16 @@ const Floors = () => {
                   <div
                     className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
                       floor.status === 'available'
-                        ? 'bg-primary/20 border border-primary/20/95 text-primary'
+                        ? 'bg-primary/20 border border-primary/30 text-primary'
                         : floor.status === 'limited'
-                          ? 'bg-warning/20 border border-warning/30/95 text-warning'
-                          : 'bg-error/20 border border-error/30/95 text-error'
+                          ? 'bg-warning/20 border border-warning/40 text-warning'
+                          : 'bg-error/20 border border-error/40 text-error'
                     }`}
                   >
                     {getStatusBadge(floor.status)}
                   </div>
 
-                  <button type="button" className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 text-muted-foreground hover:text-error shadow-sm grid place-items-center transition-colors" aria-label="Add to favorites">
+                  <button type="button" className="absolute top-3 right-3 h-8 w-8 rounded-full bg-card/90 border border-border text-muted-foreground hover:text-error shadow-sm grid place-items-center transition-colors" aria-label="Add to favorites">
                     <FaHeart />
                   </button>
                 </div>

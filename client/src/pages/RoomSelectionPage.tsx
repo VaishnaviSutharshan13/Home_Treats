@@ -44,19 +44,19 @@ const statusConfig = {
   Available: {
     bg: 'bg-primary/10 border border-primary/20',
     text: 'text-primary',
-    border: 'border-green-200',
+    border: 'border-primary/30',
     icon: <FaCheckCircle className="w-3.5 h-3.5" />,
   },
   Limited: {
     bg: 'bg-warning/10 border border-warning/20',
     text: 'text-warning',
-    border: 'border-yellow-200',
+    border: 'border-warning/40',
     icon: <FaExclamationCircle className="w-3.5 h-3.5" />,
   },
   'Not Available': {
     bg: 'bg-error/10 border border-error/20',
     text: 'text-error',
-    border: 'border-red-200',
+    border: 'border-error/40',
     icon: <FaTimesCircle className="w-3.5 h-3.5" />,
   },
 };
@@ -65,7 +65,7 @@ const RoomSelectionPage: React.FC = () => {
   const { floorId } = useParams<{ floorId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [apiRooms, setApiRooms] = useState<ApiRoom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,6 +143,12 @@ const RoomSelectionPage: React.FC = () => {
     });
   }, [floorRooms, filters]);
 
+  const canBook = useMemo(() => {
+    const role = (user?.role || '').toLowerCase();
+    const approval = (user?.approvalStatus || user?.status || '').toLowerCase();
+    return role === 'student' && approval === 'approved';
+  }, [user]);
+
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
@@ -168,7 +174,7 @@ const RoomSelectionPage: React.FC = () => {
   };
 
   const handleContinueBooking = () => {
-    if (!selectedRoom || !config) return;
+    if (!selectedRoom || !config || !canBook) return;
     const bookingData = {
       roomId: selectedRoom.id,
       roomNumber: selectedRoom.roomNumber,
@@ -217,7 +223,7 @@ const RoomSelectionPage: React.FC = () => {
       </section>
 
       <section className="max-w-6xl mx-auto mt-8 px-4">
-        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+        <div className="bg-card rounded-2xl shadow-md border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <FaFilter className="text-primary w-4 h-4" />
             <h3 className="text-sm font-bold text-foreground/90 uppercase tracking-wide">Filter Rooms</h3>
@@ -225,11 +231,11 @@ const RoomSelectionPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative lg:col-span-1">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input type="text" name="search" placeholder="Search room ID..." value={filters.search} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none" />
+              <input type="text" name="search" placeholder="Search room ID..." value={filters.search} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground transition-all outline-none" />
             </div>
             <div className="relative">
               <FaBuilding className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="building" value={filters.building} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="building" value={filters.building} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground transition-all outline-none appearance-none bg-muted/30 cursor-pointer">
                 <option value="">All Buildings</option>
                 {buildings.map((b) => (
                   <option key={b} value={b}>{b}</option>
@@ -238,7 +244,7 @@ const RoomSelectionPage: React.FC = () => {
             </div>
             <div className="relative">
               <FaLayerGroup className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="floor" value={filters.floor} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="floor" value={filters.floor} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground transition-all outline-none appearance-none bg-muted/30 cursor-pointer">
                 <option value="">All Floors</option>
                 {floors.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -247,14 +253,14 @@ const RoomSelectionPage: React.FC = () => {
             </div>
             <div className="relative">
               <FaCheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
-              <select name="availability" value={filters.availability} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground/90 transition-all outline-none appearance-none bg-white cursor-pointer">
+              <select name="availability" value={filters.availability} onChange={handleFilterChange} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border focus:border-primary focus:ring-2 focus:ring-primary/25 text-sm text-foreground transition-all outline-none appearance-none bg-muted/30 cursor-pointer">
                 <option value="">All Status</option>
                 {statuses.map((s) => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
             </div>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 border-2 border-primary text-primary font-semibold px-4 py-2.5 rounded-xl bg-white hover:bg-surface-active transition-all duration-200 text-sm">
+            <button onClick={handleReset} className="flex items-center justify-center gap-2 border border-border text-foreground font-semibold px-4 py-2.5 rounded-xl bg-muted/30 hover:bg-surface-hover transition-all duration-200 text-sm">
               <FaRedo className="w-3 h-3" /> Reset
             </button>
           </div>
@@ -287,7 +293,7 @@ const RoomSelectionPage: React.FC = () => {
                   key={room.id}
                   className={`
                     relative bg-white rounded-2xl border-2 transition-all duration-300 p-5
-                    ${isSelected ? 'border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/25' : 'border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200'}
+                    ${isSelected ? 'bg-card border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/25' : 'bg-card border-border shadow-sm hover:shadow-md hover:border-primary/30'}
                     ${isUnavailable ? 'opacity-60' : 'cursor-pointer'}
                   `}
                   onClick={() => handleSelectRoom(room)}
@@ -342,7 +348,7 @@ const RoomSelectionPage: React.FC = () => {
       </section>
 
       <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 transform ${selectedRoom ? 'translate-y-0' : 'translate-y-full'}`}>
-        <div className="bg-white border-t-2 border-primary/25 shadow-[0_-8px_30px_rgba(124,58,237,0.12)]">
+        <div className="bg-card border-t border-border shadow-[0_-8px_30px_rgba(59,130,246,0.12)]">
           <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-surface-active rounded-xl flex items-center justify-center shrink-0"><MdMeetingRoom className="w-5 h-5 text-primary" /></div>
@@ -361,8 +367,13 @@ const RoomSelectionPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <button onClick={() => setSelectedRoom(null)} className="px-4 py-2.5 border border-gray-300 text-muted-foreground rounded-xl font-medium text-sm hover:bg-muted transition-all">Cancel</button>
-              <button onClick={handleContinueBooking} className="px-8 py-2.5 bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-300">
+              <button onClick={() => setSelectedRoom(null)} className="px-4 py-2.5 border border-border text-muted-foreground rounded-xl font-medium text-sm hover:bg-surface-hover transition-all">Cancel</button>
+              <button
+                onClick={handleContinueBooking}
+                disabled={!canBook}
+                title={canBook ? 'Continue booking' : 'Only approved students can continue booking'}
+                className={`px-8 py-2.5 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 ${canBook ? 'bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white hover:shadow-lg' : 'bg-muted text-muted-foreground cursor-not-allowed shadow-none'}`}
+              >
                 Continue Booking →
               </button>
             </div>

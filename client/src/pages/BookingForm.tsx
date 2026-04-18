@@ -15,6 +15,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { MdMeetingRoom } from "react-icons/md";
+import { useAuth } from "../context/AuthContext";
 
 interface RoomData {
   roomId: string;
@@ -48,12 +49,13 @@ const durations = [
 const BookingForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    phone: "",
-    nic: "",
+    fullName: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    nic: user?.studentId || "",
     startDate: "",
     duration: "",
     notes: "",
@@ -77,8 +79,18 @@ const BookingForm: React.FC = () => {
       }
     }
 
-    navigate("/rooms", { replace: true });
+    navigate("/floors", { replace: true });
   }, [navigate, location.state]);
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      fullName: prev.fullName || user?.name || "",
+      email: prev.email || user?.email || "",
+      phone: prev.phone || user?.phone || "",
+      nic: prev.nic || user?.studentId || "",
+    }));
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -115,7 +127,7 @@ const BookingForm: React.FC = () => {
     };
     localStorage.setItem("bookingFormData", JSON.stringify(paymentData));
     localStorage.removeItem("selectedRoom");
-    navigate("/payment");
+    navigate("/student/my-fees", { state: { fromBooking: true } });
   };
 
   if (!roomData) return null;
@@ -130,11 +142,11 @@ const BookingForm: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <Link
-            to="/rooms"
+            to={roomData?.floor ? `/floor/${roomData.floor.toLowerCase().replace(/\s+/g, "-")}/rooms` : "/floors"}
             className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 transition-colors text-sm font-medium"
           >
             <FaArrowLeft className="w-3.5 h-3.5" />
-            Back to Floors
+            Back to Room Selection
           </Link>
           <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-7 shadow-lg">
             <div className="uppercase text-xs tracking-widest text-white/70 font-semibold mb-2">
@@ -158,28 +170,28 @@ const BookingForm: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* ── LEFT: Room Details Card (Read-only) ── */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sticky top-24">
+            <div className="bg-card rounded-2xl shadow-md border border-border p-6 sticky top-24">
               <h2 className="text-lg font-bold text-foreground mb-5 flex items-center gap-2">
                 <MdMeetingRoom className="w-5 h-5 text-primary" />
                 Room Details
               </h2>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div className="flex items-center justify-between py-3 border-b border-border">
                   <span className="text-muted-foreground text-sm flex items-center gap-2">
                     <MdMeetingRoom className="w-4 h-4 text-primary" />
                     Room ID
                   </span>
                   <span className="font-semibold text-foreground text-sm">{roomData.roomNumber || roomData.roomId}</span>
                 </div>
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div className="flex items-center justify-between py-3 border-b border-border">
                   <span className="text-muted-foreground text-sm flex items-center gap-2">
                     <FaBuilding className="w-4 h-4 text-primary" />
                     Building
                   </span>
                   <span className="font-semibold text-foreground text-sm">{roomData.building}</span>
                 </div>
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                <div className="flex items-center justify-between py-3 border-b border-border">
                   <span className="text-muted-foreground text-sm flex items-center gap-2">
                     <FaLayerGroup className="w-4 h-4 text-primary" />
                     Floor
@@ -202,7 +214,7 @@ const BookingForm: React.FC = () => {
 
           {/* ── RIGHT: Booking Form ─────────────── */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 sm:p-8">
+            <div className="bg-card rounded-2xl shadow-md border border-border p-6 sm:p-8">
               <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
                 <FaUser className="w-5 h-5 text-primary" />
                 Your Details
@@ -225,7 +237,7 @@ const BookingForm: React.FC = () => {
                       className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.fullName
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border bg-muted/30 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -250,7 +262,7 @@ const BookingForm: React.FC = () => {
                       className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.email
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border bg-muted/30 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -275,7 +287,7 @@ const BookingForm: React.FC = () => {
                       className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.phone
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border bg-muted/30 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -300,7 +312,7 @@ const BookingForm: React.FC = () => {
                       className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.nic
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border bg-muted/30 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -325,7 +337,7 @@ const BookingForm: React.FC = () => {
                       className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
                         formErrors.startDate
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border bg-muted/30 hover:border-primary/30"
                       }`}
                     />
                   </div>
@@ -345,10 +357,10 @@ const BookingForm: React.FC = () => {
                       name="duration"
                       value={formData.duration}
                       onChange={handleChange}
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 appearance-none bg-white cursor-pointer ${
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 appearance-none bg-muted/30 cursor-pointer ${
                         formErrors.duration
                           ? "border-red-400 bg-error/10 border border-error/20"
-                          : "border-gray-200 hover:border-primary/30"
+                          : "border-border hover:border-primary/30"
                       }`}
                     >
                       <option value="">Select duration</option>
@@ -377,13 +389,13 @@ const BookingForm: React.FC = () => {
                       onChange={handleChange}
                       placeholder="Any special requests or notes..."
                       rows={3}
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 hover:border-primary/30 text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none"
+                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-border bg-muted/30 hover:border-primary/30 text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none"
                     />
                   </div>
                 </div>
 
                 {/* Divider */}
-                <div className="border-t border-gray-100 pt-2" />
+                <div className="border-t border-border pt-2" />
 
                 {/* Submit Button */}
                 <button
@@ -395,7 +407,7 @@ const BookingForm: React.FC = () => {
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center mt-2">
-                  You will be redirected to the payment page
+                  You will be redirected to the payment section
                 </p>
               </form>
             </div>
