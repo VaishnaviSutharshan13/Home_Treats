@@ -9,7 +9,11 @@ import {
 import About from "./pages/About";
 import BookingForm from "./pages/BookingForm";
 import ContactUs from "./pages/ContactUs";
+import Floors from "./pages/Floors";
+import FloorDetails from "./pages/FloorDetails";
 import Home from "./pages/Home";
+import Rooms from "./pages/Rooms";
+import RoomSelectionPage from "./pages/RoomSelectionPage";
 
 // Auth Pages
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -57,6 +61,14 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected Routes */}
+          {/* Shared Authenticated Routes (Admin + Student) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/floors" element={<Floors />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/floor/:floorId" element={<FloorDetails />} />
+            <Route path="/floor/:floorId/rooms" element={<RoomSelectionPage />} />
+          </Route>
+
           {/* Admin Routes */}
           <Route element={<ProtectedRoute requiredRole="admin" />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

@@ -359,23 +359,31 @@ export const getReceipt = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Receipt only available for paid fees' });
     }
 
+    const paidDate = fee.paidDate || fee.paymentDate || new Date();
+    const amount = Number(fee.amount || 0);
+    const paidAmount = Number(fee.paidAmount ?? amount);
+    const remainingAmount = Math.max(0, Number(fee.remainingAmount ?? amount - paidAmount));
+
     res.json({
       success: true,
       data: {
         receiptNo: `REC-${fee.transactionId || fee._id}`,
-        date: fee.paidDate || new Date(),
+        date: paidDate,
+        paidDate,
         studentName: fee.studentName,
         studentId: fee.studentId,
         room: fee.room,
         feeType: fee.feeType,
         semester: fee.semester,
-        totalAmount: fee.amount,
-        paidAmount: fee.paidAmount || fee.amount,
-        remainingAmount: fee.remainingAmount || 0,
-        paymentMethod: fee.paymentMethod,
-        transactionId: fee.transactionId,
+        amount,
+        totalAmount: amount,
+        paidAmount,
+        remainingAmount,
+        paymentMethod: fee.paymentMethod || 'N/A',
+        transactionId: fee.transactionId || `TXN-${String(fee._id)}`,
         status: fee.status,
         currency: 'LKR',
+        generatedAt: new Date(),
       },
     });
   } catch (error: any) {
