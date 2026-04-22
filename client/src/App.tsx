@@ -13,6 +13,7 @@ import Floors from "./pages/Floors";
 import FloorDetails from "./pages/FloorDetails";
 import Home from "./pages/Home";
 import Rooms from "./pages/Rooms";
+import RoomDetailsPage from "./pages/RoomDetailsPage";
 import RoomSelectionPage from "./pages/RoomSelectionPage";
 
 // Auth Pages
@@ -27,6 +28,7 @@ import ComplaintManagement from "./pages/admin/ComplaintManagement";
 import AdminDashboard from "./pages/admin/Dashboard";
 import FeesManagement from "./pages/admin/FeesManagement";
 import RoomManagement from "./pages/admin/RoomManagement";
+import RoomRequests from "./pages/admin/RoomRequests";
 import StudentManagement from "./pages/admin/StudentManagement";
 
 // Student Pages
@@ -42,6 +44,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import AdminLayout from "./components/layout/AdminLayout";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -60,40 +63,43 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
+          {/* Public Browse Routes */}
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/floor/:floorId" element={<RoomDetailsPage />} />
+          <Route path="/floor/:floorId/rooms" element={<RoomSelectionPage />} />
+
           {/* Protected Routes */}
           {/* Shared Authenticated Routes (Admin + Student) */}
           <Route element={<ProtectedRoute />}>
             <Route path="/floors" element={<Floors />} />
-            <Route path="/rooms" element={<Rooms />} />
-            <Route path="/floor/:floorId" element={<FloorDetails />} />
-            <Route path="/floor/:floorId/rooms" element={<RoomSelectionPage />} />
+            <Route path="/legacy-floor/:floorId" element={<FloorDetails />} />
           </Route>
 
           {/* Admin Routes */}
           <Route element={<ProtectedRoute requiredRole="admin" />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/profile" element={<AdminProfile />} />
-            <Route path="/admin/student-profile/:id" element={<Profile />} />
-            <Route
-              path="/admin/student-management"
-              element={<StudentManagement />}
-            />
-            <Route path="/admin/room-management" element={<RoomManagement />} />
-            <Route path="/admin/fees-management" element={<FeesManagement />} />
-            <Route
-              path="/admin/complaint-management"
-              element={<ComplaintManagement />}
-            />
-            <Route
-              path="/admin/approvals"
-              element={<Navigate to="/admin/student-management" replace />}
-            />
-            <Route path="/admin/activity-log" element={<ActivityLog />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="profile" element={<AdminProfile />} />
+              <Route path="student-profile/:id" element={<Profile />} />
+              <Route path="student-management" element={<StudentManagement />} />
+              <Route path="room-management" element={<RoomManagement />} />
+              <Route path="room-requests" element={<RoomRequests />} />
+              <Route path="fees-management" element={<FeesManagement />} />
+              <Route
+                path="complaint-management"
+                element={<ComplaintManagement />}
+              />
+              <Route
+                path="approvals"
+                element={<Navigate to="/admin/student-management" replace />}
+              />
+              <Route path="activity-log" element={<ActivityLog />} />
+            </Route>
           </Route>
 
           {/* Student Routes */}
           <Route element={<ProtectedRoute requiredRole="student" />}>
-            <Route path="/booking" element={<BookingForm />} />
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/student/profile" element={<Profile />} />
             <Route path="/student/my-room" element={<MyRoom />} />
@@ -104,6 +110,11 @@ function App() {
               path="/student/booking-form"
               element={<RoomBookingFormPage />}
             />
+          </Route>
+
+          {/* Booking Route: login required only */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/booking" element={<BookingForm />} />
           </Route>
 
           {/* Catch-all - redirect to home */}

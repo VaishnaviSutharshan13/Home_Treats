@@ -177,8 +177,31 @@ const Register = () => {
         setErrors({ general: res.message || "Registration failed" });
       }
     } catch (error: any) {
+      const responseData = error?.response?.data;
+      const backendErrors: Record<string, string> = {};
+
+      if (Array.isArray(responseData?.errors)) {
+        responseData.errors.forEach((err: { field?: string; message?: string }) => {
+          if (!err?.field || !err?.message) return;
+          const fieldMap: Record<string, keyof FormData | "general"> = {
+            name: "fullName",
+            studentId: "studentId",
+            email: "email",
+            phone: "phone",
+            password: "password",
+            confirmPassword: "confirmPassword",
+          };
+          const mapped = fieldMap[err.field] || "general";
+          backendErrors[mapped] = err.message;
+        });
+      }
+
       setErrors({
-        general: error?.response?.data?.message || "Registration failed",
+        ...backendErrors,
+        general:
+          responseData?.message ||
+          backendErrors.general ||
+          "Registration failed",
       });
     } finally {
       setLoading(false);
