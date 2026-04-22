@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaWifi,
@@ -7,30 +7,9 @@ import {
   FaBook,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaTimesCircle,
-  FaSearch,
   FaBed,
 } from 'react-icons/fa';
-import { roomService } from '../services';
-import { marketingAvailability, toFloorId } from '../utils/roomView';
-import type { ApiRoom } from '../utils/roomView';
-
-const availabilityColors: { [key: string]: string } = {
-  Available: 'bg-primary/20 border border-primary/20 text-primary',
-  'Limited Rooms': 'bg-warning/20 border border-warning/30 text-warning',
-  Full: 'bg-error/20 border border-error/30 text-error',
-};
-
-const facilityIcons: { [key: string]: React.ReactNode } = {
-  WiFi: <FaWifi className="w-4 h-4" />,
-  AC: <FaFan className="w-4 h-4" />,
-  Fan: <FaFan className="w-4 h-4" />,
-  'Study Table': <FaBook className="w-4 h-4" />,
-  Wardrobe: <FaBook className="w-4 h-4" />,
-  Lockers: <FaBook className="w-4 h-4" />,
-  'Private Bathroom': <FaBook className="w-4 h-4" />,
-  'Common Area': <FaBook className="w-4 h-4" />,
-};
+import { toFloorId } from '../utils/roomView';
 
 interface FacilityItemProps {
   icon: React.ReactNode;
@@ -67,45 +46,39 @@ const BookingStep: React.FC<BookingStepProps> = ({ number, icon, title }) => (
   </div>
 );
 
+const floorImages: { [key: string]: string } = {
+  '1st Floor': '/images/1stimage.png',
+  '2nd Floor': '/images/2ndfloor.jpg',
+  '3rd Floor': '/images/3rdfloor.png',
+  '4th Floor': '/images/4thfloor.jpg',
+};
+
+const floorCardHighlights: {
+  [key: string]: {
+    subtitle: string;
+    points: [string, string];
+  };
+} = {
+  '1st Floor': {
+    subtitle: 'Best for New Students',
+    points: ['Near Entrance', 'Easy access to common areas'],
+  },
+  '2nd Floor': {
+    subtitle: 'Quiet Zone',
+    points: ['Study Friendly', 'Calm environment'],
+  },
+  '3rd Floor': {
+    subtitle: 'Premium Rooms',
+    points: ['Best View', 'Spacious layout'],
+  },
+  '4th Floor': {
+    subtitle: 'Top Floor',
+    points: ['Private Atmosphere', 'Peaceful stay'],
+  },
+};
+
 const Rooms: React.FC = () => {
   const navigate = useNavigate();
-  const [apiRooms, setApiRooms] = useState<ApiRoom[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [filters, setFilters] = useState({
-    type: '',
-    price: '',
-    availability: '',
-  });
-  const [visibleCount, setVisibleCount] = useState(6);
-
-  useEffect(() => {
-    const fetchRooms = async () => {
-      setLoading(true);
-      try {
-        const res = await roomService.getAll();
-        setApiRooms(Array.isArray(res?.data) ? res.data : []);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRooms();
-  }, []);
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
-
-  const filteredRooms = useMemo(() => {
-    return apiRooms.filter((room) => {
-      const roomType = room.type || '';
-      const roomAvailability = marketingAvailability(room);
-      const typeMatch = !filters.type || roomType === filters.type;
-      const priceMatch = !filters.price || (filters.price === 'low' ? room.price < 15000 : room.price >= 15000);
-      const availMatch = !filters.availability || roomAvailability === filters.availability;
-      return typeMatch && priceMatch && availMatch;
-    });
-  }, [apiRooms, filters]);
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -115,93 +88,53 @@ const Rooms: React.FC = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <form className="flex flex-wrap gap-4 items-end justify-center bg-surface-active border border-primary/15 rounded-2xl p-6 shadow-sm">
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-1">Room Type</label>
-            <select name="type" value={filters.type} onChange={handleFilterChange} className="rounded-xl border border-border bg-muted/30 focus:ring-2 focus:ring-primary focus:border-primary text-sm px-4 py-2 w-40 text-foreground transition-colors hover:border-primary/30">
-              <option value="">All</option>
-              <option value="Single Room">Single Room</option>
-              <option value="Double Room">Double Room</option>
-              <option value="Dormitory">Dormitory</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-1">Price Range</label>
-            <select name="price" value={filters.price} onChange={handleFilterChange} className="rounded-xl border border-border bg-muted/30 focus:ring-2 focus:ring-primary focus:border-primary text-sm px-4 py-2 w-40 text-foreground transition-colors hover:border-primary/30">
-              <option value="">All</option>
-              <option value="low">Below Rs. 15,000</option>
-              <option value="high">Rs. 15,000 & above</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-1">Availability</label>
-            <select name="availability" value={filters.availability} onChange={handleFilterChange} className="rounded-xl border border-border bg-muted/30 focus:ring-2 focus:ring-primary focus:border-primary text-sm px-4 py-2 w-40 text-foreground transition-colors hover:border-primary/30">
-              <option value="">All</option>
-              <option value="Available">Available</option>
-              <option value="Limited Rooms">Limited Rooms</option>
-              <option value="Full">Full</option>
-            </select>
-          </div>
-          <button type="button" className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary to-primary-hover transform hover:scale-[1.02] hover:shadow-primary/20 transition-all text-white font-bold rounded-xl text-sm mt-2">
-            <FaSearch className="w-4 h-4" /> Search
-          </button>
-        </form>
+        <div className="text-center text-muted-foreground">Select a floor to view available rooms</div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {loading ? (
-          <div className="py-16 text-center text-muted-foreground">Loading rooms...</div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRooms.slice(0, visibleCount).map((room) => {
-                const availability = marketingAvailability(room);
-                const facilities = Array.isArray(room.facilities) ? room.facilities : [];
-                const floorId = toFloorId(room.floor);
-                return (
-                  <div key={room._id} className="bg-card rounded-2xl border border-border shadow-lg group flex flex-col overflow-hidden relative hover:-translate-y-1 hover:border-primary/40 hover:shadow-primary/5 transition-all duration-300">
-                    <div className="relative overflow-hidden h-48">
-                      <img src={room.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80'} alt={room.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                      <span className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold shadow ${availabilityColors[availability]}`}>
-                        {availability === 'Available' && <FaCheckCircle className="inline mr-1 mb-0.5" />}
-                        {availability === 'Limited Rooms' && <FaExclamationTriangle className="inline mr-1 mb-0.5" />}
-                        {availability === 'Full' && <FaTimesCircle className="inline mr-1 mb-0.5" />}
-                        {availability}
-                      </span>
-                    </div>
-                    <div className="flex-1 flex flex-col p-6">
-                      <h3 className="text-lg font-bold text-primary mb-1 tracking-wide">{room.name}</h3>
-                      <div className="text-xs text-primary font-semibold mb-2">{room.type} • {room.floor}</div>
-                      <div className="flex items-center gap-2 text-primary font-semibold mb-2">
-                        Rs. {room.price.toLocaleString()} <span className="text-xs text-muted-foreground font-normal">/ month</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
-                        <FaUserFriends className="w-4 h-4 text-primary" /> Capacity: {room.capacity} {room.capacity > 1 ? 'students' : 'student'}
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {facilities.slice(0, 4).map((f) => (
-                          <span key={f} className="inline-flex items-center gap-1 bg-surface-active text-primary px-2 py-1 rounded-full text-xs font-medium">
-                            {facilityIcons[f] || <FaBook className="w-4 h-4" />} {f}
-                          </span>
-                        ))}
-                      </div>
-                      <p className="text-muted-foreground text-sm mb-4 flex-1">{room.description || 'Comfortable student accommodation with essential amenities.'}</p>
-                      <div className="flex gap-3 mt-auto">
-                        <button onClick={() => navigate(`/floor/${floorId}`)} className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-primary-hover hover:scale-[1.02] transform transition-all shadow-md text-white font-bold rounded-xl text-sm">View Details</button>
-                        <button onClick={() => navigate(`/floor/${floorId}/rooms`)} className="flex-1 px-4 py-2 bg-muted hover:bg-muted/70 text-foreground font-bold rounded-xl transition-colors text-sm">Book Now</button>
-                      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {['1st Floor', '2nd Floor', '3rd Floor', '4th Floor'].map((floor) => {
+            const floorId = toFloorId(floor);
+            const cardMeta = floorCardHighlights[floor];
+            return (
+              <div key={floor} className="bg-card rounded-2xl border border-border shadow-lg group flex flex-col overflow-hidden relative hover:-translate-y-1 hover:border-primary/40 hover:shadow-primary/5 transition-all duration-300">
+                <div className="relative overflow-hidden h-48 flex items-center justify-center">
+                  <img 
+                    src={floorImages[floor]} 
+                    alt={floor} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-5xl font-black text-white mb-2">{floor}</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            {visibleCount < filteredRooms.length && (
-              <div className="flex justify-center mt-12">
-                <button onClick={() => setVisibleCount((prev) => prev + 6)} className="px-8 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-2xl">Load More Rooms</button>
+                </div>
+                <div className="flex-1 flex flex-col p-6">
+                  <h3 className="text-xl font-bold text-primary mb-4 tracking-wide">{floor}</h3>
+                  <div className="space-y-2 mb-4 flex-1">
+                    <div className="text-base font-semibold text-foreground">{cardMeta.subtitle}</div>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <FaCheckCircle className="w-4 h-4 text-primary" /> {cardMeta.points[0]}
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <FaCheckCircle className="w-4 h-4 text-primary" /> {cardMeta.points[1]}
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/floor/${floorId}`)} 
+                    className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-hover hover:scale-[1.02] transform transition-all shadow-md text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2"
+                  >
+                    <span>View Details</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-            )}
-          </>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
