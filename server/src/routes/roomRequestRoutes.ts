@@ -4,9 +4,12 @@ import {
   createRoomRequest,
   getAllRoomRequests,
   getMyRoomRequests,
+  getMyRoomRequestStatus,
+  createRoomChangeRequest,
   getRoomRequestById,
   approveRoomRequest,
   rejectRoomRequest,
+  deleteRoomRequest,
   getRoomRequestStats,
 } from '../controllers/roomRequestController';
 import { authMiddleware, adminOnly, studentOnly } from '../middleware/auth';
@@ -43,6 +46,25 @@ router.post(
 router.get('/my-requests', authMiddleware, studentOnly, getMyRoomRequests);
 
 /**
+ * Get my latest room request status (student)
+ */
+router.get('/my-request-status', authMiddleware, studentOnly, getMyRoomRequestStatus);
+
+/**
+ * Create room change request (student)
+ */
+router.post(
+  '/room-change',
+  authMiddleware,
+  studentOnly,
+  [
+    body('newRoomNumber').notEmpty().withMessage('New room number is required'),
+    body('reason').optional().isString(),
+  ],
+  createRoomChangeRequest
+);
+
+/**
  * Get all room requests (admin only)
  */
 router.get('/admin/all', authMiddleware, adminOnly, getAllRoomRequests);
@@ -76,5 +98,10 @@ router.patch(
   adminOnly,
   rejectRoomRequest
 );
+
+/**
+ * Delete room request (admin only)
+ */
+router.delete('/:id', authMiddleware, adminOnly, deleteRoomRequest);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import {
   FaArrowLeft,
@@ -16,7 +16,8 @@ import {
 } from 'react-icons/fa';
 import { MdMeetingRoom } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
-import { roomService } from '../services';
+import RoomChangeModal from '../components/common/RoomChangeModal';
+import { authService, roomRequestService, roomService } from '../services';
 import { buildingFromBlock, selectionAvailability, toFloorId } from '../utils/roomView';
 import type { ApiRoom } from '../utils/roomView';
 
@@ -55,6 +56,14 @@ interface FloorProfile {
   notAvailableCount: number;
   statusBadge: string;
 }
+
+interface PageToast {
+  id: number;
+  type: 'success' | 'error';
+  text: string;
+}
+
+type RequestStatus = 'Pending' | 'Approved' | 'Rejected' | 'Cancelled' | null;
 
 const isValidObjectId = (value: string): boolean => /^[a-fA-F0-9]{24}$/.test(String(value || '').trim());
 
@@ -231,12 +240,17 @@ const RoomSelectionPage: React.FC = () => {
   const { floorId } = useParams<{ floorId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
 
   const [apiRooms, setApiRooms] = useState<ApiRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<SelectionRoom | null>(null);
   const [roomSelectionError, setRoomSelectionError] = useState('');
+  const [requestStatusLoading, setRequestStatusLoading] = useState(false);
+  const [latestRequestStatus, setLatestRequestStatus] = useState<RequestStatus>(null);
+  const [showRoomChangeModal, setShowRoomChangeModal] = useState(false);
+  const [currentRoomNumber, setCurrentRoomNumber] = useState('');
+  const [toasts, setToasts] = useState<PageToast[]>([]);
   const [filters, setFilters] = useState<Filters>({
     roomType: '',
     availability: '',
@@ -256,6 +270,34 @@ const RoomSelectionPage: React.FC = () => {
     };
     fetchRooms();
   }, []);
+
+  const loadLatestRequestStatus = useCallback(async (): Promise<RequestStatus> => {
+    if (!isAuthenticated) {
+      setLatestRequestStatus(null);
+      return null;
+    }
+
+    setRequestStatusLoading(true);
+    try {
+      const res = await roomRequestService.getMyRequestStatus();
+      if (res?.success) {
+        const status = (res?.data?.latestStatus || null) as RequestStatus;
+        setLatestRequestStatus(status);
+        return status;
+      }
+    } catch {
+      setLatestRequestStatus(null);
+      return null;
+    } finally {
+      setRequestStatusLoading(false);
+    }
+
+    return null;
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    loadLatestRequestStatus();
+  }, [loadLatestRequestStatus]);
 
   const canonicalFloorId = useMemo(() => getCanonicalFloorId(floorId), [floorId]);
 
@@ -324,9 +366,91 @@ const RoomSelectionPage: React.FC = () => {
     });
   }, [activeFloorRooms, filters]);
 
+  const canCreateNewRequest = useMemo(() => {
+    return latestRequestStatus !== 'Pending' && latestRequestStatus !== 'Approved';
+  }, [latestRequestStatus]);
+
+  const requestRestrictionMessage = useMemo(() => {
+    if (latestRequestStatus === 'Pending') {
+      return 'You already submitted a room request. Please wait for admin approval.';
+    }
+    if (latestRequestStatus === 'Approved') {
+      return 'Your room request has already been approved. If you need another room, please submit a Room Change Request.';
+    }
+    if (latestRequestStatus === 'Rejected') {
+      return 'Previous request rejected. Apply again.';
+    }
+    return '';
+  }, [latestRequestStatus]);
+
   const canBook = useMemo(() => {
-    return true;
+    if (!isAuthenticated) return true;
+    if (requestStatusLoading) return false;
+    return canCreateNewRequest;
+  }, [isAuthenticated, requestStatusLoading, canCreateNewRequest]);
+
+  const availableRoomOptions = useMemo(() => {
+    return apiRooms
+      .filter((room) => selectionAvailability(room) === 'Available')
+      .map((room) => ({ roomNumber: room.roomNumber }))
+      .sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+  }, [apiRooms]);
+
+  const resolveCurrentRoomNumber = useCallback(async (): Promise<string> => {
+    let resolved = String(user?.roomNumber || '').trim();
+
+    try {
+      const profileRes = await authService.getProfile();
+      if (profileRes?.success && profileRes?.data) {
+        const profileUser = profileRes.data as { room?: string; roomNumber?: string; studentId?: string };
+        updateUser({
+          room: profileUser.room,
+          roomNumber: profileUser.roomNumber,
+          studentId: profileUser.studentId,
+        });
+        resolved = String(profileUser.roomNumber || resolved).trim();
+
+        if (!resolved && profileUser.room) {
+          const matched = apiRooms.find((room) => room._id === profileUser.room);
+          resolved = String(matched?.roomNumber || '').trim();
+        }
+      }
+    } catch {
+      // Fallback to auth context values.
+    }
+
+    if (!resolved && user?.room) {
+      const matched = apiRooms.find((room) => room._id === user.room);
+      resolved = String(matched?.roomNumber || '').trim();
+    }
+
+    return resolved;
+  }, [apiRooms, updateUser, user?.room, user?.roomNumber]);
+
+  const handleOpenRoomChangeModal = useCallback(async () => {
+    const resolvedRoom = await resolveCurrentRoomNumber();
+    if (!resolvedRoom) {
+      setRoomSelectionError('Current room details are not available. Please refresh and try again.');
+      return;
+    }
+
+    setCurrentRoomNumber(resolvedRoom);
+    setShowRoomChangeModal(true);
+  }, [resolveCurrentRoomNumber]);
+
+  const showPageToast = useCallback((text: string, type: 'success' | 'error') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, type, text }]);
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 3500);
   }, []);
+
+  useEffect(() => {
+    if (!canCreateNewRequest) {
+      setSelectedRoom(null);
+    }
+  }, [canCreateNewRequest]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -338,13 +462,29 @@ const RoomSelectionPage: React.FC = () => {
   };
 
   const handleSelectRoom = (room: SelectionRoom) => {
+    if (isAuthenticated && !canCreateNewRequest) {
+      setRoomSelectionError(requestRestrictionMessage || 'You already submitted a request.');
+      return;
+    }
     if (room.status === 'Not Available') return;
     setRoomSelectionError('');
     setSelectedRoom((prev) => (prev?.id === room.id ? null : room));
   };
 
-  const handleContinueBooking = () => {
+  const handleContinueBooking = async () => {
     if (!selectedRoom || !config || !canBook) return;
+
+    if (isAuthenticated) {
+      const latestStatus = await loadLatestRequestStatus();
+      if (latestStatus === 'Pending') {
+        setRoomSelectionError('You already submitted a room request. Please wait for admin approval.');
+        return;
+      }
+      if (latestStatus === 'Approved') {
+        setRoomSelectionError('Your room request has already been approved. If you need another room, please submit a Room Change Request.');
+        return;
+      }
+    }
 
     if (!isValidObjectId(selectedRoom.id)) {
       setRoomSelectionError('Selected room could not be verified. Please refresh and select a listed room again.');
@@ -390,6 +530,21 @@ const RoomSelectionPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted pb-28">
+      <div className="fixed top-4 right-4 z-[130] flex flex-col gap-2">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`rounded-lg border px-4 py-2.5 text-sm font-medium shadow-lg ${
+              toast.type === 'success'
+                ? 'border-success/30 bg-success/10 text-success'
+                : 'border-error/30 bg-error/10 text-error'
+            }`}
+          >
+            {toast.text}
+          </div>
+        ))}
+      </div>
+
       <section className="w-full bg-gradient-to-br from-primary via-primary-hover to-secondary relative py-16 sm:py-20">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-6xl mx-auto px-4">
@@ -412,6 +567,21 @@ const RoomSelectionPage: React.FC = () => {
       </section>
 
       <section className="max-w-6xl mx-auto mt-8 px-4">
+        {isAuthenticated && requestRestrictionMessage && (
+          <div className="mb-4 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning flex items-center justify-between gap-3">
+            <span>{requestRestrictionMessage}</span>
+            {latestRequestStatus === 'Approved' && (
+              <button
+                type="button"
+                onClick={handleOpenRoomChangeModal}
+                className="px-3 py-1.5 rounded-lg border border-warning/40 text-warning text-xs font-semibold hover:bg-warning/10 transition-colors"
+              >
+                Request Room Change
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="bg-card rounded-2xl shadow-md border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <FaFilter className="text-primary w-4 h-4" />
@@ -521,13 +691,13 @@ const RoomSelectionPage: React.FC = () => {
                       e.stopPropagation();
                       handleSelectRoom(room);
                     }}
-                    disabled={isUnavailable}
+                    disabled={isUnavailable || (isAuthenticated && !canCreateNewRequest)}
                     className={`
                       w-full mt-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300
-                      ${isUnavailable ? 'bg-muted text-muted-foreground cursor-not-allowed' : isSelected ? 'bg-primary text-white shadow-md hover:bg-primary-hover' : 'bg-surface-active text-primary hover:bg-surface-active border border-primary/25'}
+                      ${isUnavailable || (isAuthenticated && !canCreateNewRequest) ? 'bg-muted text-muted-foreground cursor-not-allowed' : isSelected ? 'bg-primary text-white shadow-md hover:bg-primary-hover' : 'bg-surface-active text-primary hover:bg-surface-active border border-primary/25'}
                     `}
                   >
-                    {isUnavailable ? 'Not Available' : isSelected ? '✓ Selected' : 'Select Room'}
+                    {isUnavailable ? 'Not Available' : isAuthenticated && !canCreateNewRequest ? 'Request Blocked' : isSelected ? '✓ Selected' : 'Select Room'}
                   </button>
                 </div>
               );
@@ -560,7 +730,7 @@ const RoomSelectionPage: React.FC = () => {
               <button
                 onClick={handleContinueBooking}
                 disabled={!canBook}
-                title={canBook ? 'Continue booking' : 'Only students can continue booking'}
+                title={canBook ? 'Continue booking' : requestRestrictionMessage || 'Only students can continue booking'}
                 className={`px-8 py-2.5 rounded-xl font-semibold text-sm shadow-md transition-all duration-300 ${canBook ? 'bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white hover:shadow-lg' : 'bg-muted text-muted-foreground cursor-not-allowed shadow-none'}`}
               >
                 Book Now →
@@ -574,6 +744,18 @@ const RoomSelectionPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      <RoomChangeModal
+        isOpen={showRoomChangeModal}
+        currentRoomNumber={currentRoomNumber}
+        availableRooms={availableRoomOptions}
+        onClose={() => setShowRoomChangeModal(false)}
+        onSubmitted={(message) => {
+          setRoomSelectionError('');
+          setShowRoomChangeModal(false);
+          showPageToast(message, 'success');
+        }}
+      />
     </div>
   );
 };

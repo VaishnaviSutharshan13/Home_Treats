@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -45,6 +45,8 @@ interface FormErrors {
   [key: string]: string;
 }
 
+type RequestStatus = "Pending" | "Approved" | "Rejected" | "Cancelled" | null;
+
 const durations = [
   "3_months",
   "6_months",
@@ -90,6 +92,8 @@ const BookingForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [requestStatusLoading, setRequestStatusLoading] = useState(false);
+  const [latestRequestStatus, setLatestRequestStatus] = useState<RequestStatus>(null);
 
   useEffect(() => {
     if (location.state?.room) {
@@ -121,6 +125,45 @@ const BookingForm: React.FC = () => {
     }));
   }, [user]);
 
+  const getRestrictionMessageByStatus = (status: RequestStatus): string => {
+    if (status === "Pending") {
+      return "You already submitted a room request. Please wait for admin approval.";
+    }
+    if (status === "Approved") {
+      return "Your room request has already been approved.";
+    }
+    if (status === "Rejected") {
+      return "Previous request rejected. Apply again.";
+    }
+    return "";
+  };
+
+  const fetchMyRequestStatus = useCallback(async (): Promise<RequestStatus> => {
+    if (!user) return null;
+    setRequestStatusLoading(true);
+    try {
+      const response = await roomRequestService.getMyRequestStatus();
+      if (response?.success) {
+        const status = (response?.data?.latestStatus || null) as RequestStatus;
+        setLatestRequestStatus(status);
+        return status;
+      }
+      setLatestRequestStatus(null);
+      return null;
+    } catch {
+      setLatestRequestStatus(null);
+      return null;
+    } finally {
+      setRequestStatusLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchMyRequestStatus();
+  }, [fetchMyRequestStatus]);
+
+  const isBlockedByActiveRequest = latestRequestStatus === "Pending" || latestRequestStatus === "Approved";
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -151,6 +194,12 @@ const BookingForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const latestStatus = await fetchMyRequestStatus();
+    if (latestStatus === "Pending" || latestStatus === "Approved") {
+      setErrorMessage(getRestrictionMessageByStatus(latestStatus));
+      return;
+    }
+
     if (!validate()) return;
     if (!roomData) return;
 
@@ -201,6 +250,23 @@ const BookingForm: React.FC = () => {
       }
     } catch (error: unknown) {
       console.error("Error submitting request:", error);
+
+      const activeStatus =
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as { response?: { data?: { data?: { status?: string } } } }).response
+          ?.data?.data?.status === "string"
+          ? ((error as { response?: { data?: { data?: { status?: string } } } }).response?.data?.data
+              ?.status as RequestStatus)
+          : null;
+
+      if (activeStatus === "Pending" || activeStatus === "Approved") {
+        setLatestRequestStatus(activeStatus);
+        setErrorMessage(getRestrictionMessageByStatus(activeStatus));
+        return;
+      }
+
       const message =
         typeof error === "object" && error !== null && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -317,6 +383,24 @@ const BookingForm: React.FC = () => {
                 <FaUser className="w-5 h-5 text-primary" />
                 Your Details
               </h2>
+
+              {latestRequestStatus && (
+                <div className={`mb-5 rounded-lg border px-4 py-3 text-sm ${isBlockedByActiveRequest ? "border-warning/30 bg-warning/10 text-warning" : "border-success/20 bg-success/10 text-success"}`}>
+                  {getRestrictionMessageByStatus(latestRequestStatus)}
+                </div>
+              )}
+
+              {latestRequestStatus === "Approved" && (
+                <div className="mb-5">
+                  <button
+                    type="button"
+                    onClick={() => setErrorMessage("If you need another room, please submit a Room Change Request.")}
+                    className="w-full py-3 rounded-xl font-semibold text-sm border border-primary/30 text-primary hover:bg-surface-active transition-all"
+                  >
+                    Request Room Change
+                  </button>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Full Name */}
@@ -551,10 +635,10 @@ const BookingForm: React.FC = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || requestStatusLoading || isBlockedByActiveRequest}
                   className="w-full py-3.5 bg-gradient-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary text-white rounded-xl font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  {submitting ? "Submitting..." : "Submit Room Request"}
+                  {requestStatusLoading ? "Checking eligibility..." : submitting ? "Submitting..." : "Submit Room Request"}
                   <FaArrowRight className="w-4 h-4" />
                 </button>
 
