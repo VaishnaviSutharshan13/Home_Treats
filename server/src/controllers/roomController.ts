@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import Room from "../models/Room";
 import User from "../models/User";
+import Student from "../models/Student";
 import { logAdminAction } from "./adminLogController";
 import { createNotification } from "./notificationController";
 
@@ -10,12 +12,11 @@ const findRoomByIdentifier = async (identifier: string) => {
   if (!trimmedIdentifier) return null;
 
   const objectIdCandidate = /^[a-fA-F0-9]{24}$/.test(trimmedIdentifier)
-    ? trimmedIdentifier
+    ? new mongoose.Types.ObjectId(trimmedIdentifier)
     : null;
 
   const rawRoom = await Room.collection.findOne({
     $or: [
-      { _id: trimmedIdentifier as any },
       ...(objectIdCandidate ? [{ _id: objectIdCandidate as any }] : []),
       { roomNumber: trimmedIdentifier },
     ],
@@ -49,14 +50,19 @@ export const getAllRooms = async (req: Request, res: Response) => {
 // GET single room
 export const getRoomById = async (req: Request, res: Response) => {
   try {
-    const room = await Room.findById(req.params.id);
-    if (!room) {
+    const roomIdentifier = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const resolved = await findRoomByIdentifier(roomIdentifier);
+    if (!resolved) {
       return res.status(404).json({
         success: false,
         message: "Room not found",
       });
     }
-    res.json({ success: true, data: room });
+
+    res.json({ success: true, data: resolved.room });
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -289,6 +295,61 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
         .json({ success: false, message: "Room is under maintenance" });
     }
 
+    // Step 1: Check if student already has a room assigned and FREE the old room
+    const studentUser = await User.findOne({
+      role: "student",
+      studentId: req.body.studentId,
+    }).select("_id name studentId room roomNumber");
+
+    let oldRoomId: string | null = null;
+    if (studentUser && studentUser.room) {
+      oldRoomId = String(studentUser.room);
+      
+      // Find and update the old room
+      const oldRoomObjectId = /^[a-fA-F0-9]{24}$/.test(oldRoomId)
+        ? new mongoose.Types.ObjectId(oldRoomId)
+        : null;
+
+      if (oldRoomObjectId) {
+        const oldRoom = await Room.collection.findOne({
+          _id: oldRoomObjectId,
+        });
+
+        if (oldRoom) {
+          const oldStudents = Array.isArray(oldRoom.students)
+            ? oldRoom.students.filter((sid: string) => sid !== req.body.studentId)
+            : [];
+          const newOldOccupied = oldStudents.length;
+          const newOldStatus = newOldOccupied > 0 ? "Occupied" : "Available";
+
+          // Update old room: remove student, mark as Available if empty
+          await Room.collection.updateOne(
+            { _id: oldRoomObjectId },
+            {
+              $set: {
+                students: oldStudents,
+                occupied: newOldOccupied,
+                status: newOldStatus,
+              },
+            }
+          );
+
+          await createNotification(
+            "Room Deallocated",
+            `You have been deallocated from Room ${oldRoom.roomNumber}. A new room has been assigned.`,
+            "room",
+            {
+              source: "Room Management",
+              recipientUserId: String(studentUser._id),
+              relatedModuleId: String(oldRoomObjectId),
+              priority: "normal",
+            },
+          );
+        }
+      }
+    }
+
+    // Step 2: Allocate the new room to student
     const nextStudents = currentStudents.includes(req.body.studentId)
       ? currentStudents
       : [...currentStudents, req.body.studentId];
@@ -305,15 +366,33 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
 
     const updatedRoom = await Room.collection.findOne(filter);
 
-    const studentUser = await User.findOne({
-      role: "student",
-      studentId: req.body.studentId,
-    }).select("_id name studentId");
-
+    // Step 3: Update User model with new room information
     if (studentUser) {
+      await User.findByIdAndUpdate(studentUser._id, {
+        room: String(room._id),
+        roomNumber: room.roomNumber,
+      }, { new: true });
+    }
+
+    // Step 4: Update Student model with new room information
+    await Student.findOneAndUpdate(
+      { studentId: req.body.studentId },
+      {
+        room: String(room._id),
+        roomNumber: room.roomNumber,
+      },
+      { new: true }
+    );
+
+    // Step 5: Send notifications
+    if (studentUser) {
+      const notificationMessage = oldRoomId
+        ? `You have been allocated to Room ${room.roomNumber}.`
+        : `You have been assigned to Room ${room.roomNumber}.`;
+
       await createNotification(
         "Room Assigned",
-        `You have been assigned to Room ${room.roomNumber}.`,
+        notificationMessage,
         "room",
         {
           source: "Room Management",
@@ -325,9 +404,11 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
     }
 
     // Notification + Admin Log
+    const allocationAction = oldRoomId ? "Reallocated student to new room" : "Allocated room to student";
+    const oldRoomInfo = oldRoomId ? ` (moved from old room)` : "";
     await createNotification(
       "Room Assignment Completed",
-      `Room ${room.roomNumber} allocated to Student ID ${req.body.studentId}`,
+      `Room ${room.roomNumber} allocated to Student ID ${req.body.studentId}${oldRoomInfo}`,
       "room",
       {
         source: "Room Management",
@@ -340,7 +421,7 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
       await logAdminAction(
         req.user.email,
         String(req.user.id),
-        "Allocated room to student",
+        allocationAction,
         "room",
         String(req.params.id),
         `Room ${room.roomNumber} → ${req.body.studentId}`,
@@ -349,7 +430,9 @@ export const allocateRoom = async (req: AuthRequest, res: Response) => {
 
     res.json({
       success: true,
-      message: "Room allocated successfully",
+      message: oldRoomId
+        ? `Room changed successfully to Room ${room.roomNumber}`
+        : "Room allocated successfully",
       data: updatedRoom || {
         ...room,
         students: nextStudents,
@@ -382,6 +465,9 @@ export const vacateRoom = async (req: AuthRequest, res: Response) => {
 
     const { room, filter } = resolved;
 
+    // Get list of current students before clearing
+    const currentStudents = Array.isArray(room.students) ? room.students : [];
+
     await Room.collection.updateOne(filter, {
       $set: {
         students: [],
@@ -389,6 +475,19 @@ export const vacateRoom = async (req: AuthRequest, res: Response) => {
         status: "Available",
       },
     });
+
+    // Clear room information from User and Student models for all students
+    if (currentStudents.length > 0) {
+      await User.updateMany(
+        { studentId: { $in: currentStudents } },
+        { $unset: { room: "", roomNumber: "" } }
+      );
+
+      await Student.updateMany(
+        { studentId: { $in: currentStudents } },
+        { $unset: { room: "", roomNumber: "" } }
+      );
+    }
 
     const updatedRoom = await Room.collection.findOne(filter);
 

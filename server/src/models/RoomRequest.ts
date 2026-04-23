@@ -17,7 +17,7 @@ export interface IRoomRequest extends Document {
   building: string;
   roomType: string;
   monthlyFee: number;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Cancelled';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -116,7 +116,7 @@ const RoomRequestSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Approved', 'Rejected'],
+      enum: ['Pending', 'Approved', 'Rejected', 'Cancelled'],
       default: 'Pending',
       index: true,
     },

@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { FaCheckCircle, FaTimes, FaSearch, FaFilter, FaSync, FaBars } from 'react-icons/fa';
+import { FaCheckCircle, FaTimes, FaSearch, FaFilter, FaSync, FaBars, FaTrash } from 'react-icons/fa';
 import Sidebar from '../../components/layout/Sidebar';
 import { roomRequestService } from '../../services';
 
@@ -18,7 +18,7 @@ interface RoomRequest {
   roomNumber: string;
   floor: string;
   moveInDate: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Cancelled';
   createdAt: string;
 }
 
@@ -26,8 +26,21 @@ interface Stats {
   pending: number;
   approved: number;
   rejected: number;
+  cancelled?: number;
   total: number;
 }
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message === 'string'
+  ) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
 
 export default function RoomRequests() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -36,7 +49,7 @@ export default function RoomRequests() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
+  const [filterStatus, setFilterStatus] = useState<'All' | 'Pending' | 'Approved' | 'Rejected' | 'Cancelled'>('All');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -48,9 +61,9 @@ export default function RoomRequests() {
       if (response?.success) {
         setRequests(Array.isArray(response.data) ? response.data : []);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching requests:', error);
-      setErrorMessage('Failed to load requests');
+      setErrorMessage(getApiErrorMessage(error, 'Failed to load requests'));
     } finally {
       setLoading(false);
     }
@@ -84,9 +97,9 @@ export default function RoomRequests() {
         fetchStats();
         setTimeout(() => setSuccessMessage(''), 3000);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error approving request:', error);
-      setErrorMessage(error?.response?.data?.message || 'Failed to approve request');
+      setErrorMessage(getApiErrorMessage(error, 'Failed to approve request'));
     } finally {
       setProcessing(null);
     }
@@ -104,9 +117,32 @@ export default function RoomRequests() {
         fetchStats();
         setTimeout(() => setSuccessMessage(''), 3000);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error rejecting request:', error);
-      setErrorMessage(error?.response?.data?.message || 'Failed to reject request');
+      setErrorMessage(getApiErrorMessage(error, 'Failed to reject request'));
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleDelete = async (id: string, studentName: string, roomNumber: string) => {
+    const confirmed = window.confirm(`Delete room request of ${studentName} for Room ${roomNumber}?`);
+    if (!confirmed) return;
+
+    setProcessing(id);
+    setErrorMessage('');
+    setSuccessMessage('');
+    try {
+      const response = await roomRequestService.delete(id);
+      if (response?.success) {
+        setSuccessMessage(`${studentName}'s request for Room ${roomNumber} deleted.`);
+        setRequests((prev) => prev.filter((req) => req._id !== id));
+        fetchStats();
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
+    } catch (error: unknown) {
+      console.error('Error deleting request:', error);
+      setErrorMessage(getApiErrorMessage(error, 'Failed to delete request'));
     } finally {
       setProcessing(null);
     }
@@ -246,13 +282,14 @@ export default function RoomRequests() {
                 <FaFilter className="w-4 h-4 text-muted-foreground" />
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value as any)}
+                  onChange={(e) => setFilterStatus(e.target.value as 'All' | 'Pending' | 'Approved' | 'Rejected' | 'Cancelled')}
                   className="px-3 py-2.5 rounded-lg bg-muted/50 border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
                 >
                   <option value="All">All Statuses</option>
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
             </div>
@@ -359,9 +396,28 @@ export default function RoomRequests() {
                                   <FaTimes className="w-3.5 h-3.5" />
                                   Reject
                                 </button>
+                                <button
+                                  onClick={() =>
+                                    handleDelete(request._id, request.studentName, request.roomNumber)
+                                  }
+                                  disabled={processing === request._id}
+                                  className="px-3 py-1.5 bg-error/10 text-error hover:bg-error/20 border border-error/20 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                >
+                                  <FaTrash className="w-3.5 h-3.5" />
+                                  Delete
+                                </button>
                               </>
                             ) : (
-                              <span className="text-xs text-muted-foreground">-</span>
+                              <button
+                                onClick={() =>
+                                  handleDelete(request._id, request.studentName, request.roomNumber)
+                                }
+                                disabled={processing === request._id}
+                                className="px-3 py-1.5 bg-error/10 text-error hover:bg-error/20 border border-error/20 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                              >
+                                <FaTrash className="w-3.5 h-3.5" />
+                                Delete
+                              </button>
                             )}
                           </div>
                         </td>
