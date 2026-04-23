@@ -24,6 +24,8 @@ import bookingRoutes from './routes/bookingRoutes';
 import paymentRoutes from './routes/paymentRoutes';
 import profileRoutes from './routes/profileRoutes';
 import settingsRoutes from './routes/settingsRoutes';
+import floorRoutes from './routes/floorRoutes';
+import roomRequestRoutes from './routes/roomRequestRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -60,6 +62,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/floors', floorRoutes);
+app.use('/api/room-requests', roomRequestRoutes);
 
 // Health check
 app.get('/api/health', (_req: Request, res: Response) => {

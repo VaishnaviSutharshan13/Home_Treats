@@ -33,7 +33,6 @@ import {
   FaEye,
   FaChevronLeft,
   FaBars,
-  FaClock,
   FaRedo,
   FaLayerGroup,
   FaClipboardList,
@@ -126,6 +125,51 @@ const resolveImageUrl = (img?: string) => {
   return `${API_BASE}${img}`;
 };
 
+// ─── Room Display Helpers ────────────────────────────────────
+const getFloorNumber = (floorStr: string): string => {
+  const match = String(floorStr || '').match(/(\d+)/);
+  return match ? match[1] : '1';
+};
+
+const transformRoomNumber = (roomNum: string, floorNum: string): string => {
+  const lastThree = String(roomNum || '').slice(-3);
+  return `${floorNum}-${lastThree}`;
+};
+
+const blockToBuilding = (block: string): string => {
+  const blockLower = String(block || '').toLowerCase();
+  if (blockLower.includes('a') || blockLower.includes('c')) {
+    return 'Main Building';
+  }
+  return 'Annex Building';
+};
+
+const getStatusEmoji = (status: string): string => {
+  switch (status) {
+    case 'Available':
+      return '🟢';
+    case 'Limited':
+      return '🟡';
+    case 'Occupied':
+      return '🔴';
+    case 'Maintenance':
+      return '🟠';
+    default:
+      return '⚪';
+  }
+};
+
+const getStatusNote = (status: string): string | undefined => {
+  switch (status) {
+    case 'Limited':
+      return 'Only 1 left';
+    case 'Occupied':
+      return 'Full';
+    default:
+      return undefined;
+  }
+};
+
 // ─── Component ───────────────────────────────────────────────
 const RoomManagement = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -210,16 +254,6 @@ const RoomManagement = () => {
       case 'Maintenance': return 'bg-warning/20 border border-warning/30 text-warning border border-orange-200';
       default: return 'bg-muted text-foreground/90 border border-border';
     }
-  };
-
-  const getTimeAgo = (dateStr: string) => {
-    if (!dateStr) return 'N/A';
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    return `${Math.floor(hrs / 24)}d ago`;
   };
 
   // ─── Modal helpers ───────────────────────────────────────
@@ -602,54 +636,56 @@ const RoomManagement = () => {
 
                 {/* Details */}
                 <div className="p-4">
-                  {/* Room Number = Primary, Room Name = Subtitle */}
-                  <h3 className="text-lg font-bold text-foreground leading-tight mb-0.5">
-                    {room.roomNumber}
+                  {/* Room Number - New Format */}
+                  <h3 className="text-lg font-bold text-foreground leading-tight mb-1">
+                    Room {transformRoomNumber(room.roomNumber, getFloorNumber(room.floor))}
                   </h3>
-                  <p className="text-sm text-primary font-medium line-clamp-1 mb-2">
-                    {room.name || 'Unnamed Room'}
+
+                  {/* Room Type */}
+                  <p className="text-sm text-primary font-medium mb-3">
+                    {room.type}
                   </p>
 
-                  {/* Location */}
-                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
-                    <FaMapMarkerAlt className="text-muted-foreground shrink-0" />
-                    {room.block} &middot; {room.floor}
+                  {/* Location - Building • Floor */}
+                  <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                    <FaMapMarkerAlt className="text-muted-foreground shrink-0 w-3 h-3" />
+                    {blockToBuilding(room.block)} • {room.floor}
                   </p>
 
-                  {/* Type + Occupancy row */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 bg-muted border border-border px-2 py-1 rounded-md text-foreground/90 text-xs font-medium">
-                      <FaBed className="text-muted-foreground text-xs" />
-                      {room.type}
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-muted border border-border px-2 py-1 rounded-md text-foreground/90 text-xs font-medium">
-                      <FaUsers className="text-muted-foreground text-xs" />
-                      {room.occupied}/{room.capacity} beds
-                    </span>
+                  {/* Capacity Info */}
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Capacity: {room.capacity} Student{room.capacity !== 1 ? 's' : ''}
+                  </p>
+
+                  {/* Occupancy */}
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Occupied: {room.occupied}/{room.capacity}
+                  </p>
+
+                  {/* Price - Per Month */}
+                  <p className="text-sm font-bold text-foreground mb-2">
+                    Rs. {room.price.toLocaleString()}/month
+                  </p>
+
+                  {/* Status Badge with Note */}
+                  <div className="flex items-center justify-between gap-2 mb-3 bg-muted/50 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{getStatusEmoji(room.status)}</span>
+                      <span className={`text-xs font-semibold`}>
+                        {room.status}
+                      </span>
+                    </div>
+                    {getStatusNote(room.status) && (
+                      <span className="text-xs font-medium text-muted-foreground">{getStatusNote(room.status)}</span>
+                    )}
                   </div>
 
-                  {/* Facilities tags */}
+                  {/* Facilities */}
                   {room.facilities && room.facilities.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {room.facilities.slice(0, 3).map((f) => (
-                        <span key={f} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-active text-primary text-xs font-medium border border-primary/15">
-                          {FACILITY_ICONS[f] || null}
-                          {f}
-                        </span>
-                      ))}
-                      {room.facilities.length > 3 && (
-                        <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground text-xs font-medium border border-border">
-                          +{room.facilities.length - 3}
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Facilities: {room.facilities.slice(0, 3).join(', ')}{room.facilities.length > 3 ? ` +${room.facilities.length - 3} more` : ''}
+                    </p>
                   )}
-
-                  {/* Last Updated */}
-                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
-                    <FaClock className="w-3 h-3" />
-                    Updated {getTimeAgo(room.createdAt)}
-                  </p>
 
                   {/* Action Buttons */}
                   <div className="flex items-center gap-2 pt-3 border-t border-border">
@@ -789,7 +825,7 @@ const RoomManagement = () => {
                       <input
                         type="text"
                         required
-                        placeholder="e.g. A-101"
+                        placeholder="e.g. 1-101"
                         value={formData.roomNumber}
                         onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
                         className="w-full rounded-lg px-3 py-2 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
