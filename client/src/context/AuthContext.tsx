@@ -20,6 +20,7 @@ interface User {
   status?: "Pending" | "Approved" | "Rejected" | "Inactive";
   approvalStatus?: "Pending" | "Approved" | "Rejected";
   room?: string;
+  roomNumber?: string;
   course?: string;
 }
 

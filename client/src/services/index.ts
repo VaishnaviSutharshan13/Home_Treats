@@ -230,6 +230,13 @@ export const roomService = {
   },
 };
 
+export const floorService = {
+  getById: async (floorId: string) => {
+    const response = await api.get(`/floors/${floorId}`);
+    return response.data;
+  },
+};
+
 // ─── Fees Services ───────────────────────────────────────────
 export const feesService = {
   getAll: async () => {
@@ -485,6 +492,78 @@ export const bookingService = {
 
   updateStatus: async (id: string, status: "Confirmed" | "Cancelled") => {
     const response = await api.put(`/bookings/${id}/status`, { status });
+    return response.data;
+  },
+};
+
+// ─── Room Request Services ──────────────────────────────────
+export const roomRequestService = {
+  create: async (payload: {
+    studentName: string;
+    email: string;
+    phone: string;
+    studentId: string;
+    nic: string;
+    landline?: string;
+    moveInDate: string;
+    duration: string;
+    specialRequest?: string;
+    roomNumber: string;
+    roomId: string;
+    floor: string;
+    building: string;
+    roomType: string;
+    monthlyFee?: number;
+  }) => {
+    const response = await api.post("/room-requests", payload);
+    return response.data;
+  },
+
+  getMyRequests: async () => {
+    const response = await api.get("/room-requests/my-requests");
+    return response.data;
+  },
+
+  getMyRequestStatus: async () => {
+    const response = await api.get('/room-requests/my-request-status');
+    return response.data;
+  },
+
+  getAllRequests: async (params?: { status?: "Pending" | "Approved" | "Rejected" | "Cancelled" }) => {
+    const response = await api.get("/room-requests/admin/all", { params });
+    return response.data;
+  },
+
+  getStats: async () => {
+    const response = await api.get("/room-requests/admin/stats");
+    return response.data;
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get(`/room-requests/${id}`);
+    return response.data;
+  },
+
+  approve: async (id: string) => {
+    const response = await api.patch(`/room-requests/${id}/approve`);
+    return response.data;
+  },
+
+  reject: async (id: string) => {
+    const response = await api.patch(`/room-requests/${id}/reject`);
+    return response.data;
+  },
+
+  createRoomChangeRequest: async (payload: {
+    newRoomNumber: string;
+    reason?: string;
+  }) => {
+    const response = await api.post('/room-requests/room-change', payload);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/room-requests/${id}`);
     return response.data;
   },
 };
