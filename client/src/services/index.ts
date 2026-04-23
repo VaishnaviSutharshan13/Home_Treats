@@ -524,7 +524,12 @@ export const roomRequestService = {
     return response.data;
   },
 
-  getAllRequests: async (params?: { status?: "Pending" | "Approved" | "Rejected" }) => {
+  getMyRequestStatus: async () => {
+    const response = await api.get('/room-requests/my-request-status');
+    return response.data;
+  },
+
+  getAllRequests: async (params?: { status?: "Pending" | "Approved" | "Rejected" | "Cancelled" }) => {
     const response = await api.get("/room-requests/admin/all", { params });
     return response.data;
   },
@@ -546,6 +551,19 @@ export const roomRequestService = {
 
   reject: async (id: string) => {
     const response = await api.patch(`/room-requests/${id}/reject`);
+    return response.data;
+  },
+
+  createRoomChangeRequest: async (payload: {
+    newRoomNumber: string;
+    reason?: string;
+  }) => {
+    const response = await api.post('/room-requests/room-change', payload);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/room-requests/${id}`);
     return response.data;
   },
 };

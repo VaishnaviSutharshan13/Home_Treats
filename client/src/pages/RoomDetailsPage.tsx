@@ -132,7 +132,7 @@ const floorFallbackMap: Record<string, FloorDetailsData> = {
     statusBadge: 'Popular Floor',
     statusTone: 'blue',
     location: 'Jaffna, Sri Lanka',
-    image: null,
+    image: '/images/firstfloordetail.png',
   },
   '2nd-floor': {
     id: '2nd-floor',
@@ -162,7 +162,7 @@ const floorFallbackMap: Record<string, FloorDetailsData> = {
     statusBadge: 'Best for Study',
     statusTone: 'green',
     location: 'Jaffna, Sri Lanka',
-    image: null,
+    image: '/images/secondfloordetails.png',
   },
   '4th-floor': {
     id: '4th-floor',
@@ -249,14 +249,16 @@ const RoomDetailsPage: React.FC = () => {
       ? floorRooms.filter((r) => selectionAvailability(r) !== 'Not Available').length
       : floorData.availableRooms;
 
+    const isFirstFloor = floorData.id === '1st-floor';
+
     return {
       id: floorData.id,
       title: floorData.title,
       totalRooms: floorRooms.length || floorData.totalRooms,
       availableRooms,
-      priceMin: prices.length ? Math.min(...prices) : floorData.monthlyFeeRange.min,
-      priceMax: prices.length ? Math.max(...prices) : floorData.monthlyFeeRange.max,
-      image: sample?.image || floorData.image || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
+      priceMin: isFirstFloor ? 8000 : prices.length ? Math.min(...prices) : floorData.monthlyFeeRange.min,
+      priceMax: isFirstFloor ? 9000 : prices.length ? Math.max(...prices) : floorData.monthlyFeeRange.max,
+      image: floorData.image || sample?.image || 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
       location: floorData.location || sample?.location || 'Jaffna, Sri Lanka',
       description: floorData.about,
       facilities: floorData.facilities,
