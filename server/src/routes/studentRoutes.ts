@@ -35,11 +35,13 @@ const validateStudent = [
     .custom((value, { req }) => value === req.body.password)
     .withMessage('Passwords do not match'),
   body('status').optional().isIn(['Pending', 'Approved', 'Rejected', 'Inactive']).withMessage('Status must be Pending, Approved, Rejected, or Inactive'),
+  body('feeStatus').optional().isIn(['Pending', 'Paid']).withMessage('Fee status must be Pending or Paid'),
 ];
 
 const validateStudentUpdate = [
   body('roomNumber').optional().isString().withMessage('Room number must be a string'),
   body('status').optional().isIn(['Pending', 'Approved', 'Rejected', 'Inactive']).withMessage('Status must be Pending, Approved, Rejected, or Inactive'),
+  body('feeStatus').optional().isIn(['Pending', 'Paid']).withMessage('Fee status must be Pending or Paid'),
 ];
 
 // Routes — List, approval queue, and CRUD require admin

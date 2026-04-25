@@ -278,11 +278,10 @@ const Home = () => {
             {roomTypes.map((room) => (
               <article
                 key={room.name}
-                className={`flex flex-col rounded-2xl border bg-muted/40 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${
-                  room.featured
-                    ? "border-primary/40 ring-2 ring-primary/20"
-                    : "border-border hover:border-primary/30"
-                }`}
+                className={`flex flex-col rounded-2xl border bg-muted/40 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg ${room.featured
+                  ? "border-primary/40 ring-2 ring-primary/20"
+                  : "border-border hover:border-primary/30"
+                  }`}
               >
                 {room.featured && (
                   <span className="mb-3 w-fit rounded-full bg-surface-active px-3 py-1 text-xs font-semibold text-primary">
@@ -424,11 +423,10 @@ const Home = () => {
             {galleryImages.map((img, i) => (
               <figure
                 key={img.label}
-                className={`group relative overflow-hidden rounded-2xl border border-border bg-muted shadow-sm ${
-                  i === 0
-                    ? "sm:col-span-2 sm:row-span-2 min-h-[240px] lg:min-h-[320px]"
-                    : "aspect-[4/3] min-h-[200px]"
-                }`}
+                className={`group relative overflow-hidden rounded-2xl border border-border bg-muted shadow-sm ${i === 0
+                  ? "sm:col-span-2 sm:row-span-2 min-h-[240px] lg:min-h-[320px]"
+                  : "aspect-[4/3] min-h-[200px]"
+                  }`}
               >
                 <img
                   src={img.url}

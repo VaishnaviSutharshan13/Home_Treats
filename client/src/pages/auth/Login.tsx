@@ -50,7 +50,7 @@ const Login = () => {
     if (authError) {
       clearAuthError();
     }
-    
+
     // Clear field-specific error when user starts typing
     if (formErrors[name]) {
       setFormErrors(prev => ({
@@ -62,26 +62,26 @@ const Login = () => {
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
-    
+
     if (!formData.email) {
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       errors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -91,7 +91,7 @@ const Login = () => {
 
     try {
       const success = await login(formData.email, formData.password);
-      
+
       if (success) {
         // The useEffect will handle redirection
       } else {
@@ -113,7 +113,7 @@ const Login = () => {
     <div className="min-h-[calc(100vh-4rem)] flex">
       {/* Left Side - Hostel Image */}
       <div className="hidden lg:flex lg:w-1/2 relative">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')"
@@ -121,7 +121,7 @@ const Login = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-br from-sidebar/95 to-primary-hover/70"></div>
         </div>
-        
+
         {/* Overlay Content */}
         <div className="relative z-10 flex flex-col justify-center items-center h-full text-white p-12">
           <div className="text-center">
@@ -189,11 +189,10 @@ const Login = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-4 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
-                      formErrors.email 
-                        ? 'border-error/50 focus:ring-error bg-error/10' 
-                        : 'border-border hover:border-primary/30'
-                    }`}
+                    className={`w-full pl-12 pr-4 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${formErrors.email
+                      ? 'border-error/50 focus:ring-error bg-error/10'
+                      : 'border-border hover:border-primary/30'
+                      }`}
                     placeholder="john@example.com"
                   />
                 </div>
@@ -216,11 +215,10 @@ const Login = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-12 pr-12 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${
-                      formErrors.password 
-                        ? 'border-error/50 focus:ring-error bg-error/10' 
-                        : 'border-border hover:border-primary/30'
-                    }`}
+                    className={`w-full pl-12 pr-12 py-3 bg-muted/30 border rounded-xl text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 ${formErrors.password
+                      ? 'border-error/50 focus:ring-error bg-error/10'
+                      : 'border-border hover:border-primary/30'
+                      }`}
                     placeholder="Enter your password"
                   />
                   <button

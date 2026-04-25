@@ -20,7 +20,7 @@ import {
 
 const ContactUs = () => {
   const { user, isAuthenticated } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',

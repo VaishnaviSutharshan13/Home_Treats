@@ -117,9 +117,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
       )}
 
       <div
-        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 transform flex-col border-r border-border bg-sidebar shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 transform flex-col border-r border-border bg-sidebar shadow-xl transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5">
           <div className="flex items-center gap-3">
@@ -158,18 +157,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
                 onClick={() => {
                   if (window.innerWidth < 1024) onToggle();
                 }}
-                className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-sidebar-active text-sidebar-foreground"
-                    : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground"
-                }`}
+                className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${active
+                  ? "bg-sidebar-active text-sidebar-foreground"
+                  : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground"
+                  }`}
               >
                 <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
-                    active
-                      ? "bg-primary/20 text-info"
-                      : "bg-sidebar-hover/50 text-sidebar-muted group-hover:text-sidebar-foreground"
-                  }`}
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${active
+                    ? "bg-primary/20 text-info"
+                    : "bg-sidebar-hover/50 text-sidebar-muted group-hover:text-sidebar-foreground"
+                    }`}
                 >
                   {item.icon}
                 </div>

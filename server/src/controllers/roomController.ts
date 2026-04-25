@@ -32,6 +32,48 @@ const findRoomByIdentifier = async (identifier: string) => {
 export const getAllRooms = async (req: Request, res: Response) => {
   try {
     const rooms = await Room.find().sort({ createdAt: -1 });
+
+    const assignedStudents = await User.find({
+      role: "student",
+      isActive: true,
+      approvalStatus: "Approved",
+      room: { $exists: true, $ne: "" },
+    }).select("room");
+
+    const roomOccupancyMap = new Map<string, number>();
+    for (const student of assignedStudents) {
+      const roomNumber = String((student as any).room || "").trim();
+      if (!roomNumber) continue;
+      roomOccupancyMap.set(roomNumber, (roomOccupancyMap.get(roomNumber) || 0) + 1);
+    }
+
+    const bulkOps: any[] = [];
+    for (const room of rooms) {
+      if (room.status === "Maintenance") continue;
+
+      const occupied = Math.max(
+        0,
+        Number(roomOccupancyMap.get(String(room.roomNumber || "").trim()) || 0),
+      );
+      const capacity = Math.max(1, Number(room.capacity || 1));
+      const normalizedStatus = occupied >= capacity ? "Occupied" : "Available";
+
+      if (room.status !== normalizedStatus || Number(room.occupied || 0) !== occupied) {
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: room._id },
+            update: { $set: { status: normalizedStatus, occupied } },
+          },
+        });
+        room.status = normalizedStatus as any;
+        room.occupied = occupied;
+      }
+    }
+
+    if (bulkOps.length > 0) {
+      await Room.bulkWrite(bulkOps);
+    }
+
     res.json({
       success: true,
       count: rooms.length,
