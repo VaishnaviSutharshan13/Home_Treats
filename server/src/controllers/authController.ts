@@ -186,77 +186,128 @@ export const register = async (req: Request, res: Response) => {
       address,
     } = req.body;
 
-    if (password !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Passwords do not match" });
-    }
-
+    const normalizedName = String(name || "").trim();
     const normalizedEmail = String(email || "")
       .toLowerCase()
       .trim();
     const normalizedStudentId = String(studentId || "")
       .toUpperCase()
       .trim();
+    const normalizedPhone = String(phone || "").trim();
+    const normalizedAddress = String(address || "").trim();
+
+    if (
+      !normalizedName ||
+      !normalizedEmail ||
+      !normalizedStudentId ||
+      !normalizedPhone ||
+      !password ||
+      !confirmPassword
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all required fields",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Passwords do not match" });
+    }
+
     const normalizedCourse = VALID_COURSES.includes(course)
       ? course
       : "Computer Science";
     const normalizedYear = VALID_YEARS.includes(year) ? year : "1st Year";
 
-    const existingUser = await User.findOne({ email: normalizedEmail });
-    if (existingUser) {
+    const [existingUserByEmail, existingStudentByEmail] = await Promise.all([
+      User.findOne({ email: normalizedEmail }).select("_id"),
+      Student.findOne({ email: normalizedEmail }).select("_id"),
+    ]);
+    if (existingUserByEmail || existingStudentByEmail) {
       return res.status(400).json({
         success: false,
-        message: "User already exists with this email",
+        message: "Email already registered",
       });
     }
 
-    const existingStudentId = await User.findOne({
-      studentId: normalizedStudentId,
-    });
-    if (existingStudentId) {
+    const [existingUserByStudentId, existingStudentByStudentId] =
+      await Promise.all([
+        User.findOne({ studentId: normalizedStudentId }).select("_id"),
+        Student.findOne({ studentId: normalizedStudentId }).select("_id"),
+      ]);
+
+    if (existingUserByStudentId || existingStudentByStudentId) {
       return res
         .status(400)
         .json({ success: false, message: "Student ID already exists" });
     }
 
-    const user = await User.create({
-      name,
-      email: normalizedEmail,
-      password,
-      role: "student",
-      phone,
-      studentId: normalizedStudentId,
-      university,
-      emergencyContact,
-      gender,
-      course: normalizedCourse,
-      year: normalizedYear,
-      address,
-      room: "",
-      roomNumber: "",
-      status: "Pending",
-      approvalStatus: "Pending",
-    });
+    let user: any = null;
+    try {
+      user = await User.create({
+        name: normalizedName,
+        email: normalizedEmail,
+        password,
+        role: "student",
+        phone: normalizedPhone,
+        studentId: normalizedStudentId,
+        university,
+        emergencyContact,
+        gender,
+        course: normalizedCourse,
+        year: normalizedYear,
+        address: normalizedAddress,
+        room: "",
+        roomNumber: "",
+        status: "Pending",
+        approvalStatus: "Pending",
+      });
 
-    await Student.create({
-      studentId: normalizedStudentId,
-      name,
-      email: normalizedEmail,
-      phone,
-      course: normalizedCourse,
-      year: normalizedYear,
-      roomNumber: "",
-      room: "Unassigned",
-      status: "Inactive",
-      joinDate: new Date(),
-      fees: "Pending",
-      emergencyContact: {
-        name: "Guardian",
-        phone: emergencyContact,
-        relationship: "Parent",
-      },
-    });
+      await Student.create({
+        studentId: normalizedStudentId,
+        name: normalizedName,
+        email: normalizedEmail,
+        phone: normalizedPhone,
+        course: normalizedCourse,
+        year: normalizedYear,
+        roomNumber: "",
+        room: "Unassigned",
+        status: "Inactive",
+        joinDate: new Date(),
+        fees: "Pending",
+        emergencyContact: {
+          name: "Guardian",
+          phone: emergencyContact,
+          relationship: "Parent",
+        },
+      });
+    } catch (creationError: any) {
+      if (user?._id) {
+        await User.findByIdAndDelete(user._id).catch(() => null);
+      }
+
+      if (creationError?.code === 11000) {
+        const dupFields = Object.keys(creationError?.keyPattern || {});
+        if (dupFields.includes("email")) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Email already registered" });
+        }
+        if (dupFields.includes("studentId")) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Student ID already exists" });
+        }
+        return res.status(400).json({
+          success: false,
+          message: "Invalid input data",
+        });
+      }
+
+      throw creationError;
+    }
 
     const now = new Date();
     const dueDate = new Date(now);
@@ -308,9 +359,27 @@ export const register = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
+    if (error?.code === 11000) {
+      const dupFields = Object.keys(error?.keyPattern || {});
+      if (dupFields.includes("email")) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Email already registered" });
+      }
+      if (dupFields.includes("studentId")) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Student ID already exists" });
+      }
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input data",
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: "Registration failed",
+      message: "Registration failed. Please try again.",
       error: error.message,
     });
   }
