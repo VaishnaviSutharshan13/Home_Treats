@@ -582,10 +582,10 @@ const FeesManagement = () => {
 
                     {/* Payment Info */}
                     <td className="px-5 py-4">
-                      {fee.paidDate ? (
+                      {fee.paymentMethod || fee.status === 'Paid' || fee.status === 'Partial' ? (
                         <div>
-                          <p className="text-sm text-muted-foreground">{new Date(fee.paidDate).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}</p>
-                          <p className="text-xs text-muted-foreground">{fee.paymentMethod}</p>
+                          <p className="text-sm text-muted-foreground">{fee.paidDate ? new Date(fee.paidDate).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '-'}</p>
+                          <p className="text-xs text-muted-foreground">{fee.paymentMethod || 'Recorded'}</p>
                           {fee.transactionId && <p className="text-xs text-muted-foreground font-mono mt-0.5 truncate max-w-[120px]">{fee.transactionId}</p>}
                         </div>
                       ) : (

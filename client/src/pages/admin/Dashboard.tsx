@@ -309,23 +309,20 @@ const Dashboard = () => {
               <Link
                 key={idx}
                 to={card.link}
-                className={`group bg-card rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 ${
-                  idx === 0 ? 'delay-75' : idx === 1 ? 'delay-150' : idx === 2 ? 'delay-200' : 'delay-300'
-                } ${
-                  chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                }`}
+                className={`group bg-card rounded-2xl border border-border p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 ${idx === 0 ? 'delay-75' : idx === 1 ? 'delay-150' : idx === 2 ? 'delay-200' : 'delay-300'
+                  } ${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                  }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-11 h-11 ${card.iconBg} rounded-xl flex items-center justify-center text-white shadow-sm`}>
                     {card.icon}
                   </div>
-                  <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-                    card.trend === 'up' ? 'bg-primary/15 text-primary' :
+                  <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${card.trend === 'up' ? 'bg-primary/15 text-primary' :
                     card.trend === 'down' ? 'bg-error/10 border border-error/30 text-error' :
-                    'bg-muted/60 text-muted-foreground'
-                  }`}>
+                      'bg-muted/60 text-muted-foreground'
+                    }`}>
                     {card.trend === 'up' ? <FaArrowUp className="w-2.5 h-2.5" /> :
-                     card.trend === 'down' ? <FaArrowDown className="w-2.5 h-2.5" /> : null}
+                      card.trend === 'down' ? <FaArrowDown className="w-2.5 h-2.5" /> : null}
                     <span>{card.trendValue}</span>
                   </div>
                 </div>
@@ -338,11 +335,9 @@ const Dashboard = () => {
 
           {/* --- ROW 2: Monthly Revenue Chart --- */}
           <div
-            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-              'delay-300 '
-            }${
-              chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-300 '
+              }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
@@ -371,39 +366,39 @@ const Dashboard = () => {
 
             <div className="h-72 sm:h-80 w-full min-w-0">
               {chartsLoaded ? (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                    axisLine={{ stroke: '#E5E7EB' }}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v.toString()}
-                  />
-                  <Tooltip content={<RevenueTooltip />} />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#7c3aed"
-                    strokeWidth={2.5}
-                    fill="url(#revenueGradient)"
-                    animationDuration={1200}
-                    animationEasing="ease-out"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12, fill: '#6B7280' }}
+                      axisLine={{ stroke: '#E5E7EB' }}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12, fill: '#6B7280' }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v.toString()}
+                    />
+                    <Tooltip content={<RevenueTooltip />} />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#7c3aed"
+                      strokeWidth={2.5}
+                      fill="url(#revenueGradient)"
+                      animationDuration={1200}
+                      animationEasing="ease-out"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="h-full w-full rounded-xl bg-muted/30 animate-pulse" aria-hidden />
               )}
@@ -415,11 +410,9 @@ const Dashboard = () => {
 
             {/* Room Occupancy Donut */}
             <div
-              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-                'delay-500 '
-              }${
-                chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-500 '
+                }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
             >
               <h3 className="text-lg font-semibold text-foreground mb-1">Room Occupancy Overview</h3>
               <p className="text-sm text-muted-foreground mb-4">{adminStats.rooms.total} total rooms</p>
@@ -434,34 +427,34 @@ const Dashboard = () => {
               ) : (
                 <div className="h-64 sm:h-72 w-full min-w-0">
                   {chartsLoaded ? (
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                    <PieChart>
-                      <Pie
-                        data={occupancyData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={95}
-                        paddingAngle={4}
-                        dataKey="value"
-                        animationDuration={1000}
-                        animationEasing="ease-out"
-                        stroke="none"
-                      >
-                        {occupancyData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<OccupancyTooltip />} />
-                      <Legend
-                        verticalAlign="bottom"
-                        height={36}
-                        formatter={(value: string) => (
-                          <span className="text-sm text-muted-foreground">{value}</span>
-                        )}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                      <PieChart>
+                        <Pie
+                          data={occupancyData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={95}
+                          paddingAngle={4}
+                          dataKey="value"
+                          animationDuration={1000}
+                          animationEasing="ease-out"
+                          stroke="none"
+                        >
+                          {occupancyData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<OccupancyTooltip />} />
+                        <Legend
+                          verticalAlign="bottom"
+                          height={36}
+                          formatter={(value: string) => (
+                            <span className="text-sm text-muted-foreground">{value}</span>
+                          )}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
                   ) : (
                     <div className="h-full w-full rounded-xl bg-muted/30 animate-pulse" aria-hidden />
                   )}
@@ -484,11 +477,9 @@ const Dashboard = () => {
 
             {/* Recent Students Widget */}
             <div
-              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-                'delay-500 '
-              }${
-                chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-500 '
+                }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
             >
               <div className="flex items-center justify-between mb-5">
                 <div>
@@ -515,9 +506,8 @@ const Dashboard = () => {
                   {recentStudents.map((student) => (
                     <div
                       key={student._id}
-                      className={`flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-all duration-300 ${
-                        chartsLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-                      }`}
+                      className={`flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-all duration-300 ${chartsLoaded ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+                        }`}
                     >
                       {/* Avatar */}
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-semibold text-sm shadow-sm">
@@ -528,9 +518,8 @@ const Dashboard = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
-                          <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
-                            student.status === 'Active' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
-                          }`}>
+                          <span className={`inline-flex px-1.5 py-0.5 text-[10px] font-medium rounded-full ${student.status === 'Active' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
+                            }`}>
                             {student.status}
                           </span>
                         </div>
@@ -560,11 +549,9 @@ const Dashboard = () => {
 
           {/* --- ROW 4: Room Booking Requests --- */}
           <div
-            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-              'delay-700 '
-            }${
-              chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-700 '
+              }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-foreground">Room Booking Requests</h3>
@@ -590,9 +577,8 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                        booking.status === 'Confirmed' ? 'bg-primary/15 text-primary' : 'bg-error/10 border border-error/20 text-error'
-                      }`}>
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${booking.status === 'Confirmed' ? 'bg-primary/15 text-primary' : 'bg-error/10 border border-error/20 text-error'
+                        }`}>
                         {booking.status}
                       </span>
                       {booking.status === 'Confirmed' ? (
@@ -624,11 +610,9 @@ const Dashboard = () => {
 
             {/* Complaint Status */}
             <div
-              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-                'delay-700 '
-              }${
-                chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-700 '
+                }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
             >
               <h3 className="text-lg font-semibold text-foreground mb-4">Complaint Status</h3>
               <div className="space-y-4">
@@ -677,11 +661,9 @@ const Dashboard = () => {
 
             {/* Fee Collection Overview */}
             <div
-              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-                'delay-700 '
-              }${
-                chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-700 '
+                }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
             >
               <h3 className="text-lg font-semibold text-foreground mb-4">Fee Collection</h3>
 
@@ -735,11 +717,9 @@ const Dashboard = () => {
 
             {/* Recent Activity */}
             <div
-              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-                'delay-700 '
-              }${
-                chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-              }`}
+              className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-700 '
+                }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
             >
               <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
               {activities.length === 0 ? (
@@ -750,11 +730,10 @@ const Dashboard = () => {
                 <div className="space-y-3.5 max-h-80 overflow-y-auto pr-1">
                   {activities.slice(0, 8).map((activity, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${
-                        activity.type === 'student' ? 'bg-primary/15 text-primary' :
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs ${activity.type === 'student' ? 'bg-primary/15 text-primary' :
                         activity.type === 'complaint' ? 'bg-amber-500/15 text-amber-400' :
-                        'bg-primary/15 text-primary'
-                      }`}>
+                          'bg-primary/15 text-primary'
+                        }`}>
                         {activity.type === 'student' ? <FaUserGraduate /> : activity.type === 'complaint' ? <FaExclamationTriangle /> : <FaMoneyBillWave />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -770,13 +749,11 @@ const Dashboard = () => {
 
           {/* --- ROW 5: Quick Actions --- */}
           <div
-            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${
-              'delay-1000 '
-            }${
-              chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
+            className={`bg-card rounded-2xl border border-primary/20 p-6 transition-all duration-500 ${'delay-1000 '
+              }${chartsLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`}
           >
-              <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
                 { label: 'Students', link: '/admin/student-management', icon: <FaUsers className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },

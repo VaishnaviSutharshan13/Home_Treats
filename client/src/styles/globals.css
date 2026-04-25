@@ -74,6 +74,7 @@
 }
 
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -107,21 +108,18 @@
 }
 
 @layer utilities {
+
   /* Hero overlay: only primary + secondary tones from the palette */
   .landing-mesh {
     background-color: #020617;
     background-image:
       radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.3) 0px, transparent 52%),
-      radial-gradient(
-        at 85% 15%,
+      radial-gradient(at 85% 15%,
         rgba(52, 211, 153, 0.14) 0px,
-        transparent 42%
-      ),
-      radial-gradient(
-        at 10% 70%,
+        transparent 42%),
+      radial-gradient(at 10% 70%,
         rgba(59, 130, 246, 0.12) 0px,
-        transparent 48%
-      ),
+        transparent 48%),
       radial-gradient(at 90% 85%, rgba(251, 191, 36, 0.1) 0px, transparent 45%);
   }
 }

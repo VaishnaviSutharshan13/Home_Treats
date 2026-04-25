@@ -10,7 +10,6 @@ import {
   FaSpinner,
   FaSync,
   FaTimes,
-  FaTrash,
   FaUserClock,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -51,6 +50,14 @@ interface StudentForm {
   roomNumber: string;
   course: string;
   status: StudentStatus;
+  feeStatus: "Pending" | "Paid";
+}
+
+interface RoomOption {
+  roomNumber?: string;
+  status?: string;
+  occupied?: number;
+  capacity?: number;
 }
 
 type StudentFormErrors = Partial<
@@ -79,6 +86,7 @@ const emptyForm: StudentForm = {
   roomNumber: "",
   course: "Computer Science",
   status: "Pending",
+  feeStatus: "Pending",
 };
 
 const TEN_DIGIT_REGEX = /^\d{10}$/;
@@ -93,6 +101,20 @@ const statusBadgeClass: Record<StudentStatus, string> = {
   Approved: "bg-primary/20 border border-primary/20 text-primary",
   Rejected: "bg-error/20 border border-error/30 text-error",
   Inactive: "bg-muted/60 border border-border text-muted-foreground",
+};
+
+const toCanonicalStatus = (status: string): StudentStatus => {
+  const normalized = status.toLowerCase();
+  if (normalized === "approved" || normalized === "active") return "Approved";
+  if (normalized === "rejected") return "Rejected";
+  if (normalized === "inactive") return "Inactive";
+  return "Pending";
+};
+
+const getStatusLabel = (status: string) => {
+  const canonical = toCanonicalStatus(status);
+  if (canonical === "Approved") return "Active";
+  return canonical;
 };
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -130,6 +152,7 @@ const StudentManagement = () => {
   const [form, setForm] = useState<StudentForm>(emptyForm);
   const [formErrors, setFormErrors] = useState<StudentFormErrors>({});
   const [roomOptions, setRoomOptions] = useState<string[]>([]);
+  const [loadingRoomOptions, setLoadingRoomOptions] = useState(false);
 
   const canToggleActivity =
     !editing || editing.status === "Approved" || editing.status === "Inactive";
@@ -158,29 +181,37 @@ const StudentManagement = () => {
     fetchStudents();
   }, []);
 
-  useEffect(() => {
-    const loadRooms = async () => {
-      try {
-        const res = await roomService.getAll();
-        const rooms: Array<{ roomNumber?: string }> = Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-            ? res
-            : [];
-        const options: string[] = Array.from(
-          new Set(
-            rooms
-              .map((room) => String(room.roomNumber || "").trim())
-              .filter(Boolean),
-          ),
-        ).sort((left, right) => left.localeCompare(right));
-        setRoomOptions(options);
-      } catch {
-        setRoomOptions([]);
-      }
-    };
+  const loadAvailableRooms = async (selectedRoomNumber?: string) => {
+    setLoadingRoomOptions(true);
+    try {
+      const res = await roomService.getAll();
+      const rooms: RoomOption[] = Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res)
+          ? res
+          : [];
 
-    loadRooms();
+      const availableRooms = rooms
+        .filter((room) => String(room.status || "").trim().toLowerCase() === "available")
+        .map((room) => String(room.roomNumber || "").trim())
+        .filter(Boolean);
+
+      const currentRoom = String(selectedRoomNumber || "").trim();
+      const options = Array.from(
+        new Set(currentRoom ? [currentRoom, ...availableRooms] : availableRooms),
+      ).sort((left, right) => left.localeCompare(right));
+
+      setRoomOptions(options);
+    } catch {
+      const currentRoom = String(selectedRoomNumber || "").trim();
+      setRoomOptions(currentRoom ? [currentRoom] : []);
+    } finally {
+      setLoadingRoomOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAvailableRooms();
   }, []);
 
   useEffect(() => {
@@ -191,10 +222,14 @@ const StudentManagement = () => {
   const stats = useMemo(() => {
     return {
       total: students.length,
-      pending: students.filter((s) => s.status === "Pending").length,
-      approved: students.filter((s) => s.status === "Approved").length,
-      rejected: students.filter((s) => s.status === "Rejected").length,
-      inactive: students.filter((s) => s.status === "Inactive").length,
+      pending: students.filter((s) => toCanonicalStatus(s.status) === "Pending")
+        .length,
+      approved: students.filter((s) => toCanonicalStatus(s.status) === "Approved")
+        .length,
+      rejected: students.filter((s) => toCanonicalStatus(s.status) === "Rejected")
+        .length,
+      inactive: students.filter((s) => toCanonicalStatus(s.status) === "Inactive")
+        .length,
     };
   }, [students]);
 
@@ -205,7 +240,7 @@ const StudentManagement = () => {
     setShowModal(true);
   };
 
-  const openEditModal = (student: StudentRow) => {
+  const openEditModal = async (student: StudentRow) => {
     setEditing(student);
     setForm({
       ...emptyForm,
@@ -219,9 +254,14 @@ const StudentManagement = () => {
       emergencyContact: sanitizePhone(student.emergencyContact || ""),
       roomNumber: student.roomNumber || "",
       status: student.status,
+      feeStatus:
+        String(student.fees || "").trim().toLowerCase() === "paid"
+          ? "Paid"
+          : "Pending",
     });
     setFormErrors({});
     setShowModal(true);
+    await loadAvailableRooms(student.roomNumber || "");
   };
 
   const closeModal = () => {
@@ -265,6 +305,7 @@ const StudentManagement = () => {
         await studentService.update(editing._id, {
           roomNumber: form.roomNumber,
           status: form.status,
+          feeStatus: form.feeStatus,
         });
         showToast("Updated successfully", "success");
       } else {
@@ -283,17 +324,6 @@ const StudentManagement = () => {
       showToast(getErrorMessage(error, "Operation failed"), "error");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const deleteStudent = async (student: StudentRow) => {
-    if (!window.confirm(`Delete ${student.name}?`)) return;
-    try {
-      await studentService.delete(student._id);
-      showToast("Deleted successfully", "success");
-      fetchStudents();
-    } catch (error: unknown) {
-      showToast(getErrorMessage(error, "Delete failed"), "error");
     }
   };
 
@@ -492,20 +522,22 @@ const StudentManagement = () => {
                         </td>
                         <td className="p-3">
                           <span
-                            className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadgeClass[s.status]}`}
+                            className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadgeClass[toCanonicalStatus(s.status)]}`}
                           >
-                            {s.status}
+                            {getStatusLabel(s.status)}
                           </span>
                         </td>
                         <td className="p-3 text-sm text-foreground">
-                          {s.roomNumber || "-"}
+                          {toCanonicalStatus(s.status) === "Inactive"
+                            ? "-"
+                            : s.roomNumber || "-"}
                         </td>
                         <td className="p-3 text-sm text-foreground">
-                          {s.fees || "-"}
+                          {s.fees || "Pending"}
                         </td>
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            {s.status === "Pending" && (
+                            {toCanonicalStatus(s.status) === "Pending" && (
                               <>
                                 <button
                                   type="button"
@@ -541,14 +573,6 @@ const StudentManagement = () => {
                             >
                               <FaEdit /> Edit
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteStudent(s)}
-                              className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-error/20 bg-error/10 text-error"
-                              title="Delete"
-                            >
-                              <FaTrash /> Delete
-                            </button>
                           </div>
                         </td>
                       </tr>
@@ -565,6 +589,7 @@ const StudentManagement = () => {
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
             <form
               onSubmit={submit}
+              autoComplete="off"
               className="bg-card p-6 rounded-2xl border border-border space-y-3 w-full max-w-lg"
             >
               <h2 className="text-lg font-bold">
@@ -593,6 +618,7 @@ const StudentManagement = () => {
                         })
                       }
                       required
+                      autoComplete="off"
                       pattern="[A-Za-z]{2}[0-9]{8}"
                       title="Student ID must start with 2 letters followed by 8 digits"
                       className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
@@ -623,6 +649,7 @@ const StudentManagement = () => {
                         setForm({ ...form, email: e.target.value })
                       }
                       required
+                      autoComplete="off"
                       className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                     />
                     {formErrors.email && (
@@ -683,6 +710,7 @@ const StudentManagement = () => {
                           setForm({ ...form, password: e.target.value })
                         }
                         required
+                        autoComplete="new-password"
                         className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
                       {formErrors.password && (
@@ -700,6 +728,7 @@ const StudentManagement = () => {
                           setForm({ ...form, confirmPassword: e.target.value })
                         }
                         required
+                        autoComplete="new-password"
                         className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
                       />
                       {formErrors.confirmPassword && (
@@ -758,25 +787,54 @@ const StudentManagement = () => {
                   </div>
 
                   <div>
-                    <select
-                      value={form.roomNumber}
-                      onChange={(e) =>
-                        setForm({ ...form, roomNumber: e.target.value })
-                      }
-                      className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
-                    >
-                      <option value="">Select Room</option>
-                      {roomOptions.map((roomNumber: string) => (
-                        <option key={roomNumber} value={roomNumber}>
-                          Room {roomNumber}
-                        </option>
-                      ))}
-                    </select>
-                    {!roomOptions.length && (
+                    {(() => {
+                      const selectedCurrentRoom = String(editing.roomNumber || "").trim();
+                      const selectableRooms =
+                        selectedCurrentRoom && !roomOptions.includes(selectedCurrentRoom)
+                          ? [selectedCurrentRoom, ...roomOptions]
+                          : roomOptions;
+
+                      return (
+                        <select
+                          value={form.roomNumber}
+                          onChange={(e) =>
+                            setForm({ ...form, roomNumber: e.target.value })
+                          }
+                          className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                        >
+                          <option value="">Select Room</option>
+                          {selectableRooms.map((roomNumber: string) => (
+                            <option key={roomNumber} value={roomNumber}>
+                              Room {roomNumber}
+                            </option>
+                          ))}
+                        </select>
+                      );
+                    })()}
+                    {!loadingRoomOptions && !roomOptions.length && (
                       <p className="text-xs text-muted-foreground mt-1">
                         No rooms available right now.
                       </p>
                     )}
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                      Fees
+                    </p>
+                    <select
+                      value={form.feeStatus}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          feeStatus: e.target.value as StudentForm["feeStatus"],
+                        })
+                      }
+                      className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Paid">Paid</option>
+                    </select>
                   </div>
                 </>
               )}
@@ -820,15 +878,24 @@ const StudentManagement = () => {
                   )}
                 </div>
               ) : (
-                <select
-                  value={form.status}
-                  onChange={(e) =>
-                    setForm({ ...form, status: e.target.value as StudentStatus })
-                  }
-                  className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30 appearance-none"
-                >
-                  <option>Pending</option>
-                </select>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Fees
+                  </label>
+                  <select
+                    value={form.feeStatus}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        feeStatus: e.target.value as StudentForm["feeStatus"],
+                      })
+                    }
+                    className="w-full rounded-xl px-3 py-2.5 bg-muted/30 border border-border text-foreground placeholder-subtle focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors hover:border-primary/30 appearance-none"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                  </select>
+                </div>
               )}
 
               <div className="flex justify-end gap-3 pt-4">
@@ -870,10 +937,10 @@ const StudentManagement = () => {
                   </p>
                 </div>
                 <span
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusBadgeClass[viewing.status]}`}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusBadgeClass[toCanonicalStatus(viewing.status)]}`}
                 >
                   <FaCheckCircle className="text-current" />
-                  {viewing.status}
+                  {getStatusLabel(viewing.status)}
                 </span>
               </div>
 
@@ -926,7 +993,9 @@ const StudentManagement = () => {
                   </p>
                   <p>
                     <span className="text-muted-foreground">Room:</span>{" "}
-                    {viewing.roomNumber || "-"}
+                    {toCanonicalStatus(viewing.status) === "Inactive"
+                      ? "-"
+                      : viewing.roomNumber || "-"}
                   </p>
                   <p>
                     <span className="text-muted-foreground">Floor:</span>{" "}

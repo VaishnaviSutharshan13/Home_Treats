@@ -9,10 +9,72 @@ import { logAdminAction } from './adminLogController';
 export const getAllFees = async (req: Request, res: Response) => {
   try {
     const fees = await Fee.find().sort({ createdAt: -1 });
+
+    const now = Date.now();
+    const bulkOps: any[] = [];
+    const normalizedFees = fees.map((fee) => {
+      const feeObject = fee.toObject();
+      const dueTime = new Date(fee.dueDate).getTime();
+      const remaining = Math.max(0, Number(fee.remainingAmount ?? fee.amount));
+
+      let normalizedStatus: "Paid" | "Pending" | "Overdue" | "Partial" = fee.status;
+      if (fee.status === "Paid") {
+        normalizedStatus = "Paid";
+      } else if (fee.status === "Partial" && remaining <= 0) {
+        normalizedStatus = "Paid";
+      } else if (fee.status === "Partial" && remaining > 0) {
+        normalizedStatus = "Partial";
+      } else if (Number.isFinite(dueTime) && dueTime < now) {
+        normalizedStatus = "Overdue";
+      } else {
+        normalizedStatus = "Pending";
+      }
+
+      const normalizedPaymentMethod =
+        normalizedStatus === "Paid" || normalizedStatus === "Partial"
+          ? fee.paymentMethod || null
+          : null;
+
+      const shouldUpdate =
+        normalizedStatus !== fee.status ||
+        normalizedPaymentMethod !== (fee.paymentMethod || null);
+
+      if (shouldUpdate) {
+        const update: Record<string, any> = {
+          status: normalizedStatus,
+          paymentStatus: normalizedStatus,
+        };
+        if (normalizedPaymentMethod) {
+          update.paymentMethod = normalizedPaymentMethod;
+        }
+
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: fee._id },
+            update: {
+              $set: update,
+              ...(normalizedPaymentMethod ? {} : { $unset: { paymentMethod: "" } }),
+            },
+          },
+        });
+      }
+
+      return {
+        ...feeObject,
+        status: normalizedStatus,
+        paymentStatus: normalizedStatus,
+        paymentMethod: normalizedPaymentMethod,
+      };
+    });
+
+    if (bulkOps.length) {
+      await Fee.bulkWrite(bulkOps);
+    }
+
     res.json({
       success: true,
-      count: fees.length,
-      data: fees,
+      count: normalizedFees.length,
+      data: normalizedFees,
     });
   } catch (error: any) {
     res.status(500).json({

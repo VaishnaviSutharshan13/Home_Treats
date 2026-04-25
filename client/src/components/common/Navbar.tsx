@@ -44,16 +44,16 @@ const Navbar = () => {
 
   const dashboardLink = isAdmin
     ? {
-        name: "Dashboard",
-        href: "/admin/dashboard",
-        icon: <FaTachometerAlt className="h-4 w-4" />,
-      }
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: <FaTachometerAlt className="h-4 w-4" />,
+    }
     : isStudent
       ? {
-          name: "Dashboard",
-          href: "/student/dashboard",
-          icon: <FaTachometerAlt className="h-4 w-4" />,
-        }
+        name: "Dashboard",
+        href: "/student/dashboard",
+        icon: <FaTachometerAlt className="h-4 w-4" />,
+      }
       : null;
 
   const linkBase =
@@ -66,11 +66,10 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky inset-x-0 top-0 z-50 isolate border-b border-border bg-navbar/95 backdrop-blur-md transition-shadow duration-300 ${
-        scrolled
-          ? "shadow-md shadow-foreground/10"
-          : "shadow-sm shadow-foreground/5"
-      }`}
+      className={`sticky inset-x-0 top-0 z-50 isolate border-b border-border bg-navbar/95 backdrop-blur-md transition-shadow duration-300 ${scrolled
+        ? "shadow-md shadow-foreground/10"
+        : "shadow-sm shadow-foreground/5"
+        }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link
@@ -201,7 +200,7 @@ const Navbar = () => {
                   className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"
                   onClick={() => setMobileOpen(false)}
                 >
-                   Home
+                  Home
                 </Link>
                 <Link
                   to="/about"
@@ -212,7 +211,7 @@ const Navbar = () => {
                 </Link>
               </>
             )}
-            
+
             <Link
               to="/contact"
               className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-surface-hover text-foreground"

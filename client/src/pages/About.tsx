@@ -126,32 +126,32 @@ const About = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto animate-fade-in">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Your Home Away <span className="text-primary">From Home</span>
-              </h2>
-              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                Home_Treats is a premier student accommodation provider located in the heart of Sri Lanka.
-                Since our establishment, we have been dedicated to offering safe, modern, and affordable
-                living spaces that support students throughout their academic journey.
-              </p>
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                Our hostel combines the warmth of home with world-class amenities, creating an environment
-                where students can focus on their studies while enjoying a vibrant community life. We believe
-                that comfortable living leads to better academic performance.
-              </p>
-              <div className="space-y-3">
-                {[
-                  'Affordable pricing starting from LKR 4,000/month',
-                  'Safe and secure environment with 24/7 staff',
-                  'Modern facilities with regular maintenance',
-                  'Friendly community atmosphere',
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <FaCheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Your Home Away <span className="text-primary">From Home</span>
+            </h2>
+            <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+              Home_Treats is a premier student accommodation provider located in the heart of Sri Lanka.
+              Since our establishment, we have been dedicated to offering safe, modern, and affordable
+              living spaces that support students throughout their academic journey.
+            </p>
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              Our hostel combines the warmth of home with world-class amenities, creating an environment
+              where students can focus on their studies while enjoying a vibrant community life. We believe
+              that comfortable living leads to better academic performance.
+            </p>
+            <div className="space-y-3">
+              {[
+                'Affordable pricing starting from LKR 4,000/month',
+                'Safe and secure environment with 24/7 staff',
+                'Modern facilities with regular maintenance',
+                'Friendly community atmosphere',
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <FaCheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span className="text-muted-foreground">{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
