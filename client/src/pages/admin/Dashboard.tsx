@@ -758,6 +758,7 @@ const Dashboard = () => {
               {[
                 { label: 'Students', link: '/admin/student-management', icon: <FaUsers className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },
                 { label: 'Rooms', link: '/admin/room-management', icon: <FaBed className="w-5 h-5" />, color: 'text-primary bg-primary/10 hover:bg-primary/20 hover:shadow-md' },
+                { label: 'Room Requests', link: '/admin/room-requests', icon: <FaBed className="w-5 h-5" />, color: 'text-info bg-info/10 hover:bg-info/20 hover:shadow-md' },
                 { label: 'Fees', link: '/admin/fees-management', icon: <FaMoneyBillWave className="w-5 h-5" />, color: 'text-secondary bg-secondary/100/10 hover:bg-secondary/100/20 hover:shadow-md' },
                 { label: 'Complaints', link: '/admin/complaint-management', icon: <FaExclamationTriangle className="w-5 h-5" />, color: 'text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 hover:shadow-md' },
               ].map((action, idx) => (

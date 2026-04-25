@@ -43,6 +43,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
       href: "/admin/room-management",
     },
     {
+      title: "Room Requests",
+      icon: <FaBed className="h-5 w-5" />,
+      href: "/admin/room-requests",
+    },
+    {
       title: "Fees",
       icon: <FaDollarSign className="h-5 w-5" />,
       href: "/admin/fees-management",
@@ -99,7 +104,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, userRole }) => {
 
   const menuItems = userRole === "admin" ? adminMenuItems : studentMenuItems;
 
-  const isActiveLink = (href: string) => location.pathname.startsWith(href);
+  const isActiveLink = (href: string) =>
+    location.pathname === href || location.pathname.startsWith(`${href}/`);
 
   const handleLogout = () => {
     logout();

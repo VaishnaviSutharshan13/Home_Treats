@@ -28,7 +28,9 @@ const Login = () => {
     if (isAuthenticated) {
       const from = location.state?.redirectTo || location.state?.from;
       if (from) {
-        navigate(from, { replace: true });
+        const targetPath = typeof from === 'string' ? from : from.pathname || '/';
+        const room = location.state?.room;
+        navigate(targetPath, { replace: true, state: room ? { room } : undefined });
         return;
       }
 

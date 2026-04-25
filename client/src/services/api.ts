@@ -26,7 +26,12 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       const path = window.location.pathname || '';
-      if (!path.startsWith('/login') && !path.startsWith('/register')) {
+
+      // Allow guests to browse room discovery flow without being forced to login.
+      const publicBrowsePaths = ['/rooms', '/floor/'];
+      const isPublicBrowsePath = publicBrowsePaths.some((prefix) => path.startsWith(prefix));
+
+      if (!isPublicBrowsePath && !path.startsWith('/login') && !path.startsWith('/register')) {
         window.location.href = '/login';
       }
     }
